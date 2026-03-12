@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* ── Indian Government Portal Theme ── */
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* Tricolor top stripe */
+.gov-stripe {
+  height: 4px;
+  background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+}
+
+/* Government header */
+.gov-header {
+  background: linear-gradient(180deg, #1a365d 0%, #1e3a5f 100%);
+  color: #ffffff;
+}
+
+/* Section card */
+.gov-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* Section header bar (blue stripe on top of card) */
+.gov-card-header {
+  background: #1a365d;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 6px 6px 0 0;
+}
+
+/* AQI color bands (CPCB standard) */
+.aqi-good       { background: #009966; color: #fff; }
+.aqi-satisfactory { background: #58bc2d; color: #fff; }
+.aqi-moderate   { background: #CABC0B; color: #333; }
+.aqi-poor       { background: #FF9933; color: #333; }
+.aqi-very-poor  { background: #CC0033; color: #fff; }
+.aqi-severe     { background: #660000; color: #fff; }
+
+/* Government table */
+.gov-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.gov-table th {
+  background: #edf2f7;
+  color: #2d3748;
+  text-align: left;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid #cbd5e0;
+}
+.gov-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+.gov-table tbody tr:hover { background: #f7fafc; }
+
+/* Status badges */
+.badge-critical { background: #fed7d7; color: #c53030; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-high     { background: #feebc8; color: #c05621; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-medium   { background: #fefcbf; color: #975a16; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-low      { background: #c6f6d5; color: #276749; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+
+/* Government footer */
+.gov-footer {
+  background: #1a365d;
+  color: #a0aec0;
+  font-size: 12px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f0f4f8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
