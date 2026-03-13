@@ -4,10 +4,11 @@ from uuid import UUID
 from app.core.database import get_db
 from app.core.dependencies import get_current_user_optional, role_required
 from app.models.core import LocationType, MonitoringLocation
+from app.models.monitoring import SensorReading
 from app.models.users import UserRole
 from app.schemas.core import MonitoringLocationCreate, MonitoringLocationResponse
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/locations", tags=["Locations"])
@@ -38,7 +39,10 @@ async def get_locations(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user_optional),
 ):
-    query = select(MonitoringLocation).where(MonitoringLocation.is_active == True)
+    query = select(MonitoringLocation).where(
+        MonitoringLocation.is_active == True,
+        exists(select(1).where(SensorReading.location_id == MonitoringLocation.id)),
+    )
 
     if type:
         try:
