@@ -5,12 +5,11 @@ import json
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import settings
 from app.models.core import MonitoringLocation, MonitoringUnit
@@ -55,22 +54,30 @@ async def get_locations(session: AsyncSession) -> list[LocationInfo]:
     result = await session.execute(select(MonitoringLocation))
     locations = []
     for idx, loc in enumerate(result.scalars().all()):
-        parsed = parse_coordinates(loc.location)
-        if not parsed and loc.name == "Central Station":
+        loc_name = str(cast(Any, loc).name)
+        parsed = parse_coordinates(cast(str | None, cast(Any, loc).location))
+        if not parsed and loc_name == "Central Station":
             parsed = (21.2514, 81.6296)
-        if not parsed and loc.name == "Bharat Steel":
+        if not parsed and loc_name == "Bharat Steel":
             parsed = (21.2315, 81.6521)
         if not parsed:
             parsed = (21.20 + (idx * 0.01), 81.55 + (idx * 0.008))
         if not parsed:
             continue
-        locations.append(LocationInfo(id=str(loc.id), name=loc.name, latitude=parsed[0], longitude=parsed[1]))
+        locations.append(
+            LocationInfo(
+                id=str(cast(Any, loc).id),
+                name=loc_name,
+                latitude=parsed[0],
+                longitude=parsed[1],
+            )
+        )
     return locations
 
 
 async def get_parameter_ids(session: AsyncSession) -> dict[str, str]:
     result = await session.execute(select(MonitoringUnit))
-    by_param = {u.parameter: str(u.id) for u in result.scalars().all()}
+    by_param = {str(cast(Any, u).parameter): str(cast(Any, u).id) for u in result.scalars().all()}
     missing = [p for p in POLLUTANT_MAP if p not in by_param]
     if missing:
         raise RuntimeError(f"Missing monitoring units in DB: {', '.join(missing)}")
@@ -162,7 +169,7 @@ async def import_rows_to_db(
 
 async def generate(days: int, import_db: bool, replace_range: bool) -> None:
     engine = create_async_engine(settings.DATABASE_URL, echo=False)
-    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     end_day = date.today()
     start_day = end_day - timedelta(days=days)

@@ -2,7 +2,7 @@ fastapi==0.104.1
 uvicorn==0.24.0.post1
 sqlalchemy==2.0.23
 asyncpg==0.29.0
-psycopg2-binary==2.9.9
+# psycopg2-binary removed: app uses asyncpg at runtime; install manually if you need Alembic CLI
 alembic==1.12.1
 pydantic==2.5.2
 pydantic-settings==2.1.0
@@ -16,3 +16,5 @@ pandas==2.1.3
 openai==1.3.5
 reportlab==4.0.7
 httpx==0.25.2
+pytest==8.3.5
+pytest-asyncio==0.26.0

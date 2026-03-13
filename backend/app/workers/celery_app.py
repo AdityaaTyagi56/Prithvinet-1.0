@@ -28,10 +28,10 @@ celery_app.conf.beat_schedule = {
     },
     "check-missing-reports-daily": {
         "task": "app.workers.tasks.check_missing_reports",
-        "schedule": crontab(hour=9, minute=0),
+        "schedule": crontab(hour="9", minute="0"),
     },
     "refresh-all-forecasts-every-6-hours": {
         "task": "app.workers.tasks.refresh_all_forecasts",
-        "schedule": crontab(minute=0, hour="*/6"),
+        "schedule": crontab(minute="0", hour="*/6"),
     },
 }

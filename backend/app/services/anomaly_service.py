@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Any, cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from app.models.monitoring import SensorReading
@@ -22,7 +23,7 @@ async def check_anomaly_streaming(reading: SensorReading, db: AsyncSession):
         if std > 0 and count > 10:
             z_score = abs((reading.value - mean) / std)
             if z_score > 3: # 3 sigma rule
-                reading.quality_flag = "anomaly"
+                cast(Any, reading).quality_flag = "anomaly"
                 # Fire alert
                 # We need to get industry_id and region_id. For simplicity, we can fetch location
                 loc_query = text("SELECT industry_id, region_id FROM monitoring_locations WHERE id = :loc_id")
@@ -31,7 +32,7 @@ async def check_anomaly_streaming(reading: SensorReading, db: AsyncSession):
                 if loc_row:
                     await create_alert(
                         db=db,
-                        alert_type=AlertType.anomaly_detected,
+                        alert_type=AlertType.anomaly,
                         location_id=reading.location_id,
                         industry_id=loc_row[0],
                         parameter_id=reading.parameter_id,

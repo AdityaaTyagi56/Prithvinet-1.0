@@ -1,11 +1,13 @@
-import pandas as pd
-from prophet import Prophet
-import holidays
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
-from app.core.redis import redis_client
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
+
+import holidays  # noqa: F401
+import pandas as pd
+from app.core.redis import redis_client
+from prophet import Prophet
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 async def get_historical_data(db: AsyncSession, location_id: str, parameter_id: str):
     query = text("""
@@ -18,11 +20,14 @@ async def get_historical_data(db: AsyncSession, location_id: str, parameter_id: 
     rows = result.fetchall()
     if not rows:
         return pd.DataFrame()
-    df = pd.DataFrame(rows, columns=['ds', 'y'])
-    df['ds'] = pd.to_datetime(df['ds']).dt.tz_localize(None)
+    df = pd.DataFrame(rows, columns=["ds", "y"])
+    df["ds"] = pd.to_datetime(df["ds"]).dt.tz_localize(None)
     return df
 
-async def generate_forecast(db: AsyncSession, location_id: str, parameter_id: str, hours: int = 72):
+
+async def generate_forecast(
+    db: AsyncSession, location_id: str, parameter_id: str, hours: int = 72
+):
     cache_key = f"forecast:{location_id}:{parameter_id}"
     cached = await redis_client.get(cache_key)
     if cached:
@@ -32,27 +37,33 @@ async def generate_forecast(db: AsyncSession, location_id: str, parameter_id: st
     if len(df) < 24:
         return []
 
-    m = Prophet(yearly_seasonality=False, weekly_seasonality=True, daily_seasonality=True)
-    m.add_country_holidays(country_name='IN')
+    m = Prophet(
+        yearly_seasonality=False,  # type: ignore[arg-type]
+        weekly_seasonality=True,  # type: ignore[arg-type]
+        daily_seasonality=True,  # type: ignore[arg-type]
+    )
+    m.add_country_holidays(country_name="IN")
     m.fit(df)
 
-    future = m.make_future_dataframe(periods=hours, freq='H')
+    future = m.make_future_dataframe(periods=hours, freq="H")
     forecast = m.predict(future)
 
-    last_ds = df['ds'].max()
-    future_forecast = forecast[forecast['ds'] > last_ds].head(hours)
+    last_ds = df["ds"].max()
+    future_forecast = forecast[forecast["ds"] > last_ds].head(hours)
 
     result = []
     for _, row in future_forecast.iterrows():
-        result.append({
-            "timestamp": row['ds'].isoformat() + "Z",
-            "point": round(row['yhat'], 2),
-            "lower": round(row['yhat_lower'], 2),
-            "upper": round(row['yhat_upper'], 2)
-        })
+        result.append(
+            {
+                "timestamp": str(row["ds"].isoformat()) + "Z",  # type: ignore[union-attr]
+                "point": round(float(row["yhat"]), 2),
+                "lower": round(float(row["yhat_lower"]), 2),
+                "upper": round(float(row["yhat_upper"]), 2),
+            }
+        )
 
     await redis_client.setex(cache_key, 3600, json.dumps(result))
-    
+
     # Store latest forecast snapshot in forecasts table.
     try:
         query = text("""
@@ -81,20 +92,29 @@ async def generate_forecast(db: AsyncSession, location_id: str, parameter_id: st
             );
         """)
 
-        point_forecast = [{"timestamp": p["timestamp"], "value": p["point"]} for p in result]
-        lower_bound = [{"timestamp": p["timestamp"], "value": p["lower"]} for p in result]
-        upper_bound = [{"timestamp": p["timestamp"], "value": p["upper"]} for p in result]
+        point_forecast = [
+            {"timestamp": p["timestamp"], "value": p["point"]} for p in result
+        ]
+        lower_bound = [
+            {"timestamp": p["timestamp"], "value": p["lower"]} for p in result
+        ]
+        upper_bound = [
+            {"timestamp": p["timestamp"], "value": p["upper"]} for p in result
+        ]
 
-        await db.execute(query, {
-            "loc_id": location_id,
-            "param_id": parameter_id,
-            "hours": hours,
-            "point_forecast": json.dumps(point_forecast),
-            "lower_bound": json.dumps(lower_bound),
-            "upper_bound": json.dumps(upper_bound),
-            "model_version": "prophet-v1",
-            "created_at": datetime.utcnow()
-        })
+        await db.execute(
+            query,
+            {
+                "loc_id": location_id,
+                "param_id": parameter_id,
+                "hours": hours,
+                "point_forecast": json.dumps(point_forecast),
+                "lower_bound": json.dumps(lower_bound),
+                "upper_bound": json.dumps(upper_bound),
+                "model_version": "prophet-v1",
+                "created_at": datetime.utcnow(),
+            },
+        )
         await db.commit()
     except Exception as e:
         print(f"Failed to store forecast in DB: {e}")

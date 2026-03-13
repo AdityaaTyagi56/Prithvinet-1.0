@@ -161,10 +161,46 @@ export function UnifiedDashboard() {
             <div>
               <h4 className="text-white font-semibold text-sm mb-2">Important Links</h4>
               <ul className="text-xs space-y-1">
-                <li><span className="text-blue-300 hover:underline cursor-pointer">Central Pollution Control Board (CPCB)</span></li>
-                <li><span className="text-blue-300 hover:underline cursor-pointer">National Clean Air Programme (NCAP)</span></li>
-                <li><span className="text-blue-300 hover:underline cursor-pointer">Air Quality Index Dashboard</span></li>
-                <li><span className="text-blue-300 hover:underline cursor-pointer">Right to Information (RTI)</span></li>
+                <li>
+                  <a
+                    href="https://cpcb.nic.in/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-300 hover:underline"
+                  >
+                    Central Pollution Control Board (CPCB)
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://moef.gov.in/en/division/air-quality-management/national-clean-air-programme/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-300 hover:underline"
+                  >
+                    National Clean Air Programme (NCAP)
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://app.cpcbccr.com/AQI_India/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-300 hover:underline"
+                  >
+                    Air Quality Index Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://rtionline.gov.in/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-300 hover:underline"
+                  >
+                    Right to Information (RTI)
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
@@ -178,7 +214,7 @@ export function UnifiedDashboard() {
           </div>
           <div className="border-t border-white/10 mt-5 pt-4 flex flex-col sm:flex-row justify-between items-center text-[11px] text-gray-500">
             <div>© {new Date().getFullYear()} Chhattisgarh Environment Conservation Board. All Rights Reserved.</div>
-            <div>Designed & Developed by National Informatics Centre (NIC) | Content owned by CECB, Govt. of Chhattisgarh</div>
+            <div>Content owned by CECB, Govt. of Chhattisgarh</div>
           </div>
         </div>
       </footer>

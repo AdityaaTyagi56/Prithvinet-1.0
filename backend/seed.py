@@ -1,56 +1,83 @@
 import asyncio
 import random
 from datetime import datetime, timedelta
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
+
 from app.core.config import settings
 from app.core.security import get_password_hash
 from app.models.base import Base
-from app.models.users import User, UserRole
-from app.models.core import RegionalOffice, Industry, IndustryStatus, MonitoringLocation, LocationType, MonitoringUnit, PrescribedLimit, LimitType
+from app.models.core import (
+    Industry,
+    IndustryStatus,
+    LimitType,
+    LocationType,
+    MonitoringLocation,
+    MonitoringUnit,
+    PrescribedLimit,
+    RegionalOffice,
+)
 from app.models.monitoring import SensorReading, SourceType
+from app.models.users import User, UserRole
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 
 async def seed_db():
     engine = create_async_engine(settings.DATABASE_URL, echo=False)
-    AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
+    AsyncSessionLocal = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+
     async with engine.begin() as conn:
-        # Create all tables
+        # Create all tables only (portable PostgreSQL setup, no TimescaleDB calls)
         await conn.run_sync(Base.metadata.create_all)
-        
-        # Setup TimescaleDB
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS timescaledb;"))
-        
+
+        # Helpful index for latest/value range lookups
         try:
-            await conn.execute(text("SELECT create_hypertable('sensor_readings', 'recorded_at', if_not_exists => TRUE);"))
-        except Exception as e:
-            print(f"Hypertable creation error (might already exist): {e}")
-            
-        try:
-            await conn.execute(text("SELECT add_compression_policy('sensor_readings', INTERVAL '7 days');"))
+            await conn.execute(
+                text(
+                    """
+                    CREATE INDEX IF NOT EXISTS idx_sensor_readings_loc_param_time
+                    ON sensor_readings (location_id, parameter_id, recorded_at DESC);
+                    """
+                )
+            )
         except Exception:
             pass
-            
+
+        # Optional materialized hourly aggregate using standard PostgreSQL
         try:
-            await conn.execute(text("""
-            CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_readings WITH (timescaledb.continuous) AS
-            SELECT time_bucket('1 hour', recorded_at) AS hour,
-            location_id, parameter_id, AVG(value) as avg_value, MAX(value) as max_value, MIN(value) as min_value
-            FROM sensor_readings GROUP BY 1, 2, 3;
-            """))
-        except Exception as e:
-            print(f"Continuous aggregate error: {e}")
-            
-        try:
-            await conn.execute(text("CREATE INDEX IF NOT EXISTS idx_sensor_readings_loc_param_time ON sensor_readings (location_id, parameter_id, recorded_at DESC);"))
+            await conn.execute(
+                text(
+                    """
+                    CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_readings AS
+                    SELECT
+                        date_trunc('hour', recorded_at) AS hour,
+                        location_id,
+                        parameter_id,
+                        AVG(value) AS avg_value,
+                        MAX(value) AS max_value,
+                        MIN(value) AS min_value
+                    FROM sensor_readings
+                    GROUP BY 1, 2, 3
+                    WITH NO DATA;
+                    """
+                )
+            )
+            await conn.execute(
+                text(
+                    """
+                    CREATE INDEX IF NOT EXISTS idx_hourly_readings_loc_param_hour
+                    ON hourly_readings (location_id, parameter_id, hour DESC);
+                    """
+                )
+            )
         except Exception:
             pass
 
     async with AsyncSessionLocal() as session:
         # Check if already seeded
         result = await session.execute(text("SELECT count(*) FROM industries"))
-        if result.scalar() > 0:
+        if (result.scalar() or 0) > 0:
             print("Database already seeded.")
             return
 
@@ -69,19 +96,57 @@ async def seed_db():
         session.add(admin_user)
 
         # 2. Create Monitoring Units & Limits
-        pm25 = MonitoringUnit(parameter="PM2.5", unit="ug/m3", description="Particulate Matter < 2.5 microns")
-        so2 = MonitoringUnit(parameter="SO2", unit="ug/m3", description="Sulfur Dioxide")
-        no2 = MonitoringUnit(parameter="NO2", unit="ug/m3", description="Nitrogen Dioxide")
+        pm25 = MonitoringUnit(
+            parameter="PM2.5",
+            unit="ug/m3",
+            description="Particulate Matter < 2.5 microns",
+        )
+        so2 = MonitoringUnit(
+            parameter="SO2", unit="ug/m3", description="Sulfur Dioxide"
+        )
+        no2 = MonitoringUnit(
+            parameter="NO2", unit="ug/m3", description="Nitrogen Dioxide"
+        )
         session.add_all([pm25, so2, no2])
         await session.flush()
 
         limits = [
-            PrescribedLimit(parameter_id=pm25.id, industry_type="Steel", limit_value=150.0, limit_type=LimitType.max),
-            PrescribedLimit(parameter_id=so2.id, industry_type="Steel", limit_value=80.0, limit_type=LimitType.max),
-            PrescribedLimit(parameter_id=no2.id, industry_type="Steel", limit_value=80.0, limit_type=LimitType.max),
-            PrescribedLimit(parameter_id=pm25.id, industry_type="Cement", limit_value=100.0, limit_type=LimitType.max),
-            PrescribedLimit(parameter_id=so2.id, industry_type="Cement", limit_value=50.0, limit_type=LimitType.max),
-            PrescribedLimit(parameter_id=no2.id, industry_type="Cement", limit_value=50.0, limit_type=LimitType.max),
+            PrescribedLimit(
+                parameter_id=pm25.id,
+                industry_type="Steel",
+                limit_value=150.0,
+                limit_type=LimitType.max,
+            ),
+            PrescribedLimit(
+                parameter_id=so2.id,
+                industry_type="Steel",
+                limit_value=80.0,
+                limit_type=LimitType.max,
+            ),
+            PrescribedLimit(
+                parameter_id=no2.id,
+                industry_type="Steel",
+                limit_value=80.0,
+                limit_type=LimitType.max,
+            ),
+            PrescribedLimit(
+                parameter_id=pm25.id,
+                industry_type="Cement",
+                limit_value=100.0,
+                limit_type=LimitType.max,
+            ),
+            PrescribedLimit(
+                parameter_id=so2.id,
+                industry_type="Cement",
+                limit_value=50.0,
+                limit_type=LimitType.max,
+            ),
+            PrescribedLimit(
+                parameter_id=no2.id,
+                industry_type="Cement",
+                limit_value=50.0,
+                limit_type=LimitType.max,
+            ),
         ]
         session.add_all(limits)
 
@@ -101,7 +166,7 @@ async def seed_db():
                 Industry(
                     name=f"{ind_type} Plant {i}",
                     type=ind_type,
-                    registration_no=f"REG-{ind_type[:3].upper()}-{1000+i}",
+                    registration_no=f"REG-{ind_type[:3].upper()}-{1000 + i}",
                     region_office_id=ro.id,
                     status=IndustryStatus.active,
                 )
@@ -143,38 +208,39 @@ async def seed_db():
         await session.flush()
 
         # 5. Generate 90 days of readings (hourly to save time/space for seed)
-        # In real scenario it's every 30s, but for 90 days * 25 locs * 3 params * 2880 = 19M rows.
-        # We'll seed hourly data for the past 90 days to populate the continuous aggregate.
         print("Generating 90 days of hourly readings...")
         now = datetime.utcnow()
         start_date = now - timedelta(days=90)
-        
+
         readings = []
         for loc in locations:
             for param, base_val in [(pm25, 80), (so2, 40), (no2, 40)]:
                 current_time = start_date
                 while current_time < now:
                     val = random.gauss(base_val, base_val * 0.2)
-                    readings.append(SensorReading(
-                        location_id=loc.id,
-                        parameter_id=param.id,
-                        value=round(max(0, val), 2),
-                        unit_id=param.id,
-                        recorded_at=current_time,
-                        source=SourceType.iot
-                    ))
+                    readings.append(
+                        SensorReading(
+                            location_id=loc.id,
+                            parameter_id=param.id,
+                            value=round(max(0, val), 2),
+                            unit_id=param.id,
+                            recorded_at=current_time,
+                            source=SourceType.iot,
+                        )
+                    )
                     current_time += timedelta(hours=1)
-                    
+
                     if len(readings) >= 10000:
                         session.add_all(readings)
                         await session.flush()
                         readings = []
-                        
+
         if readings:
             session.add_all(readings)
-            
+
         await session.commit()
-        print("Database seeded and TimescaleDB configured successfully.")
+        print("Database seeded successfully.")
+
 
 if __name__ == "__main__":
     asyncio.run(seed_db())

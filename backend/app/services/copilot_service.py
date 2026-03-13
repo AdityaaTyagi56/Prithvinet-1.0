@@ -1,8 +1,9 @@
 import json
 import asyncio
-from typing import Any
+from typing import Any, cast
 
 from openai import AsyncOpenAI
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 from sqlalchemy import text
 
 from app.core.config import settings
@@ -29,7 +30,7 @@ SYSTEM_PROMPT = (
 )
 
 
-TOOLS = [
+TOOLS: list[ChatCompletionToolParam] = [
     {
         "type": "function",
         "function": {
@@ -416,7 +417,11 @@ async def stream_copilot_response(session_id: str, query: str):
     model = settings.OPENAI_MODEL or "gpt-4o-mini"
 
     # Persist only user/assistant text in redis history, but use tool messages inside this request.
-    messages: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}, *history, user_message]
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        *history,
+        user_message,
+    ]
 
     final_text = ""
     max_tool_rounds = 5
@@ -425,8 +430,8 @@ async def stream_copilot_response(session_id: str, query: str):
         for _ in range(max_tool_rounds):
             response = await client.chat.completions.create(
                 model=model,
-                messages=messages,
-                tools=TOOLS,
+                messages=cast(list[ChatCompletionMessageParam], messages),
+                tools=cast(list[ChatCompletionToolParam], TOOLS),
                 tool_choice="auto",
                 temperature=0.2,
             )

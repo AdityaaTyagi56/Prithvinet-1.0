@@ -1,19 +1,20 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useAuthStore } from './store/authStore';
-import { api } from './lib/api';
-import { LoginPage } from './pages/auth/LoginPage';
-import { DashboardPage } from './pages/dashboard/DashboardPage';
-import { ForecastPage } from './pages/officer/ForecastPage';
-import { PublicPortal } from './pages/public/PublicPortal';
-import { ComplianceDashboard } from './pages/admin/ComplianceDashboard';
-import { UnifiedDashboard } from './pages/dashboard/UnifiedDashboard';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "./store/authStore";
+import { api } from "./lib/api";
+import { LoginPage } from "./pages/auth/LoginPage";
+import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { ForecastPage } from "./pages/officer/ForecastPage";
+import { PublicPortal } from "./pages/public/PublicPortal";
+import { ComplianceDashboard } from "./pages/admin/ComplianceDashboard";
+import { UnifiedDashboard } from "./pages/dashboard/UnifiedDashboard";
 
-type AllowedRole = 'admin' | 'regulator' | string;
+type AllowedRole = "admin" | "regulator" | string;
 
 function normalizeRole(role: string): string {
-  if (role === 'super_admin') return 'admin';
-  if (role === 'regional_officer') return 'regulator';
+  if (role === "super_admin") return "admin";
+  if (role === "regional_officer") return "regulator";
   return role;
 }
 
@@ -24,8 +25,8 @@ function ProtectedRoute({
   children: React.ReactNode;
   allowedRoles?: AllowedRole[];
 }) {
-  const user = useAuthStore(state => state.user);
-  const accessToken = useAuthStore(state => state.accessToken);
+  const user = useAuthStore((state) => state.user);
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   const isAuthenticated = Boolean(user || accessToken);
 
@@ -48,10 +49,10 @@ function ProtectedRoute({
 }
 
 export default function App() {
-  const user = useAuthStore(state => state.user);
-  const accessToken = useAuthStore(state => state.accessToken);
-  const setAuth = useAuthStore(state => state.setAuth);
-  const logout = useAuthStore(state => state.logout);
+  const user = useAuthStore((state) => state.user);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const logout = useAuthStore((state) => state.logout);
 
   const [isHydratingAuth, setIsHydratingAuth] = useState(true);
 
@@ -69,7 +70,7 @@ export default function App() {
       }
 
       try {
-        const userRes = await api.get('/auth/me', {
+        const userRes = await api.get("/auth/me", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setAuth(userRes.data, accessToken);
@@ -100,20 +101,35 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LoginPage />
+            )
+          }
+        />
         <Route path="/public" element={<PublicPortal pollutionType="air" />} />
-        <Route 
-          path="/dashboard/*" 
+        <Route
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               <UnifiedDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         {/* Legacy routes redirect to dashboard */}
-        <Route path="/forecast" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/compliance" element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/forecast"
+          element={<Navigate to="/dashboard" replace />}
+        />
+        <Route
+          path="/compliance"
+          element={<Navigate to="/dashboard" replace />}
+        />
         <Route path="/copilot" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
