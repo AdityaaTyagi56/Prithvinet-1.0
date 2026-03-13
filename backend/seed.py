@@ -111,7 +111,7 @@ async def seed_db():
         session.add_all(industries)
         await session.flush()
 
-        # 4. Create monitoring locations including requested named locations
+        # 4. Create real monitoring locations only (no synthetic Stack placeholders)
         locations = [
             MonitoringLocation(
                 name="Central Station",
@@ -129,18 +129,6 @@ async def seed_db():
                 iot_device_id="iot_002",
             ),
         ]
-        for i in range(3, 26):
-            ind = industries[(i - 1) % len(industries)]
-            locations.append(
-                MonitoringLocation(
-                    name=f"Stack {i} - {ind.name}",
-                    location=f"{21.20 + (i * 0.01):.4f},{81.55 + (i * 0.008):.4f}",
-                    type=LocationType.air,
-                    industry_id=ind.id,
-                    region_id=ro.id,
-                    iot_device_id=f"iot_{i:03d}",
-                )
-            )
         session.add_all(locations)
         await session.flush()
 

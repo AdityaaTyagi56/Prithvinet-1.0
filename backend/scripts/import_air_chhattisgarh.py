@@ -120,6 +120,7 @@ async def _fetch_air_stations(session: AsyncSession) -> tuple[List[MonitoringSta
             SELECT id, name, COALESCE(location, '') AS location
             FROM monitoring_locations
             WHERE type = 'air' AND is_active = TRUE
+              AND name NOT ILIKE 'Stack %'
             ORDER BY created_at ASC
             """
         )
@@ -418,6 +419,14 @@ async def run_import() -> None:
             logging.info("Station %s (%s): %d rows", station_names.get(station_id, "unknown"), station_id, count)
 
     await engine.dispose()
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(run_import())
+    except Exception as exc:
+        logging.exception("Air import failed: %s", exc)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

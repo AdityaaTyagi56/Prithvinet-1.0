@@ -42,6 +42,7 @@ async def get_locations(
     query = select(MonitoringLocation).where(
         MonitoringLocation.is_active == True,
         exists(select(1).where(SensorReading.location_id == MonitoringLocation.id)),
+        ~MonitoringLocation.name.ilike("Stack %"),
     )
 
     if type:

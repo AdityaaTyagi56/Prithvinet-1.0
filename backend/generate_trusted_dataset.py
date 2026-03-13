@@ -55,6 +55,8 @@ async def get_locations(session: AsyncSession) -> list[LocationInfo]:
     result = await session.execute(select(MonitoringLocation))
     locations = []
     for idx, loc in enumerate(result.scalars().all()):
+        if (loc.name or "").strip().lower().startswith("stack "):
+            continue
         parsed = parse_coordinates(loc.location)
         if not parsed and loc.name == "Central Station":
             parsed = (21.2514, 81.6296)

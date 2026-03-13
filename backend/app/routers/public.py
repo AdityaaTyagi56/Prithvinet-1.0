@@ -55,6 +55,7 @@ async def get_public_overview(db: AsyncSession = Depends(get_db)):
                 JOIN monitoring_units mu ON mu.id = sr.parameter_id
                 JOIN monitoring_locations ml ON ml.id = sr.location_id
                 WHERE mu.parameter = 'PM2.5'
+                                    AND ml.name NOT ILIKE 'Stack %'
                 ORDER BY sr.location_id, sr.recorded_at DESC
                 """
             )

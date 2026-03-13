@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import logging
 import os
+import re
 import sys
 import uuid
 from dataclasses import dataclass
@@ -18,19 +19,48 @@ from sqlalchemy.orm import sessionmaker
 
 
 GOV_URL = "https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69"
-OWM_URL = "http://api.openweathermap.org/data/2.5/air_pollution"
 
 POLLUTANT_PARAM_MAP = {
-    "PM10": "PM10",
-    "PM2.5": "PM2.5",
-    "SO2": "SO2",
-    "NO2": "NO2",
+    "PM10": ["pm10", "pm_10", "rspfpm10", "respirable_particulate_matter"],
+    "PM2.5": ["pm2_5", "pm2.5", "pm25", "pm_2_5", "fine_particulate_matter"],
+    "SO2": ["so2", "sulphur_dioxide", "sulfur_dioxide"],
+    "NO2": ["no2", "nitrogen_dioxide"],
 }
 
-CITY_COORDS = {
-    "raipur": (21.2514, 81.6296),
-    "bhilai": (21.1938, 81.3509),
-    "korba": (22.3595, 82.7501),
+DISTRICT_COORDS = {
+    "balod": (20.73, 81.20),
+    "baloda bazar": (21.65, 82.16),
+    "balrampur": (23.60, 83.61),
+    "bastar": (19.11, 81.95),
+    "bemetara": (21.71, 81.54),
+    "bijapur": (18.84, 80.92),
+    "bilaspur": (22.08, 82.14),
+    "dantewada": (18.90, 81.35),
+    "dhamtari": (20.71, 81.55),
+    "durg": (21.19, 81.28),
+    "gariaband": (20.63, 82.06),
+    "gaurela pendra marwahi": (22.89, 81.90),
+    "janjgir champa": (22.02, 82.58),
+    "jashpur": (22.88, 84.14),
+    "kabirdham": (22.01, 81.25),
+    "kanker": (20.27, 81.49),
+    "khairagarh chhuikhadan gandai": (21.42, 81.33),
+    "kondagaon": (19.59, 81.66),
+    "korba": (22.36, 82.75),
+    "koriya": (23.26, 82.56),
+    "mahasamund": (21.11, 82.10),
+    "manendragarh chirmiri bharatpur": (23.25, 82.35),
+    "mohla manpur ambagarh chowki": (20.88, 80.74),
+    "mungeli": (22.07, 81.69),
+    "narayanpur": (19.72, 81.25),
+    "raigarh": (21.90, 83.40),
+    "raipur": (21.25, 81.63),
+    "rajnandgaon": (21.10, 81.03),
+    "sakti": (22.02, 82.96),
+    "sarangarh bilaigarh": (21.59, 83.08),
+    "sukma": (18.39, 81.66),
+    "surajpur": (23.22, 82.86),
+    "surguja": (23.12, 83.20),
 }
 
 
@@ -52,7 +82,7 @@ def _configure_logging() -> None:
     )
 
 
-def _load_env() -> Tuple[str, str, Optional[str]]:
+def _load_env() -> Tuple[str, str]:
     here = Path(__file__).resolve()
     backend_root = here.parents[1]
     project_root = backend_root.parent
@@ -63,14 +93,12 @@ def _load_env() -> Tuple[str, str, Optional[str]]:
 
     database_url = os.getenv("DATABASE_URL")
     govapi_key = os.getenv("GOVAPI_KEY")
-    owm_key = os.getenv("OWM_KEY")
-
     if not database_url:
         raise SyncError("DATABASE_URL is missing")
     if not govapi_key:
         raise SyncError("GOVAPI_KEY is missing")
 
-    return database_url, govapi_key, owm_key
+    return database_url, govapi_key
 
 
 async def _load_stations_and_params(
@@ -92,52 +120,66 @@ async def _load_stations_and_params(
     params_result = await session.execute(text("SELECT id, parameter FROM monitoring_units"))
     params = {(row[1] or "").strip().upper(): row[0] for row in params_result.fetchall()}
 
-    missing = [v for v in POLLUTANT_PARAM_MAP.values() if v.upper() not in params]
+    required = ["PM10", "PM2.5", "SO2", "NO2"]
+    missing = [v for v in required if v.upper() not in params]
     if missing:
         raise SyncError(f"Missing monitoring parameters: {', '.join(missing)}")
 
-    resolved_params = {k: params[v.upper()] for k, v in POLLUTANT_PARAM_MAP.items()}
+    resolved_params = {k: params[k.upper()] for k in required}
     return stations, resolved_params
 
 
-def _station_match(stations: List[Station], text_blob: str) -> Optional[uuid.UUID]:
-    blob = text_blob.lower()
+def _norm(text_value: str) -> str:
+    return re.sub(r"\s+", " ", (text_value or "").strip().lower())
 
-    def first_match(*keywords: str) -> Optional[uuid.UUID]:
-        for s in stations:
-            hay = f"{s.name} {s.location}".lower()
-            if all(k in hay for k in keywords):
-                return s.id
-        return None
 
-    if "raipur" in blob and "industrial" in blob:
-        hit = first_match("raipur", "industrial")
-        if hit:
-            return hit
+def _slug(text_value: str) -> str:
+    raw = _norm(text_value)
+    cleaned = re.sub(r"[^a-z0-9]+", "-", raw).strip("-")
+    return cleaned or "unknown"
 
-    if "raipur" in blob and "residential" in blob:
-        hit = first_match("raipur", "residential")
-        if hit:
-            return hit
 
-    if "bhilai" in blob and "industrial" in blob:
-        hit = first_match("bhilai", "industrial")
-        if hit:
-            return hit
+def _first_non_empty(record: Dict[str, Any], keys: List[str]) -> str:
+    for key in keys:
+        value = record.get(key)
+        if value is None:
+            continue
+        as_text = str(value).strip()
+        if as_text:
+            return as_text
+    return ""
 
-    if "korba" in blob:
-        hit = first_match("korba")
-        if hit:
-            return hit
 
-    if "bhilai" in blob:
-        # Any non-industrial Bhilai fallback
-        for s in stations:
-            hay = f"{s.name} {s.location}".lower()
-            if "bhilai" in hay and "industrial" not in hay:
-                return s.id
+def _resolve_station_name(record: Dict[str, Any]) -> str:
+    return _first_non_empty(
+        record,
+        [
+            "station",
+            "station_name",
+            "location",
+            "location_name",
+            "site",
+            "site_name",
+            "area",
+            "city",
+        ],
+    )
 
-    return None
+
+def _resolve_district(record: Dict[str, Any]) -> str:
+    return _first_non_empty(record, ["district", "city", "city_name", "state_district"])
+
+
+def _resolve_state(record: Dict[str, Any]) -> str:
+    return _first_non_empty(record, ["state", "state_name"])
+
+
+def _is_chhattisgarh_record(record: Dict[str, Any]) -> bool:
+    state = _norm(_resolve_state(record))
+    district = _norm(_resolve_district(record))
+    station = _norm(_resolve_station_name(record))
+    hay = f"{state} {district} {station}"
+    return "chhattisgarh" in hay or "chattisgarh" in hay
 
 
 def _extract_timestamp(record: Dict[str, Any]) -> datetime:
@@ -191,72 +233,132 @@ def _normalize_record(record: Dict[str, Any]) -> Dict[str, Optional[float]]:
         except Exception:
             return None
 
-    return {
-        "PM10": as_float(record.get("pm10") or record.get("PM10")),
-        "PM2.5": as_float(record.get("pm2_5") or record.get("PM2.5") or record.get("pm25")),
-        "SO2": as_float(record.get("so2") or record.get("SO2")),
-        "NO2": as_float(record.get("no2") or record.get("NO2")),
-    }
+    out: Dict[str, Optional[float]] = {"PM10": None, "PM2.5": None, "SO2": None, "NO2": None}
+    lower_map = {str(k).lower(): v for k, v in record.items()}
+    for pollutant, aliases in POLLUTANT_PARAM_MAP.items():
+        for alias in aliases:
+            if alias in lower_map:
+                parsed = as_float(lower_map[alias])
+                if parsed is not None:
+                    out[pollutant] = parsed
+                    break
+    return out
 
 
 async def _fetch_govapi(govapi_key: str) -> List[Dict[str, Any]]:
-    params = {
-        "api-key": govapi_key,
-        "format": "json",
-        "limit": 500,
-        "filters[state]": "Chhattisgarh",
-    }
     timeout = httpx.Timeout(25.0)
+    all_records: List[Dict[str, Any]] = []
+
     async with httpx.AsyncClient(timeout=timeout) as client:
-        resp = await client.get(GOV_URL, params=params)
-        resp.raise_for_status()
-        payload = resp.json()
-
-    records = payload.get("records") or []
-    if not isinstance(records, list):
-        return []
-    return records
-
-
-async def _fetch_owm(owm_key: str) -> List[Dict[str, Any]]:
-    if not owm_key:
-        return []
-
-    timeout = httpx.Timeout(25.0)
-    out: List[Dict[str, Any]] = []
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        for city, (lat, lon) in CITY_COORDS.items():
+        limit = 1000
+        offset = 0
+        while True:
             resp = await client.get(
-                OWM_URL,
-                params={"lat": lat, "lon": lon, "appid": owm_key},
+                GOV_URL,
+                params={
+                    "api-key": govapi_key,
+                    "format": "json",
+                    "limit": limit,
+                    "offset": offset,
+                    "filters[state]": "Chhattisgarh",
+                },
             )
             resp.raise_for_status()
             payload = resp.json()
-            items = payload.get("list") or []
-            if not items:
-                continue
-            item = items[0]
-            components = item.get("components") or {}
-            dt_unix = item.get("dt")
-            dt = (
-                datetime.fromtimestamp(int(dt_unix), tz=timezone.utc)
-                if dt_unix is not None
-                else datetime.now(timezone.utc)
+            batch = payload.get("records") or []
+            if not isinstance(batch, list) or not batch:
+                break
+            all_records.extend(batch)
+            if len(batch) < limit:
+                break
+            offset += limit
+
+    return all_records
+
+
+async def _default_region_id(session: AsyncSession) -> Optional[uuid.UUID]:
+    row = (
+        await session.execute(
+            text(
+                """
+                SELECT id
+                FROM regional_offices
+                WHERE LOWER(state) LIKE '%chhattisgarh%'
+                ORDER BY created_at ASC
+                LIMIT 1
+                """
             )
-            out.append(
-                {
-                    "city": city,
-                    "station": city,
-                    "timestamp": dt.replace(minute=0, second=0, microsecond=0),
-                    "values": {
-                        "PM10": components.get("pm10"),
-                        "PM2.5": components.get("pm2_5"),
-                        "SO2": components.get("so2"),
-                        "NO2": components.get("no2"),
-                    },
-                }
+        )
+    ).first()
+    return row[0] if row else None
+
+
+def _district_coords(district: str) -> Tuple[float, float]:
+    key = _norm(district)
+    if key in DISTRICT_COORDS:
+        return DISTRICT_COORDS[key]
+    return DISTRICT_COORDS["raipur"]
+
+
+async def _ensure_station(
+    session: AsyncSession,
+    stations_by_iot: Dict[str, uuid.UUID],
+    stations_by_name: Dict[str, uuid.UUID],
+    station_name: str,
+    district: str,
+    region_id: Optional[uuid.UUID],
+) -> uuid.UUID:
+    district_text = district or "Chhattisgarh"
+    station_key = _norm(station_name)
+    iot_key = f"govapi-air-{_slug(station_name)}-{_slug(district_text)}"
+
+    if iot_key in stations_by_iot:
+        return stations_by_iot[iot_key]
+    if station_key in stations_by_name:
+        return stations_by_name[station_key]
+
+    lat, lng = _district_coords(district_text)
+    created = await session.execute(
+        text(
+            """
+            INSERT INTO monitoring_locations (
+                id,
+                name,
+                location,
+                type,
+                region_id,
+                iot_device_id,
+                is_active,
+                created_at,
+                updated_at
             )
-    return out
+            VALUES (
+                :id,
+                :name,
+                :location,
+                CAST(:type AS locationtype),
+                :region_id,
+                :iot_device_id,
+                TRUE,
+                NOW(),
+                NOW()
+            )
+            RETURNING id
+            """
+        ),
+        {
+            "id": uuid.uuid4(),
+            "name": station_name,
+            "location": f"{lat:.4f},{lng:.4f}",
+            "type": "air",
+            "region_id": region_id,
+            "iot_device_id": iot_key,
+        },
+    )
+    station_id = created.scalar_one()
+    stations_by_iot[iot_key] = station_id
+    stations_by_name[station_key] = station_id
+    return station_id
 
 
 async def _insert_if_new(
@@ -309,64 +411,41 @@ async def _insert_if_new(
         },
     )
     return True
-
-
-async def sync_once(session: AsyncSession, govapi_key: str, owm_key: Optional[str]) -> None:
+async def sync_once(session: AsyncSession, govapi_key: str) -> None:
     stations, param_map = await _load_stations_and_params(session)
+    region_id = await _default_region_id(session)
 
-    used_source = "govapi"
+    stations_by_name: Dict[str, uuid.UUID] = {_norm(s.name): s.id for s in stations if s.name}
+    stations_by_iot: Dict[str, uuid.UUID] = {}
+
+    records = await _fetch_govapi(govapi_key)
+    if not records:
+        raise SyncError("GovAPI returned no records")
+
     inserts = 0
-
-    records: List[Dict[str, Any]] = []
-    try:
-        records = await _fetch_govapi(govapi_key)
-        if not records:
-            raise SyncError("GovAPI returned no records")
-    except Exception as exc:
-        logging.warning("GovAPI failed or empty, switching to OpenWeather fallback: %s", exc)
-        used_source = "openweathermap"
-        fallback = await _fetch_owm(owm_key or "")
-        if not fallback:
-            raise SyncError("Both GovAPI and OpenWeather fallback failed")
-
-        for item in fallback:
-            city = item["city"]
-            station_id = _station_match(stations, city)
-            if not station_id:
-                continue
-            ts = item["timestamp"]
-            values = _normalize_record(item["values"])
-            for pname, value in values.items():
-                if value is None:
-                    continue
-                created = await _insert_if_new(
-                    session,
-                    station_id=station_id,
-                    param_id=param_map[pname],
-                    recorded_at=ts,
-                    value=float(value),
-                    quality_flag="openweathermap",
-                )
-                if created:
-                    inserts += 1
-        await session.commit()
-        logging.info("Sync complete: inserted=%d source=%s", inserts, used_source)
-        return
+    skipped = 0
+    districts_seen: Dict[str, int] = {}
 
     for record in records:
-        blob = " ".join(
-            [
-                str(record.get("city") or ""),
-                str(record.get("station") or ""),
-                str(record.get("station_name") or ""),
-                str(record.get("area") or ""),
-                str(record.get("location") or ""),
-                str(record.get("location_name") or ""),
-            ]
-        )
-        station_id = _station_match(stations, blob)
-        if not station_id:
+        if not _is_chhattisgarh_record(record):
             continue
+
+        station_name = _resolve_station_name(record)
+        if not station_name:
+            skipped += 1
+            continue
+
+        district = _resolve_district(record) or "Raipur"
+        districts_seen[_norm(district)] = districts_seen.get(_norm(district), 0) + 1
+
+        station_id = await _ensure_station(
+            session=session,
+            stations_by_iot=stations_by_iot,
+            stations_by_name=stations_by_name,
+            station_name=station_name,
+            district=district,
+            region_id=region_id,
+        )
 
         ts = _extract_timestamp(record)
         values = _normalize_record(record)
@@ -375,26 +454,31 @@ async def sync_once(session: AsyncSession, govapi_key: str, owm_key: Optional[st
             if value is None:
                 continue
             created = await _insert_if_new(
-                session,
+                session=session,
                 station_id=station_id,
                 param_id=param_map[pname],
                 recorded_at=ts,
                 value=float(value),
-                quality_flag="govapi",
+                quality_flag=f"govapi:{_slug(district)}",
             )
             if created:
                 inserts += 1
 
     await session.commit()
-    logging.info("Sync complete: inserted=%d source=%s", inserts, used_source)
+    logging.info(
+        "Sync complete: inserted=%d skipped=%d districts=%d source=govapi",
+        inserts,
+        skipped,
+        len(districts_seen),
+    )
 
 
-async def _run_scheduler(session_factory: sessionmaker, govapi_key: str, owm_key: Optional[str]) -> None:
+async def _run_scheduler(session_factory: sessionmaker, govapi_key: str) -> None:
     scheduler = AsyncIOScheduler(timezone="UTC")
 
     async def _job() -> None:
         async with session_factory() as session:
-            await sync_once(session, govapi_key, owm_key)
+            await sync_once(session, govapi_key)
 
     scheduler.add_job(_job, trigger="interval", minutes=60, max_instances=1, coalesce=True)
     scheduler.start()
@@ -413,17 +497,17 @@ async def _run_scheduler(session_factory: sessionmaker, govapi_key: str, owm_key
 
 async def main(with_scheduler: bool) -> None:
     _configure_logging()
-    database_url, govapi_key, owm_key = _load_env()
+    database_url, govapi_key = _load_env()
 
     engine = create_async_engine(database_url, echo=False)
     session_factory = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     try:
         if with_scheduler:
-            await _run_scheduler(session_factory, govapi_key, owm_key)
+            await _run_scheduler(session_factory, govapi_key)
         else:
             async with session_factory() as session:
-                await sync_once(session, govapi_key, owm_key)
+                await sync_once(session, govapi_key)
     finally:
         await engine.dispose()
 
