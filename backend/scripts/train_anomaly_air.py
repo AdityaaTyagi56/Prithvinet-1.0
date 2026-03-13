@@ -9,6 +9,7 @@ Run: python scripts/train_anomaly_air.py
 
 import argparse
 import asyncio
+import datetime
 import logging
 import os
 import pickle
@@ -95,6 +96,8 @@ async def _fetch_recent_values(
     combo: Combo,
     lookback_days: int,
 ) -> pd.DataFrame:
+    from datetime import timedelta as _td
+    cutoff = datetime.datetime.utcnow() - _td(days=lookback_days)
     result = await session.execute(
         text(
             """
@@ -102,11 +105,11 @@ async def _fetch_recent_values(
             FROM sensor_readings
             WHERE location_id = :loc_id
               AND parameter_id = :param_id
-              AND recorded_at >= NOW() - INTERVAL ':days days'
+              AND recorded_at >= :cutoff
             ORDER BY recorded_at ASC
             """
         ),
-        {"loc_id": combo.location_id, "param_id": combo.parameter_id, "days": lookback_days},
+        {"loc_id": combo.location_id, "param_id": combo.parameter_id, "cutoff": cutoff},
     )
     rows = result.fetchall()
     if not rows:
@@ -152,16 +155,16 @@ async def _mark_anomalies(
     batch_size = 500
     for i in range(0, len(anomaly_ids), batch_size):
         batch = anomaly_ids[i : i + batch_size]
-        # Build a parameterized query using ANY
+        # asyncpg requires cast as array literal; pass as comma-separated string
+        placeholders = ", ".join(f"'{rid}'::uuid" for rid in batch)
         await session.execute(
             text(
-                """
+                f"""
                 UPDATE sensor_readings
                 SET quality_flag = 'anomaly'
-                WHERE id = ANY(:ids::uuid[])
+                WHERE id IN ({placeholders})
                 """
-            ),
-            {"ids": batch},
+            )
         )
     await session.commit()
 

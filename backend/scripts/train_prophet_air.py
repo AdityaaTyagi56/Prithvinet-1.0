@@ -190,38 +190,72 @@ async def _train_once(session: AsyncSession, model_dir: Path) -> None:
         frame = frame[["ds", "y"]].copy()
         frame["is_winter"] = _is_winter(frame["ds"])
 
-        model = Prophet(
-            changepoint_prior_scale=0.05,
-            seasonality_mode="multiplicative",
-            yearly_seasonality=True,
-            weekly_seasonality=True,
-            daily_seasonality=True,
-        )
-        model.add_seasonality(name="coal_plant_cycle", period=0.5, fourier_order=5)
-        model.add_regressor("is_winter")
-        model.fit(frame)
+        next_points: pd.DataFrame = pd.DataFrame()
+        used_prophet = False
 
-        future = model.make_future_dataframe(periods=HORIZON_HOURS, freq="H")
-        future["is_winter"] = _is_winter(pd.to_datetime(future["ds"]))
-        forecast = model.predict(future)
+        try:
+            model = Prophet(
+                changepoint_prior_scale=0.05,
+                seasonality_mode="multiplicative",
+                yearly_seasonality=True,
+                weekly_seasonality=True,
+                daily_seasonality=True,
+            )
+            model.add_seasonality(name="coal_plant_cycle", period=0.5, fourier_order=5)
+            model.add_regressor("is_winter")
+            model.fit(frame)
 
-        last_ds = frame["ds"].max()
-        next_points = forecast.loc[forecast["ds"] > last_ds, ["ds", "yhat", "yhat_lower", "yhat_upper"]].head(HORIZON_HOURS)
+            future = model.make_future_dataframe(periods=HORIZON_HOURS, freq="H")
+            future["is_winter"] = _is_winter(pd.to_datetime(future["ds"]))
+            forecast = model.predict(future)
+
+            last_ds = frame["ds"].max()
+            next_points = forecast.loc[
+                forecast["ds"] > last_ds, ["ds", "yhat", "yhat_lower", "yhat_upper"]
+            ].head(HORIZON_HOURS)
+
+            model_path = model_dir / f"prophet_{combo.location_id}_{combo.parameter_id}.pkl"
+            with model_path.open("wb") as fp:
+                pickle.dump(model, fp)
+            used_prophet = True
+
+        except Exception as prophet_err:
+            logging.warning(
+                "Prophet unavailable for %s / %s (%s), using statistical fallback",
+                combo.location_name,
+                combo.parameter_name,
+                prophet_err,
+            )
+            # Statistical fallback: rolling mean + ±std confidence band
+            last_ds = frame["ds"].max()
+            baseline = float(frame["y"].tail(24).mean())
+            std = float(frame["y"].tail(168).std()) if len(frame) > 1 else baseline * 0.1
+            std = max(std, 0.5)
+            rows = []
+            for h in range(1, HORIZON_HOURS + 1):
+                import math as _math
+                ts = last_ds + pd.Timedelta(hours=h)
+                # Soft diurnal cycle
+                cycle = 1.0 + 0.15 * _math.sin((h % 24 - 6) * _math.pi / 12)
+                yhat = max(0.0, round(baseline * cycle, 4))
+                rows.append({
+                    "ds": ts,
+                    "yhat": yhat,
+                    "yhat_lower": round(max(0.0, yhat - std), 4),
+                    "yhat_upper": round(yhat + std, 4),
+                })
+            next_points = pd.DataFrame(rows)
 
         await _store_forecast(session, combo, next_points)
-
-        model_path = model_dir / f"prophet_{combo.location_id}_{combo.parameter_id}.pkl"
-        with model_path.open("wb") as fp:
-            pickle.dump(model, fp)
-
         await session.commit()
         trained += 1
         elapsed = time.perf_counter() - one_start
         logging.info(
-            "Trained %s / %s in %.2fs",
+            "Forecast stored %s / %s in %.2fs (prophet=%s)",
             combo.location_name,
             combo.parameter_name,
             elapsed,
+            used_prophet,
         )
 
     total_elapsed = time.perf_counter() - start_all
