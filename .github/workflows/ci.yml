@@ -27,7 +27,7 @@ jobs:
           pip install pyright
 
       - name: Run backend type checks
-        run: pyright
+        run: pyright --project ../pyrightconfig.json
 
       - name: Run backend tests
         run: pytest
