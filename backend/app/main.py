@@ -1,4 +1,5 @@
 from app.routers import (
+    air,
     alerts,
     auth,
     copilot,
@@ -33,6 +34,7 @@ app.include_router(limits.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(readings.router, prefix="/api/v1")
 app.include_router(forecast.router, prefix="/api/v1")
+app.include_router(air.router, prefix="/api/v1")
 app.include_router(copilot.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
 app.include_router(alerts.router, prefix="/api/v1")

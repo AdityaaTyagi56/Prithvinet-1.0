@@ -426,11 +426,3 @@ if __name__ == "__main__":
     except Exception as exc:
         logging.exception("Air import failed: %s", exc)
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(run_import())
-    except Exception as exc:
-        logging.exception("Air import failed: %s", exc)
-        sys.exit(1)
