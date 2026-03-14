@@ -67,9 +67,8 @@ const copilotSessions: Record<string, { role: string; content: string }[]> = {};
 // Track which demo account is logged in
 let _loggedInEmail = 'admin@cecb.gov.in';
 
-// Live data cache — loaded on first API call
+// Live data cache — loaded on API calls automatically
 let _liveSnapshotCache: LiveSnapshot | null = null;
-let _liveLoaded = false;
 let _regionalPrevAqiByRegion: Record<string, number> = {};
 
 const REGIONAL_BASELINE: Record<string, Pick<RegionalData, "water_wqi" | "water_trend" | "noise_db" | "noise_trend">> = {
@@ -192,8 +191,6 @@ function _buildRegionalFromLive(snapshot: LiveSnapshot | null): RegionalData[] |
 }
 
 async function _ensureLiveData(): Promise<void> {
-  if (_liveLoaded) return;
-  _liveLoaded = true;
   try {
     _liveSnapshotCache = await fetchLiveSnapshot();
   } catch {
@@ -261,6 +258,12 @@ function mockGet(
       const liveVals = liveLocations.map(l => l.pm25).filter((v): v is number => !!v && v > 0);
       if (liveVals.length > 0) {
         overview.current_aqi = Math.round(liveVals.reduce((a, b) => a + b, 0) / liveVals.length);
+        if (overview.current_aqi <= 50) overview.current_category = "Good";
+        else if (overview.current_aqi <= 100) overview.current_category = "Satisfactory";
+        else if (overview.current_aqi <= 200) overview.current_category = "Moderate";
+        else if (overview.current_aqi <= 300) overview.current_category = "Poor";
+        else if (overview.current_aqi <= 400) overview.current_category = "Very Poor";
+        else overview.current_category = "Severe";
       }
     }
 

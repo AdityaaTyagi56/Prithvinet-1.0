@@ -47,14 +47,16 @@ export interface LiveSnapshot {
 
 let _cached: LiveSnapshot | null = null;
 let _fetchPromise: Promise<LiveSnapshot | null> | null = null;
+let _lastFetchTime = 0;
 
 /**
- * Fetch the live AQI snapshot. Caches the result for the session.
+ * Fetch the live AQI snapshot. Caches the result for 60 seconds.
  * Returns null if the snapshot doesn't exist yet (fetch script hasn't run).
  */
 export async function fetchLiveSnapshot(forceRefresh = false): Promise<LiveSnapshot | null> {
-  if (_cached && !forceRefresh) return _cached;
-  if (_fetchPromise && !forceRefresh) return _fetchPromise;
+  const isStale = Date.now() - _lastFetchTime > 60000;
+  if (_cached && !forceRefresh && !isStale) return _cached;
+  if (_fetchPromise && !forceRefresh && !isStale) return _fetchPromise;
 
   _fetchPromise = (async () => {
     try {
@@ -62,6 +64,7 @@ export async function fetchLiveSnapshot(forceRefresh = false): Promise<LiveSnaps
       if (!resp.ok) return null;
       const data: LiveSnapshot = await resp.json();
       _cached = data;
+      _lastFetchTime = Date.now();
       return data;
     } catch {
       return null;
