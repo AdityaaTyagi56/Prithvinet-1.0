@@ -18,6 +18,7 @@ import {
   Radio,
   Clock,
   ArrowRight,
+  Search,
 } from 'lucide-react';
 
 interface LogEntry {
@@ -313,6 +314,7 @@ export function AqiLogsPage() {
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('timestamp');
   const [sortAsc, setSortAsc] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [snapshotObj, setSnapshotObj] = useState(getCachedSnapshot());
   const snap = snapshotObj;
@@ -364,9 +366,18 @@ export function AqiLogsPage() {
     })();
   }, [selectedDate]);
 
-  // Sorted rows
+  // Filtered and Sorted rows
   const sortedRows = useMemo(() => {
-    const copy = [...rows];
+    let copy = [...rows];
+    
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      copy = copy.filter(r => 
+        r.station_name.toLowerCase().includes(q) || 
+        r.district.toLowerCase().includes(q)
+      );
+    }
+
     copy.sort((a, b) => {
       let va: string | number = (a as any)[sortKey] ?? '';
       let vb: string | number = (b as any)[sortKey] ?? '';
@@ -379,7 +390,7 @@ export function AqiLogsPage() {
       return 0;
     });
     return copy;
-  }, [rows, sortKey, sortAsc]);
+  }, [rows, sortKey, sortAsc, searchQuery]);
 
   // Forecast computed from current rows
   const forecast = useMemo(() => generateForecast(rows), [rows]);
@@ -558,12 +569,25 @@ export function AqiLogsPage() {
 
           {/* Data table */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
                 <BarChart3 className="h-4 w-4 text-[#14532d]" />
                 Readings — {selectedDate || 'Select a date'}
               </h3>
-              <span className="text-xs text-gray-400">{rows.length} rows</span>
+              
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="h-3.5 w-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search station or district..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#14532d] focus:border-[#14532d] w-full sm:w-56"
+                  />
+                </div>
+                <span className="text-xs text-gray-400">{sortedRows.length} rows</span>
+              </div>
             </div>
             {loadingRows ? (
               <div className="p-12 text-center text-sm text-gray-400">
