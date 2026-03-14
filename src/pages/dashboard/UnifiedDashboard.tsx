@@ -453,14 +453,14 @@ export function UnifiedDashboard() {
       {/* Floating Copilot Action Button */}
       <button
         onClick={() => setIsCopilotOpen(true)}
-        className="fixed bottom-6 right-6 z-40 bg-[#166534] text-white p-4 rounded-full shadow-2xl hover:bg-[#14532d] hover:-translate-y-1 transition-all flex items-center justify-center border-2 border-[#4ade80]/30"
+        className="fixed bottom-6 left-6 z-40 bg-[#166534] text-white p-4 rounded-full shadow-2xl hover:bg-[#14532d] hover:-translate-y-1 transition-all flex items-center justify-center border-2 border-[#4ade80]/30"
         aria-label="Open AI Copilot"
       >
         <MessageSquare className="w-6 h-6" />
       </button>
 
       {/* Copilot Slide-over Panel */}
-      <div className={`fixed inset-y-0 right-0 w-full sm:w-[450px] bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.15)] z-50 transform transition-transform duration-300 ease-in-out ${isCopilotOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 w-full sm:w-[450px] bg-white shadow-[10px_0_30px_rgba(0,0,0,0.15)] z-50 transform transition-transform duration-300 ease-in-out ${isCopilotOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col relative">
           <button
             onClick={() => setIsCopilotOpen(false)}
