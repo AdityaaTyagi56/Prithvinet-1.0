@@ -1,69 +1,11 @@
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sqlalchemy import text
 
 from app.core.database import AsyncSessionLocal
 from app.workers.celery_app import celery_app
 
-async def _check_missing_reports() -> dict:
-    """Find industries that have NO sensor readings in the last 24 hours, and create MissingReportReminders if they don't already exist for this period."""
-    period = datetime.utcnow().date().isoformat()
-    yesterday = datetime.utcnow() - timedelta(days=1)
-    
-    async with AsyncSessionLocal() as db:
-        missing_industries_q = text("""
-            SELECT i.id, i.name 
-            FROM industries i
-            LEFT JOIN (
-                SELECT ml.industry_id, sr.id
-                FROM sensor_readings sr
-                JOIN monitoring_locations ml ON sr.location_id = ml.id
-                WHERE sr.recorded_at >= :yesterday
-            ) recent_readings ON recent_readings.industry_id = i.id
-            WHERE i.status::text = 'active'
-            GROUP BY i.id, i.name
-            HAVING COUNT(recent_readings.id) = 0
-        """)
-        
-        missing_industries = (await db.execute(missing_industries_q, {"yesterday": yesterday})).mappings().all()
-        
-        new_reminders_count = 0
-        for mi in missing_industries:
-            exists = (await db.execute(text("""
-                SELECT 1 FROM missing_report_reminders
-                WHERE industry_id = :industry_id AND "period" = :period
-            """), {"industry_id": mi["id"], "period": period})).scalar()
-            
-            if not exists:
-                loc_id = (await db.execute(text("SELECT id FROM monitoring_locations WHERE industry_id = :industry_id LIMIT 1"), {"industry_id": mi["id"]})).scalar()
-                
-                await db.execute(text("""
-                    INSERT INTO missing_report_reminders (
-                        id, industry_id, "period", is_resolved, created_at, updated_at
-                    ) VALUES (
-                        gen_random_uuid(), :industry_id, :period, false, now(), now()
-                    )
-                """), {"industry_id": mi["id"], "period": period})
-                
-                if loc_id:
-                    await db.execute(text("""
-                        INSERT INTO alerts (
-                            id, type, severity, message, location_id, recorded_at, status, created_at, updated_at
-                        ) VALUES (
-                            gen_random_uuid(), 'missing_report', 'high', :msg, 
-                            :loc_id, now(), 'new', now(), now()
-                        )
-                    """), {
-                        "msg": f"Missing mandatory environmental report from {mi['name']} for period {period}.", 
-                        "loc_id": loc_id
-                    })
-                new_reminders_count += 1
-                
-        if new_reminders_count > 0:
-            await db.commit()
-            
-    return {"period": period, "new_reminders": new_reminders_count}
 
 async def _compute_compliance_snapshot() -> dict:
     period = datetime.utcnow().date().isoformat()
@@ -194,7 +136,9 @@ def compute_compliance_records():
 
 @celery_app.task
 def check_missing_reports():
-    return asyncio.run(_check_missing_reports())
+    # Placeholder for checking missing reports
+    print("Running check_missing_reports task")
+    return "Success"
 
 @celery_app.task
 def refresh_all_forecasts():

@@ -9,7 +9,6 @@ from app.core.config import settings
 from app.core.database import AsyncSessionLocal
 from app.core.redis import redis_client
 from app.services.ml_service import generate_forecast
-from app.services.simulate_service import simulate_environmental_intervention
 
 async def get_session_history(session_id: str):
     data = await redis_client.get(f"copilot_session:{session_id}")
@@ -64,17 +63,16 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "simulate_intervention",
-            "description": "Simulate environmental interventions using a structural/causal surrogate model to see the change in regional risk score.",
+            "description": "Simulate impact of intervention on a pollutant at a location.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "industry_id": {"type": "string", "description": "The name or ID of the industry."},
-                    "pollutant": {"type": "string", "description": "The specific pollutant (e.g. NO2, PM2_5) being reduced."},
-                    "reduction_percentage": {"type": "number", "minimum": 0, "maximum": 100, "description": "Percentage of reduction to simulate (0-100)."},
-                    "shutdown_high_risk": {"type": "boolean", "description": "True if we are temporarily shutting down high-risk units, such as during a festival."},
-                    "duration_days": {"type": "integer", "minimum": 1, "maximum": 30, "description": "Number of days the intervention lasts."}
+                    "location_name": {"type": "string"},
+                    "parameter": {"type": "string"},
+                    "reduction_percent": {"type": "number", "minimum": 0, "maximum": 100},
+                    "duration_hours": {"type": "integer", "minimum": 1, "maximum": 240},
                 },
-                "required": [],
+                "required": ["location_name", "parameter"],
             },
         },
     },
@@ -278,25 +276,41 @@ async def _tool_get_compliance_status(args: dict[str, Any]) -> dict[str, Any]:
 
 
 async def _tool_simulate_intervention(args: dict[str, Any]) -> dict[str, Any]:
-    industry_id = args.get("industry_id")
-    pollutant = args.get("pollutant")
-    reduction_percentage = float(args.get("reduction_percentage", 0.0))
-    shutdown_high_risk = bool(args.get("shutdown_high_risk", False))
-    duration_days = int(args.get("duration_days", 7))
-    reduction_percentage = max(0.0, min(reduction_percentage, 100.0))
+    location_name = args.get("location_name")
+    parameter = args.get("parameter")
+    reduction_percent = float(args.get("reduction_percent", 15))
+    duration_hours = int(args.get("duration_hours", 24))
+    reduction_percent = max(0.0, min(reduction_percent, 100.0))
+    duration_hours = max(1, min(duration_hours, 240))
 
-    try:
-        from app.services.simulate_service import simulate_environmental_intervention
-    except ImportError:
-        return {"error": "simulate_service module not found."}
+    async with AsyncSessionLocal() as db:
+        q = text(
+            """
+            SELECT AVG(sr.value)::float AS baseline
+            FROM sensor_readings sr
+            JOIN monitoring_locations ml ON ml.id = sr.location_id
+            JOIN monitoring_units mu ON mu.id = sr.parameter_id
+            WHERE lower(ml.name) = lower(:location_name)
+              AND lower(mu.parameter) = lower(:parameter)
+              AND sr.recorded_at >= now() - interval '24 hours'
+            """
+        )
+        baseline = (await db.execute(q, {"location_name": location_name, "parameter": parameter})).scalar()
 
-    return simulate_environmental_intervention(
-        industry_id=industry_id,
-        pollutant=pollutant,
-        reduction_percentage=reduction_percentage,
-        shutdown_high_risk=shutdown_high_risk,
-        duration_days=duration_days
-    )
+    baseline = float(baseline) if baseline is not None else 0.0
+    projected = baseline * (1 - (reduction_percent / 100.0))
+    absolute_reduction = baseline - projected
+
+    return {
+        "location_name": location_name,
+        "parameter": parameter,
+        "duration_hours": duration_hours,
+        "baseline_24h_avg": round(baseline, 2),
+        "reduction_percent": reduction_percent,
+        "projected_avg": round(projected, 2),
+        "estimated_absolute_reduction": round(absolute_reduction, 2),
+        "note": "Projection is a first-order estimate based on last 24h average.",
+    }
 
 
 async def _tool_get_forecast(args: dict[str, Any]) -> dict[str, Any]:
