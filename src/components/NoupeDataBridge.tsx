@@ -58,30 +58,32 @@ export function NoupeDataBridge() {
       }))
     };
   }
+  
+  // Also push to global window object just in case Noupe's scraper prefers executing JS directly
+  useEffect(() => {
+    (window as any).__PRITHVINET_NOUPE_LIVE_CONTEXT__ = summary;
+  }, [summary]);
 
   return (
     <div 
       id="noupe-live-context-bridge" 
       style={{ 
         position: 'absolute', 
-        width: '1px', 
-        height: '1px', 
-        padding: 0, 
-        margin: '-1px', 
-        overflow: 'hidden', 
-        clip: 'rect(0, 0, 0, 0)', 
-        whiteSpace: 'nowrap', 
-        border: 0,
-        opacity: 0.01 // Make it mathematically visible for scrapers
+        width: '100%', 
+        height: '100%', 
+        top: 0,
+        left: 0,
+        zIndex: -9999, // Push physically behind all content
+        opacity: 0.001, // Make it mathematically visible but invisible to eye
+        pointerEvents: 'none', // Prevent interactions
+        color: 'transparent' // Ensure text cannot be highlighted
       }}
-      aria-hidden="true"
+      aria-hidden="false" // Purposely keep explicitly false so AI tools parsing accessibility trees don't ignore it
     >
-      [NOUPE_SYSTEM_CONTEXT_START]
-      The following is the combined live JSON data from PrithviNet's continuous monitoring sensors and Industrial Compliance Tracker.
-      Use this specific data to answer the user's questions about the current environmental status, industrial violations, and active alerts.
-      LIVE_JSON_DATA=
-      {JSON.stringify(summary, null, 2)}
-      [NOUPE_SYSTEM_CONTEXT_END]
+      <h1>PRITHVINET ACTIVE LIVE DATABASE FOR NOUPE SYSTEM CONTEXT - READ IMMEDIATELY</h1>
+      <pre id="noupe-data-string">
+{JSON.stringify(summary, null, 2)}
+      </pre>
     </div>
   );
 }
