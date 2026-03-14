@@ -24,18 +24,33 @@ def _parse_coordinates(raw: str | None):
     return lat, lng
 
 
+def _pm25_to_aqi(c: float) -> float:
+    if c <= 30:
+        return ((50 - 0) / (30 - 0)) * (c - 0) + 0
+    elif c <= 60:
+        return ((100 - 51) / (60 - 31)) * (c - 31) + 51
+    elif c <= 90:
+        return ((200 - 101) / (90 - 61)) * (c - 61) + 101
+    elif c <= 120:
+        return ((300 - 201) / (120 - 91)) * (c - 91) + 201
+    elif c <= 250:
+        return ((400 - 301) / (250 - 121)) * (c - 121) + 301
+    else:
+        return min(500.0, ((500 - 401) / (380 - 250)) * (c - 250) + 401)
+
 def _aqi_category(value: float) -> str:
     if value <= 50:
         return "Good"
-    if value <= 100:
+    elif value <= 100:
+        return "Satisfactory"
+    elif value <= 200:
         return "Moderate"
-    if value <= 150:
-        return "Unhealthy for Sensitive Groups"
-    if value <= 200:
-        return "Unhealthy"
-    if value <= 300:
-        return "Very Unhealthy"
-    return "Hazardous"
+    elif value <= 300:
+        return "Poor"
+    elif value <= 400:
+        return "Very Poor"
+    else:
+        return "Severe"
 
 
 @router.get("/overview")
@@ -85,7 +100,8 @@ async def get_public_overview(db: AsyncSession = Depends(get_db)):
             }
         )
 
-    current_aqi = round(sum(loc["pm25"] for loc in map_locations) / len(map_locations), 2) if map_locations else 0.0
+    avg_pm25 = sum(loc["pm25"] for loc in map_locations) / len(map_locations) if map_locations else 0.0
+    current_aqi = round(_pm25_to_aqi(avg_pm25), 2)
 
     forecast_cards = []
     if latest_pm25_rows:
@@ -117,8 +133,8 @@ async def get_public_overview(db: AsyncSession = Depends(get_db)):
             if recent_avg is not None:
                 baseline = float(recent_avg)
                 forecast_cards = [
-                    {"label": "Tomorrow", "aqi": round(baseline * 1.03, 2)},
-                    {"label": (datetime.utcnow() + timedelta(days=2)).strftime("%A"), "aqi": round(baseline * 0.98, 2)},
+                    {"label": "Tomorrow", "aqi": round(_pm25_to_aqi(baseline * 1.03), 2)},
+                    {"label": (datetime.utcnow() + timedelta(days=2)).strftime("%A"), "aqi": round(_pm25_to_aqi(baseline * 0.98), 2)},
                 ]
 
         if forecast_points and not forecast_cards:
@@ -128,7 +144,7 @@ async def get_public_overview(db: AsyncSession = Depends(get_db)):
 
             def daily_avg(day):
                 points = [p["point"] for p in forecast_points if datetime.fromisoformat(p["timestamp"].replace("Z", "")).date() == day]
-                return round(sum(points) / len(points), 2) if points else None
+                return round(_pm25_to_aqi(sum(points) / len(points)), 2) if points else None
 
             tomorrow_avg = daily_avg(tomorrow)
             day_after_avg = daily_avg(day_after)
