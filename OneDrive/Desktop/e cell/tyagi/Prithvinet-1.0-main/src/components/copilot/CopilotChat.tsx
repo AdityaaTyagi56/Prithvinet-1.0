@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { getBytezStatus, runBytezChat } from '../../lib/bytez';
 
 export function CopilotChat() {
   const bytezStatus = { configured: true };
@@ -74,7 +73,22 @@ export function CopilotChat() {
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="p-4 border-b border-gray-200 bg-gray-50">
-        <h2 className="text-base font-semibold text-[#14532d]">PrithviNet AI Copilot</h2>
+        <div className="flex items-center gap-2 mb-0.5">
+          <svg width="22" height="22" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="72" height="72" rx="22" fill="url(#noupHdrGrad)" />
+            <circle cx="28" cy="36" r="9" fill="white" />
+            <circle cx="52" cy="36" r="9" fill="white" />
+            <circle cx="29.5" cy="37" r="5" fill="#0f4a22" />
+            <circle cx="53.5" cy="37" r="5" fill="#0f4a22" />
+            <path d="M28 52 Q40 62 52 52" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <defs>
+              <linearGradient id="noupHdrGrad" x1="4" y1="4" x2="76" y2="76" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#16a34a" /><stop offset="1" stopColor="#14532d" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <h2 className="text-base font-semibold text-[#14532d]">Noupe <span className="font-normal text-gray-500 text-sm">— PrithviNet AI</span></h2>
+        </div>
         <p className="text-xs text-gray-500">Environmental Data Analysis Assistant</p>
         <div className="mt-1 flex items-center gap-2 text-[11px]">
           <span className="rounded px-2 py-0.5 border bg-green-50 text-green-700 border-green-200">
@@ -90,8 +104,38 @@ export function CopilotChat() {
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="text-4xl mb-3">🌍</div>
-            <h3 className="text-base font-semibold text-gray-700 mb-1">PrithviNet AI Assistant</h3>
+            {/* Noupe mascot */}
+            <div className="mb-4">
+              <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Body */}
+                <rect x="4" y="4" width="72" height="72" rx="22" fill="url(#noupGrad)" />
+                {/* Shine */}
+                <ellipse cx="28" cy="22" rx="10" ry="5" fill="white" fillOpacity="0.18" transform="rotate(-15 28 22)" />
+                {/* Left eye white */}
+                <circle cx="28" cy="36" r="9" fill="white" />
+                {/* Right eye white */}
+                <circle cx="52" cy="36" r="9" fill="white" />
+                {/* Left pupil */}
+                <circle cx="29.5" cy="37" r="5" fill="#0f4a22" />
+                <circle cx="31" cy="35.5" r="1.5" fill="white" />
+                {/* Right pupil */}
+                <circle cx="53.5" cy="37" r="5" fill="#0f4a22" />
+                <circle cx="55" cy="35.5" r="1.5" fill="white" />
+                {/* Smile */}
+                <path d="M28 52 Q40 62 52 52" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" />
+                {/* Cheek blush left */}
+                <ellipse cx="20" cy="48" rx="5" ry="3" fill="white" fillOpacity="0.18" />
+                {/* Cheek blush right */}
+                <ellipse cx="60" cy="48" rx="5" ry="3" fill="white" fillOpacity="0.18" />
+                <defs>
+                  <linearGradient id="noupGrad" x1="4" y1="4" x2="76" y2="76" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#16a34a" />
+                    <stop offset="1" stopColor="#14532d" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <h3 className="text-base font-semibold text-gray-700 mb-1">Noupe — PrithviNet AI</h3>
             <p className="text-xs text-gray-500 mb-5">Ask about air quality, pollution forecasts, compliance, or run what-if scenarios.</p>
             <div className="space-y-2 w-full">
               <button
