@@ -17,7 +17,7 @@ import {
   getDemoUser,
   DEMO_TOKEN,
 } from "./mockData";
-import type { PollutionType } from "./mockData";
+import type { PollutionType, RegionalData } from "./mockData";
 import { fetchLiveSnapshot, type LiveSnapshot } from "./liveData";
 
 // ========= DEMO MODE – no backend needed =========
@@ -70,6 +70,126 @@ let _loggedInEmail = 'admin@cecb.gov.in';
 // Live data cache — loaded on first API call
 let _liveSnapshotCache: LiveSnapshot | null = null;
 let _liveLoaded = false;
+let _regionalPrevAqiByRegion: Record<string, number> = {};
+
+const REGIONAL_BASELINE: Record<string, Pick<RegionalData, "water_wqi" | "water_trend" | "noise_db" | "noise_trend">> = {
+  Raipur: { water_wqi: 48, water_trend: "down", noise_db: 73, noise_trend: "stable" },
+  Durg: { water_wqi: 44, water_trend: "stable", noise_db: 77, noise_trend: "up" },
+  Korba: { water_wqi: 46, water_trend: "down", noise_db: 70, noise_trend: "stable" },
+  Bilaspur: { water_wqi: 58, water_trend: "up", noise_db: 66, noise_trend: "down" },
+  Rajnandgaon: { water_wqi: 63, water_trend: "stable", noise_db: 61, noise_trend: "stable" },
+  Bastar: { water_wqi: 72, water_trend: "up", noise_db: 48, noise_trend: "down" },
+  Surguja: { water_wqi: 68, water_trend: "stable", noise_db: 52, noise_trend: "stable" },
+};
+
+function _normalizeRegion(city: string | undefined): string {
+  const c = (city || "").trim().toLowerCase();
+  if (!c) return "";
+  if (c.includes("bhilai") || c.includes("durg")) return "Durg";
+  if (c.includes("raipur")) return "Raipur";
+  if (c.includes("korba")) return "Korba";
+  if (c.includes("bilaspur")) return "Bilaspur";
+  if (c.includes("rajnandgaon")) return "Rajnandgaon";
+  if (c.includes("bastar") || c.includes("jagdalpur")) return "Bastar";
+  if (c.includes("surguja") || c.includes("ambikapur")) return "Surguja";
+  return city || "";
+}
+
+function _mergeRegionalWithLive(base: RegionalData[], snapshot: LiveSnapshot | null): RegionalData[] {
+  if (!snapshot?.stations?.length) return base;
+
+  const byRegion = new Map<string, number[]>();
+
+  for (const station of snapshot.stations) {
+    const region = _normalizeRegion(station.city);
+    if (!region) continue;
+
+    const pm25 = parseFloat(station.pollutants?.["PM2.5"]?.avg || "0");
+    const pm10 = parseFloat(station.pollutants?.["PM10"]?.avg || "0");
+    const estAqi = pm25 > 0 ? pm25 : (pm10 > 0 ? pm10 * 0.6 : 0);
+    if (!(estAqi > 0)) continue;
+
+    if (!byRegion.has(region)) byRegion.set(region, []);
+    byRegion.get(region)!.push(estAqi);
+  }
+
+  if (byRegion.size === 0) return base;
+
+  return base.map((r) => {
+    const vals = byRegion.get(r.region);
+    if (!vals || vals.length === 0) return r;
+
+    const liveAqi = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    const delta = liveAqi - r.air_aqi;
+    const airTrend: RegionalData["air_trend"] = delta >= 8 ? "up" : delta <= -8 ? "down" : "stable";
+
+    return {
+      ...r,
+      air_aqi: liveAqi,
+      air_trend: airTrend,
+    };
+  });
+}
+
+function _buildRegionalFromLive(snapshot: LiveSnapshot | null): RegionalData[] | null {
+  if (!snapshot?.stations?.length) return null;
+
+  const grouped = new Map<string, { aqiVals: number[]; stations: number; violations: number }>();
+
+  for (const station of snapshot.stations) {
+    const region = _normalizeRegion(station.city);
+    if (!region) continue;
+
+    const pm25 = parseFloat(station.pollutants?.["PM2.5"]?.avg || "0");
+    const pm10 = parseFloat(station.pollutants?.["PM10"]?.avg || "0");
+    const aqi = pm25 > 0 ? pm25 : (pm10 > 0 ? pm10 * 0.6 : 0);
+    if (!(aqi > 0)) continue;
+
+    if (!grouped.has(region)) {
+      grouped.set(region, { aqiVals: [], stations: 0, violations: 0 });
+    }
+    const g = grouped.get(region)!;
+    g.aqiVals.push(aqi);
+    g.stations += 1;
+    if (aqi > 100) g.violations += 1;
+  }
+
+  if (grouped.size === 0) return null;
+
+  const rows: RegionalData[] = [];
+  const nextPrev: Record<string, number> = {};
+
+  for (const [region, g] of grouped.entries()) {
+    const liveAqi = Math.round(g.aqiVals.reduce((a, b) => a + b, 0) / g.aqiVals.length);
+    const prev = _regionalPrevAqiByRegion[region];
+    const delta = typeof prev === "number" ? liveAqi - prev : 0;
+    const airTrend: RegionalData["air_trend"] = delta >= 8 ? "up" : delta <= -8 ? "down" : "stable";
+    nextPrev[region] = liveAqi;
+
+    const baseline = REGIONAL_BASELINE[region] || {
+      water_wqi: 60,
+      water_trend: "stable" as RegionalData["water_trend"],
+      noise_db: 60,
+      noise_trend: "stable" as RegionalData["noise_trend"],
+    };
+
+    rows.push({
+      region,
+      air_aqi: liveAqi,
+      air_trend: airTrend,
+      water_wqi: baseline.water_wqi,
+      water_trend: baseline.water_trend,
+      noise_db: baseline.noise_db,
+      noise_trend: baseline.noise_trend,
+      stations: g.stations,
+      violations: g.violations,
+    });
+  }
+
+  _regionalPrevAqiByRegion = nextPrev;
+  rows.sort((a, b) => b.air_aqi - a.air_aqi);
+  return rows;
+}
 
 async function _ensureLiveData(): Promise<void> {
   if (_liveLoaded) return;
@@ -135,8 +255,8 @@ function mockGet(
           pollutants: s.pollutants,
         };
       });
-      // Live stations first, then mock stations
-      overview.locations = [...liveLocations, ...overview.locations];
+      // Use only live stations for air view to avoid mixing mock with real CPCB data
+      overview.locations = liveLocations;
       // Update headline AQI from live PM values
       const liveVals = liveLocations.map(l => l.pm25).filter((v): v is number => !!v && v > 0);
       if (liveVals.length > 0) {
@@ -205,8 +325,11 @@ function mockGet(
   if (url.includes("/alerts")) return mockResponse(getAlerts());
 
   // Regional analytics
-  if (url.includes("/regions/analytics"))
-    return mockResponse(getRegionalAnalytics());
+  if (url.includes("/regions/analytics")) {
+    const liveRegional = _buildRegionalFromLive(_liveSnapshotCache);
+    if (liveRegional) return mockResponse(liveRegional);
+    return mockResponse(_mergeRegionalWithLive(getRegionalAnalytics(), _liveSnapshotCache));
+  }
 
   // Industry tracker
   if (url.includes("/industries/tracker"))

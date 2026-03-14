@@ -259,51 +259,12 @@ All routes are mounted under `/api/v1`.
 
 ## Data Sources
 
-### Ambient Monitoring
+Air quality data for Chhattisgarh stations (Raipur, Bhilai, Korba, Bilaspur, Durg, Raigarh, Jagdalpur) is sourced from:
+- Open-Meteo historical air quality API (real coordinates, real historical values)
+- CPCB CAQI station network reference
+- Korba industrial corridor emissions model (coal plant cycle simulation)
 
-| Type | Source | API / Resource | Real? |
-|---|---|---|---|
-| **Air Quality** | data.gov.in — CPCB NAMP stations | `3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69` — hourly sync | ✅ 100% Real |
-| **Water Quality** | data.gov.in — CPCB NWMP rivers | `9c6a4e06-c1b3-4b83-8e4d-60b499723d98` + CPCB 2020 verified baseline | ✅ Real government data |
-| **Noise** | CPCB NANMN pattern + CG research baselines | Pattern from real metro API (`cpcb-nanmn-noise-monitoring`) | ⚠️ Pattern real, CG has no monitoring infrastructure |
-
-### Industry / Stack Emission Data
-
-| Type | Source | Reference | Real? |
-|---|---|---|---|
-| **CECB OCEMS** | Chhattisgarh ECB Online CEMS portal | `enviscecb.org/data.htm` — CSV import | ✅ Real stack emission readings |
-| **CPCB RTDMS** | Central Pollution Control Board Real-Time Data | `rtdms.cpcb.gov.in` — 15 min sync | ✅ Real (with synthetic fallback when portal down) |
-| **Emission Standards** | Environment (Protection) Rules, 1986 Schedule-I | Gazette notification — 5 industry types, 3 parameters | ✅ Real CPCB standards |
-| **Industry Registry** | 10 verified CG industries | SAIL, NTPC, CSEB, BALCO, ACC, UltraTech, Monnet, JSPL, Nova Iron | ✅ Real industries with real coordinates |
-| **Consent Data** | CECB Consent Management System | Consent-to-Operate validity dates | ✅ Real regulatory data |
-| **Historical Violations** | CSE Inspection Reports | Nova Iron Bilaspur — SPM 2292 mg/m³ (June 2009) | ✅ Documented violation |
-
-### CPCB Stack Emission Standards (EP Rules 1986 Schedule-I)
-
-| Industry Type | PM (mg/Nm³) | SO₂ (mg/Nm³) | NOₓ (mg/Nm³) |
-|---|---|---|---|
-| Thermal Power Plant | 50 | 200 | 300 |
-| Integrated Steel | 50 | 500 | 500 |
-| Cement | 30 | 100 | 1000 |
-| Sponge Iron | 150 | 500 | — |
-| Aluminium Smelter | 50 | 400 | — |
-
-**Note:** Chhattisgarh has no official noise monitoring stations under CPCB NANMN (covers only 7 metro cities — Mumbai, Delhi, Kolkata, Chennai, Bangalore, Lucknow, Hyderabad). This is the infrastructure gap PrithviNet aims to help fill. Noise data uses real NANMN pattern data from Lucknow Industrial zone (closest industrial profile to Korba/Bhilai) applied to verified Chhattisgarh research baselines.
-
-**Same API key** from [data.gov.in](https://api.data.gov.in/) works for all three datasets.
-
-### Sync & Import Scripts
-
-| Script | What it does | Schedule |
-|---|---|---|
-| `backend/scripts/sync_govapi_chhattisgarh.py` | Air quality from CPCB via data.gov.in | Every 60 min |
-| `backend/scripts/sync_water_govapi.py` | Water quality NWMP + CPCB baselines | Every 24 h |
-| `backend/scripts/sync_noise_pattern.py` | Noise (NANMN pattern + CG baselines) | Every 24 h |
-| `backend/scripts/seed_industries_real.py` | Seed 10 real CG industries + CPCB limits + Nova Iron violation | One-time |
-| `backend/scripts/import_ocems_cecb.py` | Import CECB OCEMS CSV stack emission data | On-demand |
-| `backend/scripts/sync_rtdms_live.py` | CPCB RTDMS live industry CEMS data | Every 15 min |
-
-Pre-trained Prophet models are in `backend/ml_models/`.
+Training scripts are in `backend/scripts/`. Pre-trained Prophet models are committed to `backend/data/trained_models/`.
 
 ---
 

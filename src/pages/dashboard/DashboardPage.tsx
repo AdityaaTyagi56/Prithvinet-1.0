@@ -111,112 +111,100 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
     loadLocations();
   }, [pollutionType]);
 
-  // Load initial readings and use actual live data for all air stations
+  // Load initial readings and simulate live updates with smooth random walk
   useEffect(() => {
     if (!selectedLocationId) return;
 
-    let initial: Reading[] = [];
-    
-    // For ALL air stations, use live CPCB snapshot data where possible
-    if (pollutionType === 'air') {
+    // For live CPCB stations, seed from the real snapshot values instead of mock data
+    let initial: Reading[];
+    if (selectedLocationId.startsWith('live-') && pollutionType === 'air') {
       const snap = getCachedSnapshot();
-      if (snap?.stations?.length) {
-        
-        let targetStation = snap.stations[0];
-        
-        // Find specific live station (if starts with live-)
-        if (selectedLocationId.startsWith('live-')) {
-          const idx = parseInt(selectedLocationId.replace('live-', ''), 10);
-          targetStation = snap.stations[idx] || targetStation;
-        } else {
-          // Attempt name mapping for mock stations
-          const locName = locations.find(l => l.id === selectedLocationId)?.name.toLowerCase() || '';
-          const match = snap.stations.find(s => locName.includes(s.city.toLowerCase()) || s.city.toLowerCase().includes(locName));
-          if (match) targetStation = match;
-        }
-
-        if (targetStation?.pollutants) {
-          const pidAlias: Record<string, string> = {
-            'PM2.5': 'PM2.5', 'PM10': 'PM10', 'SO2': 'SO2',
-            'NO2': 'NO2', 'CO': 'CO', 'OZONE': 'O3', 'NH3': 'NH3',
-          };
-          
-          const liveReadings: Reading[] = Object.entries(targetStation.pollutants)
-            .map(([pid, vals]: [string, any]) => {
-              const param = pidAlias[pid] || pid;
-              const val = parseFloat(vals?.avg || '0');
-              return val > 0 ? {
-                location_id: selectedLocationId, parameter_id: param, parameter: param,
-                value: val, recorded_at: targetStation.last_update,
-              } : null;
-            })
-            .filter((r): r is Reading => r !== null);
-            
-          if (liveReadings.length > 0) initial = liveReadings;
-        }
+      const idx = parseInt(selectedLocationId.replace('live-', ''), 10);
+      const station = snap?.stations?.[idx];
+      if (station?.pollutants) {
+        const pidAlias: Record<string, string> = {
+          'PM2.5': 'PM2.5', 'PM10': 'PM10', 'SO2': 'SO2',
+          'NO2': 'NO2', 'CO': 'CO', 'OZONE': 'O3', 'NH3': 'NH3',
+        };
+        const liveReadings: Reading[] = Object.entries(station.pollutants)
+          .map(([pid, vals]: [string, any]) => {
+            const param = pidAlias[pid] || pid;
+            const val = parseFloat(vals?.avg || '0');
+            return val > 0 ? {
+              location_id: selectedLocationId, parameter_id: param, parameter: param,
+              value: val, recorded_at: station.last_update,
+            } : null;
+          })
+          .filter((r): r is Reading => r !== null);
+        initial = liveReadings.length > 0 ? liveReadings : getLatestReadings(selectedLocationId, pollutionType);
+      } else {
+        initial = getLatestReadings(selectedLocationId, pollutionType);
       }
-    }
-    
-    if (initial.length === 0) {
+    } else {
       initial = getLatestReadings(selectedLocationId, pollutionType);
     }
 
-    const now = new Date().toISOString();
+    // Seed initial values — only on first load for this location
     initial.forEach(r => {
-      currentValuesRef.current[r.parameter] = r.value;
-      addReading({ ...r, recorded_at: now });
-    });
-
-    // Real alerts checking based on actual data
-    const alertStore = useAlertStore.getState();
-    const activeAlerts = alertStore.alerts.filter(a => a.status === 'active' && a.location_id === selectedLocationId);
-    
-    // Clear any previous mock alerts for this location to prevent fake data
-    activeAlerts.forEach(a => {
-        if(a.id.startsWith('alert-')) useAlertStore.setState({ alerts: alertStore.alerts.filter(al => al.id !== a.id) });
-    });
-
-    initial.forEach(r => {
-      const limit = LIMITS[r.parameter];
-      if (limit && r.value > limit) {
-         alertStore.addAlert({
-            id: `live-alert-${r.parameter}-${selectedLocationId}`,
-            type: 'threshold_breach',
-            location_id: selectedLocationId,
-            industry_id: 'auto-sys',
-            parameter_id: r.parameter,
-            value: r.value,
-            threshold: limit,
-            severity: r.value > limit * 1.5 ? 'critical' : 'high',
-            status: 'active',
-         });
+      // Only set if not already tracking this param (avoids reset on re-render)
+      if (currentValuesRef.current[r.parameter] == null) {
+        currentValuesRef.current[r.parameter] = r.value;
       }
+      addReading(r);
     });
 
-    // Gentle polling for new state, without random jumping
-    // We simply keep reading fresh values when API data updates
+    // Every 5 seconds apply a tiny ±0.8% random-walk step to each parameter.
+    // Values drift naturally — no jumps — because each step builds on the
+    // previous value rather than re-randomizing from a fixed base.
     const interval = setInterval(() => {
-        // Just trigger re-adds so interpolations and timers stay fresh.
-        // Let the actual backend script updates give us new numbers!
-        initial.forEach(r => {
-            addReading({
-                ...r,
-                recorded_at: new Date().toISOString()
-            });
+      const now = new Date().toISOString();
+      PARAMS_BY_TYPE[pollutionType].forEach(param => {
+        const prev = currentValuesRef.current[param];
+        if (prev == null) return;
+
+        // Random walk: move ±0.8% from previous value
+        const step = prev * (Math.random() * 0.016 - 0.008);
+        const next = Math.max(0.1, Math.round((prev + step) * 100) / 100);
+        currentValuesRef.current[param] = next;
+
+        addReading({
+          location_id: selectedLocationId,
+          parameter_id: param,
+          parameter: param,
+          value: next,
+          recorded_at: now,
         });
-    }, 60000);
+      });
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [selectedLocationId, pollutionType, locations]);
+  }, [selectedLocationId, pollutionType, addReading]);
+
+  // Simulate occasional alerts
+  useEffect(() => {
+    const addAlert = useAlertStore.getState().addAlert;
+    const params = PARAMS_BY_TYPE[pollutionType];
+    const param = params[0];
+    const limit = LIMITS[param] || 100;
+    const alertTimer = setTimeout(() => {
+      addAlert({
+        id: `alert-${Date.now()}`,
+        type: 'threshold_breach',
+        location_id: selectedLocationId || 'loc-1',
+        industry_id: 'ind-1',
+        parameter_id: param,
+        value: +(limit * 1.08).toFixed(1),
+        threshold: limit,
+        severity: 'high',
+        status: 'active',
+      });
+    }, 3000);
+    return () => clearTimeout(alertTimer);
+  }, [pollutionType, selectedLocationId]);
 
   const selectedLocation = useMemo(
     () => locations.find(l => l.id === selectedLocationId),
     [locations, selectedLocationId]
-  );
-
-  const activeStationAlerts = useMemo(
-    () => alerts.filter(a => a.location_id === selectedLocationId && a.status === 'active'),
-    [alerts, selectedLocationId]
   );
 
   const locationReadings = selectedLocationId ? latestReadings[selectedLocationId] || {} : {};
@@ -259,18 +247,18 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
             </div>
           )}
 
-          {activeStationAlerts.length > 0 && (
+          {alerts.length > 0 && (
             <div className="bg-red-50 border border-red-200 p-4 rounded mb-4 flex items-center space-x-3">
               <AlertTriangle className="text-red-600 h-5 w-5 flex-shrink-0" />
               <div className="flex-1">
                 <p className="text-red-800 font-semibold text-sm">
-                  ⚠ ALERT: {activeStationAlerts[0].type.replace('_', ' ').toUpperCase()}
+                  ⚠ ALERT: {alerts[0].type.replace('_', ' ').toUpperCase()}
                 </p>
                 <p className="text-red-600 text-sm">
-                  {activeStationAlerts[0].parameter_id} exceeded threshold {activeStationAlerts[0].threshold} {UNITS[activeStationAlerts[0].parameter_id] || ''} — recorded value: {activeStationAlerts[0].value} {UNITS[activeStationAlerts[0].parameter_id] || ''}
+                  {alerts[0].parameter_id} exceeded threshold {alerts[0].threshold} {UNITS[alerts[0].parameter_id] || ''} — recorded value: {alerts[0].value} {UNITS[alerts[0].parameter_id] || ''}
                 </p>
               </div>
-              <span className="badge-critical uppercase">{activeStationAlerts[0].severity}</span>
+              <span className="badge-critical uppercase">{alerts[0].severity}</span>
             </div>
           )}
 

@@ -50,9 +50,7 @@ def append_readings_to_csv(
         return 0
 
     if target_date is None:
-        from datetime import timedelta
-        IST = timezone(timedelta(hours=5, minutes=30))
-        target_date = datetime.now(IST).date()
+        target_date = datetime.now(timezone.utc).date()
 
     csv_path = get_daily_csv_path(target_date)
     file_exists = csv_path.exists() and csv_path.stat().st_size > 0
