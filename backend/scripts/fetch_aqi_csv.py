@@ -241,7 +241,7 @@ def main():
                 fetch_and_save(api_key)
             except Exception as e:
                 logging.error("Fetch failed: %s", e)
-            time.sleep(3600)
+            time.sleep(300)
     else:
         fetch_and_save(api_key)
 
