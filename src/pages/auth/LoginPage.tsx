@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { api } from "../../lib/api";
 import { AshokEmblem } from "../../components/AshokEmblem";
 import { MissionLifeLogo, AzadiLogo } from "../../components/GovLogos";
-import { Shield, LogIn, Globe, Eye, Mail, Lock, Activity, Wind, Waves } from "lucide-react";
+import { Shield, LogIn, Mail, Lock } from "lucide-react";
 
 export function LoginPage() {
   const [email, setEmail] = useState("admin@cecb.gov.in");
   const [password, setPassword] = useState("password123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cardVisible, setCardVisible] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
 
@@ -53,125 +55,66 @@ export function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    const id = window.requestAnimationFrame(() => setCardVisible(true));
+    return () => window.cancelAnimationFrame(id);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#f5f7f5]">
-      {/* ═══ 1. Dark green top bar (PARIVESH style) ═══ */}
-      <div className="parivesh-topbar">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex items-center justify-between text-[11px]">
-          <div className="flex items-center gap-2.5">
-            {/* Indian tricolor flag */}
-            <div className="flex-shrink-0 w-6 h-[14px] rounded-[2px] overflow-hidden flex flex-col shadow-sm">
-              <div className="flex-1 bg-[#FF9933]" />
-              <div className="flex-1 bg-white relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-[5px] h-[5px] rounded-full border border-[#000080]" />
-                </div>
-              </div>
-              <div className="flex-1 bg-[#138808]" />
-            </div>
-            <span className="text-white/90 font-medium">भारत | Government of India</span>
-          </div>
-          <div className="flex items-center gap-2 text-white/80">
-            <button className="hidden sm:flex items-center gap-1 hover:text-white text-[11px]">
-              <Eye className="h-3 w-3" /> Screen Reader Access
-            </button>
-            <span className="text-white/25 hidden sm:inline">|</span>
-            <span className="text-[11px]">A<sup>-</sup></span>
-            <span className="text-[13px] font-bold">A</span>
-            <span className="text-[15px] font-bold">A<sup>+</sup></span>
-            <span className="text-white/25 mx-1">|</span>
-            <button className="flex items-center gap-1 hover:text-white text-[11px] font-semibold">
-              <Globe className="h-3 w-3" /> English
-            </button>
-          </div>
-        </div>
-      </div>
+    <div
+      className="relative min-h-screen overflow-hidden bg-[#0b2f22] bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/images/login-bg-fallback-blur.jpg')" }}
+    >
+      {/* Full-screen background video */}
+      {!videoFailed && (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          poster="/images/login-bg-fallback-blur.jpg"
+          onLoadedData={() => setVideoFailed(false)}
+          onError={() => setVideoFailed(true)}
+        >
+          <source src="/videos/login-bg.mp4?v=4" type="video/mp4" />
+        </video>
+      )}
 
-      {/* ═══ 2. White header band (PARIVESH style) ═══ */}
-      <div className="parivesh-header">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex items-center justify-between py-3 sm:py-4">
-          {/* Left: PrithviNet Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#14532d] via-[#16a34a] to-[#22c55e] flex items-center justify-center shadow-lg flex-shrink-0 border-2 border-green-200/50">
-              <svg viewBox="0 0 40 40" className="w-8 h-8 sm:w-9 sm:h-9" fill="none">
-                <path d="M20 4C20 4 8 12 8 24C8 30 13 36 20 36C27 36 32 30 32 24C32 12 20 4 20 4Z" fill="#4ade80" opacity="0.9" />
-                <path d="M20 8C20 8 12 14 12 24C12 28 15 32 20 32" stroke="white" strokeWidth="1.5" fill="none" />
-                <path d="M20 12L20 30" stroke="white" strokeWidth="1.2" />
-                <path d="M20 18L15 22" stroke="white" strokeWidth="1" />
-                <path d="M20 22L25 18" stroke="white" strokeWidth="1" />
-              </svg>
-            </div>
-            <div>
-              <div className="text-[10px] text-[#14532d]/60 font-medium">छत्तीसगढ़ पर्यावरण संरक्षण बोर्ड</div>
-              <div className="text-xl sm:text-2xl font-bold text-[#14532d] leading-tight">PrithviNet</div>
-              <div className="text-[10px] text-gray-400 hidden sm:block tracking-wider uppercase">Environmental Monitoring System</div>
-            </div>
-          </div>
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-black/40" />
 
-          {/* Center: Ministry text */}
-          <div className="hidden md:flex flex-col items-center text-center flex-1 px-6">
-            <div className="text-base sm:text-lg font-bold text-[#14532d] leading-snug">पर्यावरण, वन और जलवायु परिवर्तन मंत्रालय</div>
-            <div className="text-sm sm:text-[15px] font-semibold text-[#14532d] leading-snug mt-0.5">Ministry of Environment, Forest and Climate Change</div>
-            <div className="text-[10px] text-gray-400 mt-1 tracking-wide">भारत सरकार | Government of India</div>
-          </div>
-
-          {/* Right: Logos + National Emblem */}
-          <div className="flex items-center gap-4 sm:gap-5 flex-shrink-0">
-            <div className="hidden lg:flex flex-col items-center">
-              <MissionLifeLogo height={42} />
-            </div>
-            <div className="hidden lg:flex flex-col items-center">
-              <AzadiLogo height={52} />
-            </div>
-            <AshokEmblem size={52} className="drop-shadow-md" />
-          </div>
-        </div>
-      </div>
-
-      {/* Login form area */}
-      <div className="flex-1 flex flex-col md:flex-row relative z-0">
-        {/* Left Side: Hero Branding */}
-        <div className="hidden md:flex flex-col flex-1 bg-gradient-to-br from-[#064e3b] via-[#14532d] to-[#166534] relative overflow-hidden">
-          <div className="absolute inset-0">
-            <img 
-              src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2626&auto=format&fit=crop" 
-              alt="Environment Forest"
-              className="w-full h-full object-cover opacity-20 mix-blend-overlay"
-            />
-          </div>
-          <div className="relative z-10 flex flex-col justify-center h-full p-12 lg:p-20 text-white">
-            <div className="mb-8 flex gap-4">
-              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
-                <Wind className="w-8 h-8 text-green-300" />
-              </div>
-              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
-                <Waves className="w-8 h-8 text-blue-300" />
-              </div>
-              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
-                <Activity className="w-8 h-8 text-amber-300" />
-              </div>
-            </div>
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight drop-shadow-md">
-              Smart Environmental<br/>
-              <span className="text-green-400">Monitoring Platform</span>
+      {/* Centered login layer */}
+      <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-10">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="pointer-events-none px-6">
+            <h1
+              className="text-5xl md:text-7xl font-black tracking-[0.08em] text-white"
+              style={{ textShadow: '0 4px 18px rgba(0,0,0,0.45)' }}
+            >
+              PRITHVINET
             </h1>
-            <p className="text-lg text-green-50 max-w-xl leading-relaxed mb-10 drop-shadow">
-              Real-time air, water, and noise pollution tracking. AI-assisted compliance, predictive analytics, and regional risk mapping for actionable insights.
+            <p
+              className="mt-3 text-base md:text-xl font-bold tracking-wide text-white"
+              style={{ textShadow: '0 3px 12px rgba(0,0,0,0.42)' }}
+            >
+              Real-Time Environmental Monitoring Platform
             </p>
-            <div className="mt-auto">
-              <div className="flex items-center gap-4 text-sm font-medium text-green-200/80">
-                <div className="w-12 h-[1px] bg-green-200/40"></div>
-                PS 01: Govt. of Chhattisgarh
-              </div>
-            </div>
           </div>
-        </div>
 
-        {/* Right Side: Login Form */}
-        <div className="w-full md:w-[480px] lg:w-[550px] bg-white flex flex-col justify-center px-8 py-12 md:px-12 shadow-[-20px_0_40px_-5px_rgba(0,0,0,0.1)] relative z-10">
-          <div className="max-w-sm mx-auto w-full">
+          <div className={`w-[380px] max-w-full transform transition-all duration-[800ms] ease-out ${cardVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <div className="rounded-2xl border border-white/30 bg-white p-8 shadow-xl">
+            <div className="mx-auto w-full">
             <div className="text-center mb-8">
-               <div className="mx-auto w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mb-5 border border-green-100 shadow-inner">
+              <div className="mb-4 flex items-center justify-center gap-4">
+                <MissionLifeLogo height={34} />
+                <AshokEmblem size={40} className="drop-shadow-sm" />
+                <AzadiLogo height={40} />
+              </div>
+              <h1 className="text-3xl font-extrabold tracking-wide text-[#14532d]">PRITHVINET</h1>
+              <p className="mt-1 text-sm font-medium text-gray-600">Environmental Monitoring Platform</p>
+              <div className="mx-auto w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mb-5 border border-green-100 shadow-inner">
                  <Shield className="h-8 w-8 text-[#14532d]" />
                </div>
               <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Secure Portal Login</h2>
@@ -299,13 +242,13 @@ export function LoginPage() {
             <div className="mt-8 text-center text-[11px] text-gray-400 font-medium">
               For authorized CECB personnel only. <br/> Access is logged and monitored.
             </div>
+            </div>
           </div>
+        </div>
         </div>
       </div>
 
-      {/* Footer */}
-
-      <div className="gov-footer text-center text-green-200/50 text-[11px] py-3 relative">
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 text-center text-white/80 text-[11px] py-3">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#FF9933] via-[#FFD700] to-[#138808]" />
         &copy; {new Date().getFullYear()} CECB, Govt. of Chhattisgarh | Designed by NIC
       </div>

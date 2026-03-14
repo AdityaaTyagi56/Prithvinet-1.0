@@ -201,17 +201,85 @@ interface MapLocation {
   longitude: number;
   pm25: number;
   recorded_at: string;
+  region?: string;
 }
 
 interface PollutionMapProps {
   locations?: MapLocation[];
   pollutionType?: PollutionType;
+  selectedLocationId?: string | null;
+  selectedRegion?: string | null;
+  heightClassName?: string;
+  onLocationSelect?: (location: MapLocation | null) => void;
+}
+
+function normalizeRegionName(value?: string): string {
+  const name = (value || '').toLowerCase();
+  if (name.includes('bhilai') || name.includes('durg')) return 'Durg';
+  if (name.includes('raipur')) return 'Raipur';
+  if (name.includes('korba')) return 'Korba';
+  if (name.includes('bilaspur')) return 'Bilaspur';
+  if (name.includes('rajnandgaon')) return 'Rajnandgaon';
+  if (name.includes('jagdalpur') || name.includes('bastar')) return 'Bastar';
+  if (name.includes('ambikapur') || name.includes('surguja')) return 'Surguja';
+  return value || '';
+}
+
+function MapFocusController({
+  locations,
+  selectedLocationId,
+  selectedRegion,
+}: {
+  locations: MapLocation[];
+  selectedLocationId?: string | null;
+  selectedRegion?: string | null;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!locations.length) return;
+
+    const selectedById = selectedLocationId
+      ? locations.find((loc) => loc.location_id === selectedLocationId)
+      : null;
+
+    if (selectedById) {
+      map.flyTo([selectedById.latitude, selectedById.longitude], 10, { duration: 0.8 });
+      return;
+    }
+
+    if (!selectedRegion) return;
+
+    const regionLocations = locations.filter((loc) => {
+      const region = normalizeRegionName(loc.region || loc.location_name);
+      return region === selectedRegion;
+    });
+
+    if (regionLocations.length === 1) {
+      map.flyTo([regionLocations[0].latitude, regionLocations[0].longitude], 10, { duration: 0.8 });
+      return;
+    }
+
+    if (regionLocations.length > 1) {
+      const bounds = L.latLngBounds(regionLocations.map((loc) => [loc.latitude, loc.longitude] as [number, number]));
+      map.fitBounds(bounds.pad(0.35));
+    }
+  }, [locations, map, selectedLocationId, selectedRegion]);
+
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════
 // Main map component
 // ═══════════════════════════════════════════════════════════════
-export function PollutionMap({ locations = [], pollutionType = 'air' }: PollutionMapProps) {
+export function PollutionMap({
+  locations = [],
+  pollutionType = 'air',
+  selectedLocationId,
+  selectedRegion,
+  heightClassName = 'h-[520px]',
+  onLocationSelect,
+}: PollutionMapProps) {
   const [layers, setLayers] = useState({
     air: true,
     water: true,
@@ -259,12 +327,25 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
     { key: 'districts', label: 'District Boundaries', icon: <Layers className="h-3.5 w-3.5" />, color: '#14532d' },
   ];
 
+  const liveAirLocations = useMemo(
+    () => locations.filter((loc) => Number.isFinite(loc.latitude) && Number.isFinite(loc.longitude)),
+    [locations],
+  );
+
+  const highlightedRegion = selectedRegion || null;
+
   return (
-    <div className="relative h-[520px] w-full rounded-lg overflow-hidden border border-gray-200">
+    <div className={`relative ${heightClassName} w-full rounded-lg overflow-hidden border border-gray-200`}>
       <MapContainer center={center} zoom={7} style={{ height: '100%', width: '100%' }} zoomControl={true}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        <MapFocusController
+          locations={liveAirLocations}
+          selectedLocationId={selectedLocationId}
+          selectedRegion={selectedRegion}
         />
 
         {/* District boundary overlays */}
@@ -278,6 +359,44 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
 
         {/* AQI Heatmap */}
         {layers.heatmap && heatPoints.length > 0 && <HeatmapLayer points={heatPoints} />}
+
+        {/* Live overview air locations */}
+        {layers.air && liveAirLocations.map((loc) => {
+          const region = normalizeRegionName(loc.region || loc.location_name);
+          const isSelected = (selectedLocationId && loc.location_id === selectedLocationId) || (!!highlightedRegion && region === highlightedRegion);
+
+          return (
+            <CircleMarker
+              key={loc.location_id}
+              center={[loc.latitude, loc.longitude]}
+              eventHandlers={{
+                click: () => {
+                  onLocationSelect?.(loc);
+                },
+              }}
+              radius={isSelected ? 11 : 8}
+              pathOptions={{
+                color: isSelected ? '#14532d' : aqiColor(loc.pm25),
+                weight: isSelected ? 3 : 2,
+                fillColor: aqiColor(loc.pm25),
+                fillOpacity: isSelected ? 0.95 : 0.8,
+              }}
+            >
+              <Popup maxWidth={260}>
+                <div style={{ minWidth: 220, fontSize: 12 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, color: '#14532d' }}>{loc.location_name}</div>
+                  <div style={{ fontSize: 11, color: '#666', marginBottom: 8 }}>{region || 'Chhattisgarh'} monitoring location</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', rowGap: 6, columnGap: 12 }}>
+                    <span style={{ color: '#666' }}>Live AQI</span>
+                    <span style={{ fontWeight: 700, color: aqiColor(loc.pm25) }}>{Math.round(loc.pm25)}</span>
+                    <span style={{ color: '#666' }}>Recorded at</span>
+                    <span style={{ fontWeight: 600, color: '#14532d' }}>{loc.recorded_at || 'N/A'}</span>
+                  </div>
+                </div>
+              </Popup>
+            </CircleMarker>
+          );
+        })}
 
         {/* Air station markers */}
         {layers.air && AIR_LOCATIONS.map(loc => (
@@ -401,7 +520,7 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
 
       {/* ── Station count badge ── */}
       <div className="absolute bottom-3 left-3 z-[1000] bg-white/90 rounded-lg shadow border border-gray-200 px-3 py-2 text-[11px] font-medium text-gray-600 flex items-center gap-3">
-        {layers.air && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500" />{AIR_LOCATIONS.length} Air</span>}
+        {layers.air && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-500" />{liveAirLocations.length || AIR_LOCATIONS.length} Air</span>}
         {layers.water && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-cyan-500" />{WATER_LOCATIONS.length} Water</span>}
         {layers.noise && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" />{NOISE_LOCATIONS.length} Noise</span>}
         {layers.industries && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500" />{INDUSTRY_LOCATIONS.length} Industries</span>}
