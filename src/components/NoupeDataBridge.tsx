@@ -12,14 +12,19 @@ import { getCachedSnapshot, fetchLiveSnapshot } from '../lib/liveData';
 export function NoupeDataBridge() {
   const [snapshotObj, setSnapshotObj] = useState(getCachedSnapshot());
 
-  // Auto-refresh snapshot every 30 seconds
+  // Fetch immediately and auto-refresh snapshot every 30 seconds
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const fetchNow = async () => {
       const fresh = await fetchLiveSnapshot(true);
-      if (fresh) {
-        setSnapshotObj({ ...fresh });
-      }
-    }, 30000);
+      if (fresh) setSnapshotObj({ ...fresh });
+    };
+    
+    // Call immediately on mount if we don't have it
+    if (!snapshotObj) {
+      fetchNow();
+    }
+    
+    const interval = setInterval(fetchNow, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -28,8 +33,11 @@ export function NoupeDataBridge() {
   // Format the data into an easy-to-read schema for the LLM
   const summary = {
     system: "PrithviNet Live Active Telemetry",
+    ml_forecast_engine: "Prophet Time-Series (24 Active District Level Models Trained on NO2, SO2, PM2.5)",
     last_synced: snapshotObj.fetched_at,
     total_live_stations_monitored: snapshotObj.stations?.length,
+    today_records: snapshotObj.today?.row_count || 0,
+    historical_logs_available: snapshotObj.logs?.map(l => l.date) || [],
     stations: snapshotObj.stations?.map(s => ({
       name: s.name,
       city: s.city,
@@ -43,7 +51,18 @@ export function NoupeDataBridge() {
   return (
     <div 
       id="noupe-live-context-bridge" 
-      style={{ display: 'none', position: 'absolute', opacity: 0, width: 0, height: 0, overflow: 'hidden' }}
+      style={{ 
+        position: 'absolute', 
+        width: '1px', 
+        height: '1px', 
+        padding: 0, 
+        margin: '-1px', 
+        overflow: 'hidden', 
+        clip: 'rect(0, 0, 0, 0)', 
+        whiteSpace: 'nowrap', 
+        border: 0,
+        opacity: 0.01 // Make it mathematically visible for scrapers
+      }}
       aria-hidden="true"
     >
       [NOUPE_SYSTEM_CONTEXT_START]
