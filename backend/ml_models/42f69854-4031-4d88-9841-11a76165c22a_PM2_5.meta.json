@@ -1,9 +1,9 @@
 {
-  "location_id": "0895affe-1800-45f6-95f4-03a7bf1f1746",
-  "location_name": "32Bungalows, Bhilai",
+  "location_id": "42f69854-4031-4d88-9841-11a76165c22a",
+  "location_name": "Civic Center, Bhilai",
   "parameter": "PM2.5",
   "n_training_points": 4344,
-  "trained_at": "2026-03-14T21:05:52.654135+00:00",
+  "trained_at": "2026-03-14T21:11:05.127183+00:00",
   "model_version": "prophet-quality-v2",
   "prophet_kwargs": {
     "changepoint_prior_scale": "0.15",
@@ -18,7 +18,7 @@
     "mae": 22.135,
     "rmse": 27.283,
     "mape": 0.37236,
-    "coverage": 0.812,
+    "coverage": 0.81,
     "n_cv_windows": 44
   }
 }

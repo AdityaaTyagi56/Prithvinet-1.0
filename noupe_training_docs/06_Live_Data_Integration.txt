@@ -1,0 +1,15 @@
+PrithviNet: Live Data Integration & Technical Core
+
+Entity and Master Management Database:
+- Regional offices and industries are registered with dedicated metadata.
+- All 14 Continuous Emission Monitoring (CPCB) stations are tracked with explicit latitude/longitude geo-tagging (e.g., Korba, Raipur, Bhilai).
+
+Continuous IoT/Sensor Data Streams:
+- PrithviNet replaces fragmented files with direct API assimilation.
+- The Python backend regularly loops (every 5 minutes) via `scripts/fetch_aqi_csv.py` to index the latest data dumps from data.gov.in (and simulated inputs for noise/water).
+- The pipeline produces a JSON snapshot (`aqi-live.json`) serving as the source-of-truth for the platform.
+- Metric Units: The system enforces standardized units across the board. E.g., Air (ppm, ug/m3), Noise (dB), Temperature (°C).
+
+Visual Outputs:
+- Real-time monitoring dashboard tracks live reading inflows with <30-second delays via Frontend hooks (`useLiveReadings`).
+- Geographic Mapping: Utilizes React Leaflet to map geo-spatial pollution heatmaps and regional risk mapping visually, allowing the "Citizen" and "Regional Officer" to identify local hotspots quickly.

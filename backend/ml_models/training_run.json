@@ -1,0 +1,329 @@
+{
+  "run_at": "2026-03-14T21:18:36.509942+00:00",
+  "results": [
+    {
+      "location": "32Bungalows, Bhilai",
+      "location_id": "0895affe-1800-45f6-95f4-03a7bf1f1746",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 7.191,
+        "rmse": 8.99,
+        "mape": 0.23207,
+        "coverage": 0.922,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "32Bungalows, Bhilai",
+      "location_id": "0895affe-1800-45f6-95f4-03a7bf1f1746",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 22.135,
+        "rmse": 27.283,
+        "mape": 0.37236,
+        "coverage": 0.812,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "32Bungalows, Bhilai",
+      "location_id": "0895affe-1800-45f6-95f4-03a7bf1f1746",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.33,
+        "rmse": 7.925,
+        "mape": 0.39223,
+        "coverage": 0.919,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Krishak Nagar, Raipur",
+      "location_id": "201b289f-3599-42d3-b1b6-0666826320dd",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.629,
+        "rmse": 8.757,
+        "mape": 0.25916,
+        "coverage": 0.909,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Krishak Nagar, Raipur",
+      "location_id": "201b289f-3599-42d3-b1b6-0666826320dd",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 21.094,
+        "rmse": 25.661,
+        "mape": 0.35405,
+        "coverage": 0.827,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Krishak Nagar, Raipur",
+      "location_id": "201b289f-3599-42d3-b1b6-0666826320dd",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.215,
+        "rmse": 7.848,
+        "mape": 0.33321,
+        "coverage": 0.928,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "AIIMS, Raipur",
+      "location_id": "3dbb17c5-c62b-41be-a381-ae06f40a9920",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.629,
+        "rmse": 8.757,
+        "mape": 0.25916,
+        "coverage": 0.92,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "AIIMS, Raipur",
+      "location_id": "3dbb17c5-c62b-41be-a381-ae06f40a9920",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 21.094,
+        "rmse": 25.661,
+        "mape": 0.35405,
+        "coverage": 0.828,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "AIIMS, Raipur",
+      "location_id": "3dbb17c5-c62b-41be-a381-ae06f40a9920",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.215,
+        "rmse": 7.848,
+        "mape": 0.33321,
+        "coverage": 0.93,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Civic Center, Bhilai",
+      "location_id": "42f69854-4031-4d88-9841-11a76165c22a",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 7.191,
+        "rmse": 8.99,
+        "mape": 0.23207,
+        "coverage": 0.921,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Civic Center, Bhilai",
+      "location_id": "42f69854-4031-4d88-9841-11a76165c22a",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 22.135,
+        "rmse": 27.283,
+        "mape": 0.37236,
+        "coverage": 0.81,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Civic Center, Bhilai",
+      "location_id": "42f69854-4031-4d88-9841-11a76165c22a",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.33,
+        "rmse": 7.925,
+        "mape": 0.39223,
+        "coverage": 0.918,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Siltara Phase-II, Raipur",
+      "location_id": "46d126fa-7821-4a0a-84ea-c330ea899150",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.629,
+        "rmse": 8.757,
+        "mape": 0.25916,
+        "coverage": 0.916,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Siltara Phase-II, Raipur",
+      "location_id": "46d126fa-7821-4a0a-84ea-c330ea899150",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 21.094,
+        "rmse": 25.661,
+        "mape": 0.35405,
+        "coverage": 0.823,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Siltara Phase-II, Raipur",
+      "location_id": "46d126fa-7821-4a0a-84ea-c330ea899150",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.215,
+        "rmse": 7.848,
+        "mape": 0.33321,
+        "coverage": 0.926,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Nawapara SECL Colony, Chhal",
+      "location_id": "60884308-1fc4-454f-9e3c-c3877a9f4706",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 5.715,
+        "rmse": 7.224,
+        "mape": 0.35768,
+        "coverage": 0.901,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Nawapara SECL Colony, Chhal",
+      "location_id": "60884308-1fc4-454f-9e3c-c3877a9f4706",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 22.735,
+        "rmse": 29.748,
+        "mape": 0.5138,
+        "coverage": 0.768,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Nawapara SECL Colony, Chhal",
+      "location_id": "60884308-1fc4-454f-9e3c-c3877a9f4706",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {}
+    },
+    {
+      "location": "OP Jindal Industrial Park, Tumidih",
+      "location_id": "7bf5208c-5202-4cf9-8d4a-5f26218d2ad5",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 5.715,
+        "rmse": 7.224,
+        "mape": 0.35768,
+        "coverage": 0.898,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "OP Jindal Industrial Park, Tumidih",
+      "location_id": "7bf5208c-5202-4cf9-8d4a-5f26218d2ad5",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 22.735,
+        "rmse": 29.748,
+        "mape": 0.5138,
+        "coverage": 0.766,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "OP Jindal Industrial Park, Tumidih",
+      "location_id": "7bf5208c-5202-4cf9-8d4a-5f26218d2ad5",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {}
+    },
+    {
+      "location": "Bhatagaon New ISBT, Raipur",
+      "location_id": "f57a44ac-dc65-44c0-a275-a7492ec775a5",
+      "parameter": "NO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.629,
+        "rmse": 8.757,
+        "mape": 0.25916,
+        "coverage": 0.912,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Bhatagaon New ISBT, Raipur",
+      "location_id": "f57a44ac-dc65-44c0-a275-a7492ec775a5",
+      "parameter": "PM2.5",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 21.094,
+        "rmse": 25.661,
+        "mape": 0.35405,
+        "coverage": 0.826,
+        "n_cv_windows": 44
+      }
+    },
+    {
+      "location": "Bhatagaon New ISBT, Raipur",
+      "location_id": "f57a44ac-dc65-44c0-a275-a7492ec775a5",
+      "parameter": "SO2",
+      "n_points": 4344,
+      "status": "trained",
+      "cv_metrics": {
+        "mae": 6.215,
+        "rmse": 7.848,
+        "mape": 0.33321,
+        "coverage": 0.924,
+        "n_cv_windows": 44
+      }
+    }
+  ]
+}

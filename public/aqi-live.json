@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-14T20:16:00.585341+00:00",
+  "fetched_at": "2026-03-14T21:34:31.912269+00:00",
   "api_total_records": 96,
   "stations": [
     {
@@ -91,134 +91,46 @@
       }
     },
     {
-      "name": "OP Jindal Industrial Park, Tumidih - CECB",
-      "city": "Tumidih",
-      "lat": "22.06631475",
-      "lon": "83.33820077",
+      "name": "Nawapara SECL Colony, Chhal - CECB",
+      "city": "Chhal",
+      "lat": "22.118125",
+      "lon": "83.140608",
       "last_update": "13-03-2026 15:00:00",
       "pollutants": {
+        "PM10": {
+          "avg": "125",
+          "min": "56",
+          "max": "279"
+        },
+        "OZONE": {
+          "avg": "36",
+          "min": "32",
+          "max": "152"
+        },
+        "NO2": {
+          "avg": "30",
+          "min": "15",
+          "max": "55"
+        },
+        "NH3": {
+          "avg": "4",
+          "min": "4",
+          "max": "4"
+        },
+        "PM2.5": {
+          "avg": "148",
+          "min": "36",
+          "max": "282"
+        },
+        "SO2": {
+          "avg": "36",
+          "min": "10",
+          "max": "66"
+        },
         "CO": {
           "avg": "59",
-          "min": "24",
-          "max": "118"
-        },
-        "NH3": {
-          "avg": "1",
-          "min": "1",
-          "max": "2"
-        },
-        "NO2": {
-          "avg": "NA",
-          "min": "NA",
-          "max": "NA"
-        },
-        "OZONE": {
-          "avg": "80",
-          "min": "5",
-          "max": "130"
-        },
-        "SO2": {
-          "avg": "8",
-          "min": "6",
-          "max": "19"
-        },
-        "PM10": {
-          "avg": "167",
-          "min": "55",
-          "max": "229"
-        },
-        "PM2.5": {
-          "avg": "238",
-          "min": "35",
-          "max": "348"
-        }
-      }
-    },
-    {
-      "name": "Rampur, Korba - CECB",
-      "city": "Korba",
-      "lat": "22.368195",
-      "lon": "82.746431",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "NH3": {
-          "avg": "1",
-          "min": "1",
-          "max": "1"
-        },
-        "SO2": {
-          "avg": "48",
-          "min": "6",
-          "max": "91"
-        },
-        "NO2": {
-          "avg": "38",
-          "min": "16",
-          "max": "73"
-        },
-        "CO": {
-          "avg": "35",
-          "min": "11",
-          "max": "98"
-        },
-        "PM2.5": {
-          "avg": "161",
           "min": "27",
-          "max": "288"
-        },
-        "PM10": {
-          "avg": "112",
-          "min": "35",
-          "max": "150"
-        },
-        "OZONE": {
-          "avg": "13",
-          "min": "1",
-          "max": "18"
-        }
-      }
-    },
-    {
-      "name": "Urja Nagar, Korba - CECB",
-      "city": "Korba",
-      "lat": "22.348441",
-      "lon": "82.549611",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "160",
-          "min": "58",
-          "max": "500"
-        },
-        "PM2.5": {
-          "avg": "191",
-          "min": "44",
-          "max": "500"
-        },
-        "NH3": {
-          "avg": "1",
-          "min": "1",
-          "max": "1"
-        },
-        "SO2": {
-          "avg": "19",
-          "min": "9",
-          "max": "32"
-        },
-        "CO": {
-          "avg": "32",
-          "min": "14",
-          "max": "62"
-        },
-        "NO2": {
-          "avg": "23",
-          "min": "15",
-          "max": "30"
-        },
-        "OZONE": {
-          "avg": "4",
-          "min": "2",
-          "max": "7"
+          "max": "116"
         }
       }
     },
@@ -399,6 +311,138 @@
       }
     },
     {
+      "name": "OP Jindal Industrial Park, Tumidih - CECB",
+      "city": "Tumidih",
+      "lat": "22.06631475",
+      "lon": "83.33820077",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "CO": {
+          "avg": "59",
+          "min": "24",
+          "max": "118"
+        },
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "2"
+        },
+        "NO2": {
+          "avg": "NA",
+          "min": "NA",
+          "max": "NA"
+        },
+        "OZONE": {
+          "avg": "80",
+          "min": "5",
+          "max": "130"
+        },
+        "SO2": {
+          "avg": "8",
+          "min": "6",
+          "max": "19"
+        },
+        "PM10": {
+          "avg": "167",
+          "min": "55",
+          "max": "229"
+        },
+        "PM2.5": {
+          "avg": "238",
+          "min": "35",
+          "max": "348"
+        }
+      }
+    },
+    {
+      "name": "Rampur, Korba - CECB",
+      "city": "Korba",
+      "lat": "22.368195",
+      "lon": "82.746431",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "1"
+        },
+        "SO2": {
+          "avg": "48",
+          "min": "6",
+          "max": "91"
+        },
+        "NO2": {
+          "avg": "38",
+          "min": "16",
+          "max": "73"
+        },
+        "CO": {
+          "avg": "35",
+          "min": "11",
+          "max": "98"
+        },
+        "PM2.5": {
+          "avg": "161",
+          "min": "27",
+          "max": "288"
+        },
+        "PM10": {
+          "avg": "112",
+          "min": "35",
+          "max": "150"
+        },
+        "OZONE": {
+          "avg": "13",
+          "min": "1",
+          "max": "18"
+        }
+      }
+    },
+    {
+      "name": "Urja Nagar, Korba - CECB",
+      "city": "Korba",
+      "lat": "22.348441",
+      "lon": "82.549611",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "160",
+          "min": "58",
+          "max": "500"
+        },
+        "PM2.5": {
+          "avg": "191",
+          "min": "44",
+          "max": "500"
+        },
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "1"
+        },
+        "SO2": {
+          "avg": "19",
+          "min": "9",
+          "max": "32"
+        },
+        "CO": {
+          "avg": "32",
+          "min": "14",
+          "max": "62"
+        },
+        "NO2": {
+          "avg": "23",
+          "min": "15",
+          "max": "30"
+        },
+        "OZONE": {
+          "avg": "4",
+          "min": "2",
+          "max": "7"
+        }
+      }
+    },
+    {
       "name": "OP Jindal School, Kunjemura - CECB",
       "city": "Kunjemura",
       "lat": "22.126650",
@@ -438,50 +482,6 @@
         "CO": {
           "avg": "61",
           "min": "22",
-          "max": "116"
-        }
-      }
-    },
-    {
-      "name": "Nawapara SECL Colony, Chhal - CECB",
-      "city": "Chhal",
-      "lat": "22.118125",
-      "lon": "83.140608",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "125",
-          "min": "56",
-          "max": "279"
-        },
-        "NO2": {
-          "avg": "30",
-          "min": "15",
-          "max": "55"
-        },
-        "NH3": {
-          "avg": "4",
-          "min": "4",
-          "max": "4"
-        },
-        "OZONE": {
-          "avg": "36",
-          "min": "32",
-          "max": "152"
-        },
-        "PM2.5": {
-          "avg": "148",
-          "min": "36",
-          "max": "282"
-        },
-        "SO2": {
-          "avg": "36",
-          "min": "10",
-          "max": "66"
-        },
-        "CO": {
-          "avg": "59",
-          "min": "27",
           "max": "116"
         }
       }
@@ -618,8 +618,8 @@
     },
     {
       "date": "2026-03-14",
-      "row_count": 56,
-      "file_size_bytes": 5383,
+      "row_count": 266,
+      "file_size_bytes": 25348,
       "has_analysis": false
     }
   ],

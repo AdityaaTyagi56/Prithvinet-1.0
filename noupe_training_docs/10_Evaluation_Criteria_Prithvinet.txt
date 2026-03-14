@@ -1,0 +1,16 @@
+PrithviNet: Hackathon Evaluation Criteria & Metrics
+
+As the solution to CECB PS01, PrithviNet is built against strict evaluation criteria to judge its viability as a GovTech solution.
+
+1. Technical Implementation Quality:
+- Clean architecture separating data ingestion loops from the frontend ecosystem. Reliable code structure.
+2. Real-Time Capability:
+- Must demonstrate <1 minute sync times (accomplished via 30 second frontend polling loops and 5 minute background backend jobs fetching government API drops).
+3. Data Visualization and UX:
+- Intuitive, mobile/web responsive dashboard interface without clutter. Use of robust comparison charts.
+4. Innovation Features:
+- Successfully delivering: IoT sensor stream integration, AI-driven assistant with counterfactual predictions, and 24-72h point/uncertainty forecasting.
+5. Scalability and Feasibility:
+- Can the system handle expanding from 14 stations to 10,000? Use of static JSON snapshotting makes reads incredibly light on the frontend.
+6. Environmental Impact Potential:
+- The ability of the Citizen Transparency Portal and the Compliance Escalations workflow to enforce real-world adjustments from heavy polluters.

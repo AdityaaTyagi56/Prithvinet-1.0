@@ -3,7 +3,7 @@
   "location_name": "32Bungalows, Bhilai",
   "parameter": "SO2",
   "n_training_points": 4344,
-  "trained_at": "2026-03-14T07:30:17.845241+00:00",
+  "trained_at": "2026-03-14T21:06:31.907315+00:00",
   "model_version": "prophet-quality-v2",
   "prophet_kwargs": {
     "changepoint_prior_scale": "0.15",
@@ -18,7 +18,7 @@
     "mae": 6.33,
     "rmse": 7.925,
     "mape": 0.39223,
-    "coverage": 0.918,
+    "coverage": 0.919,
     "n_cv_windows": 44
   }
 }

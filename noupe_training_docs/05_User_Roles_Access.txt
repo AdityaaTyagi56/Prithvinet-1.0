@@ -1,0 +1,29 @@
+PrithviNet: User Roles & Access Hierarchies
+
+The platform is designed with a secure role-based login system that supports multiple distinct personas, each with unique abilities and dashboard perspectives.
+
+1. Super Admin:
+- Has absolute control over the platform.
+- Responsible for Entity and Master Management.
+- On-boards Regional Offices, Industries, Water Sources, and Monitoring teams.
+- Configures monitoring locations with geo-tagging, monitoring units (dB, ppm, °C), and sets the "prescribed limits" for every environmental parameter.
+
+2. Regional Officer:
+- Observes the macro-level environmental health of their designated jurisdiction.
+- Approves special monitoring campaigns.
+- Reviews compliance statuses and handles escalation workflows from industries exceeding prescribed limits.
+
+3. Monitoring Team:
+- Ground-level staff that interact with sensor setups.
+- Conduct special campaigns and upload specific air, water, and noise data submissions.
+- Troubleshoots anomalous readings.
+
+4. Industry User:
+- Connects their industrial monitoring logs to the platform.
+- Views their internal compliance scorecard to avoid penalization.
+- Receives automated missing report reminders and warning alerts when their exhaust approaches prescribed thresholds.
+
+5. Citizen:
+- Engages with the "Citizen Transparency Portal".
+- Views real-time monitoring dashboards, public datasets, geo-spatial pollution heatmaps, and simplified comparison charts. 
+- Goal is to promote citizen-awareness without exposing granular proprietary industrial models.
