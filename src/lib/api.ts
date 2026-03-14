@@ -19,6 +19,7 @@ import {
 } from "./mockData";
 import type { PollutionType, RegionalData } from "./mockData";
 import { fetchLiveSnapshot, type LiveSnapshot } from "./liveData";
+import { calcSubIndex } from "./aqiUtil";
 
 // ========= DEMO MODE – no backend needed =========
 const DEMO_MODE = true;
@@ -240,24 +241,38 @@ function mockGet(
       const liveLocations = _liveSnapshotCache.stations.map((s, i) => {
         const pm25Val = parseFloat(s.pollutants?.["PM2.5"]?.avg || "0");
         const pm10Val = parseFloat(s.pollutants?.["PM10"]?.avg || "0");
+        const so2Val = parseFloat(s.pollutants?.["SO2"]?.avg || "0");
+        const no2Val = parseFloat(s.pollutants?.["NO2"]?.avg || "0");
         // Estimate PM2.5 from PM10 if not available (ratio ~0.6)
         const pm25 = pm25Val > 0 ? pm25Val : (pm10Val > 0 ? pm10Val * 0.6 : 0);
+        
+        let aqi = 0;
+        if (pm25 > 0 || pm10Val > 0) {
+           aqi = Math.max(
+              pm25 > 0 ? calcSubIndex("PM2.5", pm25) : 0,
+              pm10Val > 0 ? calcSubIndex("PM10", pm10Val) : 0,
+              so2Val > 0 ? calcSubIndex("SO2", so2Val) : 0,
+              no2Val > 0 ? calcSubIndex("NO2", no2Val) : 0
+           );
+        }
+
         return {
           location_id: `live-${i}`,
           location_name: `${s.name} (CPCB Live)`,
           latitude: parseFloat(s.lat) || 21.25,
           longitude: parseFloat(s.lon) || 81.63,
           pm25: pm25 || undefined,
+          aqi: aqi || undefined,
           recorded_at: s.last_update,
           pollutants: s.pollutants,
         };
       });
       // Use only live stations for air view to avoid mixing mock with real CPCB data
       overview.locations = liveLocations;
-      // Update headline AQI from live PM values
-      const liveVals = liveLocations.map(l => l.pm25).filter((v): v is number => !!v && v > 0);
-      if (liveVals.length > 0) {
-        overview.current_aqi = Math.round(liveVals.reduce((a, b) => a + b, 0) / liveVals.length);
+      // Update headline AQI from true calculated AQI values
+      const liveAqis = liveLocations.map(l => l.aqi).filter((v): v is number => !!v && v > 0);
+      if (liveAqis.length > 0) {
+        overview.current_aqi = Math.round(liveAqis.reduce((a, b) => a + b, 0) / liveAqis.length);
         if (overview.current_aqi <= 50) overview.current_category = "Good";
         else if (overview.current_aqi <= 100) overview.current_category = "Satisfactory";
         else if (overview.current_aqi <= 200) overview.current_category = "Moderate";
