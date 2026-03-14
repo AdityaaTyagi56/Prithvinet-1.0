@@ -1,0 +1,23 @@
+Title: PrithviNet Frequently Asked Questions (FAQ) & Assistance
+Context: Common questions a user might ask the support widget, along with the correct answers.
+
+Q: How do I view the real-time pollution map?
+A: You can view the Live Map on the main dashboard. It uses a color-coded heatmap to show current pollution levels. You can filter the map by AQI, PM2.5, NO2, or SO2 using the layer controls.
+
+Q: What does AQI mean?
+A: AQI stands for Air Quality Index. It is a scale used to communicate how polluted the air currently is or how polluted it is forecast to become. As the AQI increases, an increasingly large percentage of the population is likely to experience increasingly severe adverse health effects.
+
+Q: What should I do if an industry is showing a "Critical" alert?
+A: If you are logged in as a Compliance Officer, navigate to the unified "Alerts" panel. Select the critical alert to view the specific telemetry that triggered it. You can log an inspection event or issue a warning to the registered industrial contact directly from the platform. 
+
+Q: Does PrithviNet predict future pollution?
+A: Yes! PrithviNet has an AI forecasting module that uses historical data from the Chhattisgarh state databases to forecast NO2, SO2, and PM2.5 concentration levels up to 30 days in advance.
+
+Q: Can I see water pollution data here?
+A: Currently, the primary focus of the active dashboards is Air Quality metrics (AQI, PM, SO2, NO2). However, PrithviNet's database architecture is built to support broader environmental metrics over time.
+
+Q: Who built PrithviNet?
+A: PrithviNet was built as a modern digital solution for the Chhattisgarh Environment Conservation Board (CECB) in alignment with the MoEFCC, Government of India, to streamline daily environmental monitoring.
+
+Q: How do I export or download reports?
+A: Administrators and Officers can download historical telemetry datasets or compliance logs from the specific specific regional dashboards via the built-in export features.

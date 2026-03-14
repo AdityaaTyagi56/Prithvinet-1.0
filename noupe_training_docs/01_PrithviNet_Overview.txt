@@ -1,0 +1,22 @@
+Title: PrithviNet Platform Overview & Objective
+Context: General information about what the platform is, who uses it, and its main goal.
+
+# What is PrithviNet?
+PrithviNet is the National Environmental Monitoring System developed alongside the Chhattisgarh Environment Conservation Board (CECB) and MoEFCC (Government of India). It is a comprehensive digital platform designed to provide real-time air quality monitoring, industrial compliance tracking, and AI-powered pollution forecasting.
+
+# Core Mission
+The primary goal of PrithviNet is to consolidate environmental data—specifically air quality metrics like PM2.5, SO2, NO2, and AQI—into an interactive, geographically mapped dashboard. It allows stakeholders (such as government officers, administrators, and the general public) to track pollution sources, monitor industrial plant emissions, issue violation alerts, and forecast future pollution trends.
+
+# Target Audience & Users
+1. Public Citizens: Can view general AQI readings, check localized pollution maps, and stay informed about environmental health.
+2. Compliance Officers (CECB): Monitor industrial regions and specific factories, investigate anomaly alerts, and enforce environmental limit compliances.
+3. Regional Administrators: Oversee large districts, generate systemic reports, and manage officer assignments.
+
+# Key Environmental Variables Tracked:
+- Particulate Matter (PM2.5 and PM10)
+- Sulfur Dioxide (SO2)
+- Nitrogen Dioxide (NO2)
+- Overall Air Quality Index (AQI)
+
+# Geographic Focus
+Currently configured with deep integration for the state of Chhattisgarh, India, mapping crucial industrial corridors, urban regions, and rural environmental outposts.

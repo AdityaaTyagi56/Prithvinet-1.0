@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+32,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,43,28,NO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+1,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,2,1,NH3,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+4,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,5,3,SO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+8,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,9,7,SO2,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+33,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,63,7,PM2.5,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+42,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,68,24,PM10,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+48,Bhilai,India,13-03-2026 15:00:00,21.224231,81.408350,66,14,PM2.5,Chhattisgarh,"Hathkhoj, Bhilai - CECB"
+24,Bhilai,India,13-03-2026 15:00:00,21.224231,81.408350,71,6,CO,Chhattisgarh,"Hathkhoj, Bhilai - CECB"
+16,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,31,1,OZONE,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+30,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,35,27,CO,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"

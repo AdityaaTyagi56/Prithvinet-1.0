@@ -1,0 +1,12 @@
+{
+  "name": "air_quality_chhattisgarh_so2",
+  "resource_id": "3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69",
+  "provider": "data.gov.in",
+  "filters": {
+    "state": "Chhattisgarh",
+    "pollutant_id": "SO2"
+  },
+  "generated_at_utc": "2026-03-13T21:18:02.190567+00:00",
+  "row_count": 10,
+  "output_csv": "/Users/adityatyagi/Downloads/Prithvinet-1.0-main/backend/data/trusted_sources/official/air_quality_chhattisgarh_so2_20260313_211619.csv"
+}

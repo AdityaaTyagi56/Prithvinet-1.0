@@ -1,0 +1,31 @@
+import os
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_BACKEND_ENV_FILE = os.path.join(_BASE_DIR, ".env")
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=_BACKEND_ENV_FILE, extra="ignore")
+
+    DATABASE_URL: str
+    SYNC_DATABASE_URL: str
+    REDIS_URL: str
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o"
+    OPENAI_FALLBACK_MODEL: str = "gpt-3.5-turbo"
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_MODEL: str = "anthropic/claude-3.5-sonnet"
+    OPENROUTER_SITE_URL: str = "http://localhost:3000"
+    OPENROUTER_APP_NAME: str = "PrithviNet"
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+
+settings = Settings()
