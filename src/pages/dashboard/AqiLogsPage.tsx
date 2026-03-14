@@ -107,6 +107,7 @@ function getAqiCategory(aqi: number): { label: string; color: string } {
 
 /** Sub-index for a single pollutant using CPCB AQI breakpoints. */
 function calcSubIndex(param: string, val: number): number {
+  const v = Math.round(val);
   const BP: Record<string, [number, number, number, number][]> = {
     'PM2.5': [[0, 30, 0, 50], [31, 60, 51, 100], [61, 90, 101, 200], [91, 120, 201, 300], [121, 250, 301, 400], [251, 500, 401, 500]],
     PM10:    [[0, 50, 0, 50], [51, 100, 51, 100], [101, 250, 101, 200], [251, 350, 201, 300], [351, 430, 301, 400], [431, 600, 401, 500]],
@@ -116,11 +117,11 @@ function calcSubIndex(param: string, val: number): number {
   const ranges = BP[param];
   if (!ranges) return 0;
   for (const [cLo, cHi, iLo, iHi] of ranges) {
-    if (val >= cLo && val <= cHi) {
-      return Math.round(((iHi - iLo) / (cHi - cLo)) * (val - cLo) + iLo);
+    if (v >= cLo && v <= cHi) {
+      return Math.round(((iHi - iLo) / (cHi - cLo)) * (v - cLo) + iLo);
     }
   }
-  return val > 0 ? 500 : 0;
+  return v > 0 ? 500 : 0;
 }
 
 function formatRowTime(ts: string): string {
@@ -275,8 +276,13 @@ function generateForecast(rows: AqiRow[]): ForecastPoint[] {
     // Add slight random drift (±5%) seeded by offset to keep deterministic per render
     const drift = 1 + (((h * 7 + 3) % 11) - 5) / 100;
 
-    const pm10 = Math.round(avgs.PM10 * diurnalFactor * drift * 10) / 10;
-    const pm25 = Math.round(avgs['PM2.5'] * diurnalFactor * drift * 10) / 10;
+    const draftPm25 = Math.round(avgs['PM2.5'] * diurnalFactor * drift * 10) / 10;
+    const draftPm10 = Math.round(avgs.PM10 * diurnalFactor * drift * 10) / 10;
+    
+    // PM10 must be logically >= PM2.5 in atmospheric science
+    const pm25 = draftPm25;
+    const pm10 = Math.max(draftPm10, Math.round(pm25 * 1.1 * 10) / 10);
+    
     const so2 = Math.round(avgs.SO2 * diurnalFactor * drift * 10) / 10;
     const no2 = Math.round(avgs.NO2 * diurnalFactor * drift * 10) / 10;
 
@@ -392,8 +398,8 @@ export function AqiLogsPage() {
     return copy;
   }, [rows, sortKey, sortAsc, searchQuery]);
 
-  // Forecast computed from current rows
-  const forecast = useMemo(() => generateForecast(rows), [rows]);
+  // Forecast computed from current visible rows (updates when searching)
+  const forecast = useMemo(() => generateForecast(sortedRows), [sortedRows]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -654,7 +660,7 @@ export function AqiLogsPage() {
               <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-gray-200 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-blue-900 flex items-center gap-1.5">
                   <Clock className="h-4 w-4 text-blue-600" />
-                  48hr AQI Forecast — based on current readings
+                  48hr AQI Forecast <span className="font-normal text-blue-700 ml-1">— {searchQuery.trim() ? `Based on readings for "${searchQuery}"` : "Statewide Average"}</span>
                 </h3>
                 <span className="text-[10px] text-blue-500">Diurnal pattern applied</span>
               </div>
