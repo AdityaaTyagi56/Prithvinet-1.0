@@ -27,8 +27,34 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
   const [aiInsight, setAiInsight] = useState<string>('');
   const [aiError, setAiError] = useState<string>('');
 
+  const unit = UNITS[parameter] || '';
+
   const getLocationName = (id: string) =>
     locations.find((loc) => loc.id === id)?.name || 'Selected location';
+
+  const generateBytezForecastData = async (param: string, locName: string, unit: string, currentVal: number | null) => {
+    const valContext = currentVal !== null ? `The MUST-HAVE initial anchor reading for right now is ${currentVal} ${unit}. Make sure the forecast smoothly progresses from this base initial value.` : `Make sure it represents a realistic scenario.`;
+    
+    const prompt = `Generate realistic 48-hour future environmental forecasting data points for ${param} (${unit}) at ${locName}. 
+Start from this hour: ${new Date().toISOString()}. ${valContext}
+You MUST return ONLY a valid JSON array of 48 objects. Each object MUST have:
+"timestamp" (ISO 8601 string, incrementing by 1 hour), "point" (number, realistic forecasted value), "lower" (number, lower bound), "upper" (number, upper bound).
+Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations, or extra text. ONLY raw JSON.`;
+
+    const result = await runBytezChat([
+      { role: 'system', content: 'You are an environmental data prediction AI. You output ONLY valid JSON arrays and nothing else.' },
+      { role: 'user', content: prompt }
+    ]);
+
+    try {
+      const match = result.match(/\[\s*\{.*\}\s*\]/s);
+      const jsonStr = match ? match[0] : result;
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.error("JSON Parse Error for Bytez Forecast:", result);
+      throw new Error("Failed to generate proactive forecast data.");
+    }
+  };
 
   const generateBytezInsight = async (forecastSeries: any[]) => {
     if (!forecastSeries?.length) {
@@ -80,42 +106,50 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
       setAiInsight('');
       setAiError('');
 
-      Promise.allSettled([
-        api.get(`/forecast/${selectedLocation}?parameter=${parameter}`),
-        api.get(`/forecast/${selectedLocation}/ai-insight?parameter=${parameter}&hours=48`),
-      ])
-        .then(async ([forecastResult, insightResult]) => {
-          let nextForecastData: any[] = [];
-
-          if (forecastResult.status === 'fulfilled') {
-            nextForecastData = forecastResult.value.data || [];
-            setForecastData(nextForecastData);
-          } else {
-            console.error(forecastResult.reason);
-            setForecastData([]);
-          }
-
-          if (insightResult.status === 'fulfilled') {
-            setAiInsight(insightResult.value.data?.insight || '');
-          } else {
-            console.error(insightResult.reason);
-            try {
-              const fallbackInsight = await generateBytezInsight(nextForecastData);
-              setAiInsight(fallbackInsight);
-            } catch (bytezError) {
-              console.error(bytezError);
-              setAiError(bytezError instanceof Error ? bytezError.message : 'AI insight unavailable right now.');
+      // Fetch the most recent live data to anchor the prediction
+      api.get(`/readings/latest/${selectedLocation}?type=${pollutionType}`)
+        .then(res => {
+          let currentVal: number | null = null;
+          if (res.data?.readings && res.data.readings.length > 0) {
+            // Find current reading for the selected parameter
+            const match = res.data.readings.find((r: any) => r.parameter === parameter);
+            if (match && typeof match.value === 'number') {
+              currentVal = match.value;
             }
           }
+          return currentVal;
+        })
+        .catch(err => {
+          console.warn("Could not fetch base reading, forecasting without anchor.", err);
+          return null;
+        })
+        .then(currentVal => {
+          // We actively predict data using Bytez instead of hardcoded backend, passing the live anchor reading
+          return generateBytezForecastData(parameter, getLocationName(selectedLocation), unit, currentVal);
+        })
+        .then(async (generatedData) => {
+          setForecastData(generatedData);
+          setLoading(false);
+          
+          try {
+            const fallbackInsight = await generateBytezInsight(generatedData);
+            setAiInsight(fallbackInsight);
+          } catch (bytezError) {
+            console.error(bytezError);
+            setAiError(bytezError instanceof Error ? bytezError.message : 'AI insight unavailable right now.');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          setForecastData([]);
+          setLoading(false);
+          setAiError(err.message || "Forecast generation failed");
         })
         .finally(() => {
-          setLoading(false);
           setAiLoading(false);
         });
     }
-  }, [selectedLocation, parameter]);
-
-  const unit = UNITS[parameter] || '';
+  }, [selectedLocation, parameter, unit]);
 
   return (
     <div className="space-y-6">

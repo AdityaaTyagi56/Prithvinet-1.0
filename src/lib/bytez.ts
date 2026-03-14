@@ -46,30 +46,39 @@ function normalizeBytezError(error: unknown): string {
     return 'Network issue while contacting Bytez. Check internet or firewall and try again.';
   }
 
-  return 'Bytez request failed. Please try again in a moment.';
+  return `Bytez request failed: ${error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error)}`;
 }
 
 function extractText(output: unknown): string {
-  if (typeof output === 'string') {
-    return output;
-  }
+  if (typeof output === 'string') return output;
 
-  if (output && typeof output === 'object') {
-    const maybeObj = output as { content?: unknown };
-    if (typeof maybeObj.content === 'string') {
-      return maybeObj.content;
-    }
-  }
-
+  // Sometimes models return an array of messages
   if (Array.isArray(output)) {
     for (const item of output) {
-      if (item && typeof item === 'object') {
-        const maybeObj = item as { content?: unknown };
-        if (typeof maybeObj.content === 'string') {
-          return maybeObj.content;
-        }
-      }
+       if (typeof item === 'string') return item;
+       if (item && typeof item === 'object') {
+          const maybeObj = item as any;
+          if (typeof maybeObj.content === 'string') return maybeObj.content;
+          if (Array.isArray(maybeObj.content)) {
+            if (maybeObj.content.length === 0) return "I apologize, but I could not generate a response for that. Please try again.";
+            if (typeof maybeObj.content[0] === 'string') return maybeObj.content[0];
+            if (maybeObj.content[0]?.text) return maybeObj.content[0].text;
+          }
+          if (typeof maybeObj.text === 'string') return maybeObj.text;
+       }
     }
+  }
+
+  // Sometimes they return a single message object
+  if (output && typeof output === 'object') {
+    const maybeObj = output as any;
+    if (typeof maybeObj.content === 'string') return maybeObj.content;
+    if (Array.isArray(maybeObj.content)) {
+      if (maybeObj.content.length === 0) return "I apologize, but I could not generate a response for that. Please try again.";
+      if (typeof maybeObj.content[0] === 'string') return maybeObj.content[0];
+      if (maybeObj.content[0]?.text) return maybeObj.content[0].text;
+    }
+    if (typeof maybeObj.text === 'string') return maybeObj.text;
   }
 
   return JSON.stringify(output);
@@ -89,6 +98,7 @@ export async function runBytezChat(messages: Array<{ role: 'user' | 'assistant' 
   const { error, output } = await model.run(messages);
 
   if (error) {
+    console.error("Bytez API Error:", error);
     throw new Error(normalizeBytezError(error));
   }
 
