@@ -16,6 +16,7 @@ import {
   getAqiLogAnalysis,
   getDemoUser,
   DEMO_TOKEN,
+  getStableValue,
 } from "./mockData";
 import type { PollutionType, RegionalData } from "./mockData";
 import { fetchLiveSnapshot, type LiveSnapshot } from "./liveData";
@@ -300,20 +301,64 @@ function mockGet(
     const qIdx = url.indexOf("?");
     const params = qIdx >= 0 ? new URLSearchParams(url.slice(qIdx)) : new URLSearchParams();
     const parameter = params.get("parameter") || "PM2.5";
-    
+    const locId = insightMatch[1];
+
+    let currentVal = getStableValue(locId, parameter);
+    if (currentVal === undefined && locId.startsWith("live-") && _liveSnapshotCache?.stations?.length) {
+      const pidAlias: Record<string, string> = { "OZONE": "O3" };
+      const idx = parseInt(locId.replace("live-", ""), 10);
+      const station = _liveSnapshotCache.stations?.[idx];
+      if (station?.pollutants) {
+        const key = Object.keys(station.pollutants).find(k => (pidAlias[k] || k) === parameter);
+        if (key) currentVal = parseFloat(station.pollutants[key]?.avg || "0") || undefined;
+      }
+    }
+
+    const val = currentVal ?? 0;
+    const LIMIT_MAP: Record<string, number> = {
+      "PM2.5": 60, PM10: 100, SO2: 80, NO2: 80, CO: 2, O3: 100,
+      pH: 8.5, BOD: 30, COD: 250, TDS: 2100, DO: 5, Turbidity: 10,
+      Leq: 75, Lmax: 85,
+    };
+    const limit = LIMIT_MAP[parameter];
+    const exceedsPct = limit ? Math.round(((val - limit) / limit) * 100) : 0;
+    const exceeds = limit ? val > limit : false;
+    const trend = exceeds ? "elevated above permissible limit" : "within acceptable range";
+    const riskLevel = exceeds
+      ? exceedsPct > 20 ? "Critical — immediate regulatory action warranted"
+        : exceedsPct > 5 ? "High — inspection advised within 48 hours"
+        : "Moderate — close monitoring required"
+      : "Low — standard compliance checks sufficient";
+
     return mockResponse({
-      insight: `**Predicted ${parameter} Trends**\n- Based on Prophet ML analysis, ${parameter} is expected to fluctuate within 10-15% of the district median over the next 48 hours.\n- High-confidence clustering shows diurnal spiking during peak traffic hours (7-9 AM, 6-8 PM).\n- Secondary peak predicted tomorrow evening at 20:00 hrs due to expected surface temperature inversion.\n\n**Risk & Action Alert**\n- Peak predicted values are approaching moderate risk thresholds. Continue standard compliance checks.\n- Ensure heavy industry emission filters remain active during predicted thermal inversion windows.`
+      insight: `**${parameter} Forecast Summary**\n- Current measured value: ${val > 0 ? val.toFixed(1) : "N/A"} ${val > 0 && limit ? `(Limit: ${limit})` : ""}\n- 48-hour Prophet ML projection shows ${parameter} remaining ${trend}.\n- Diurnal cycle detected: peak values expected 7–9 AM and 6–8 PM due to traffic and industrial activity.\n- Tomorrow evening thermal inversion window (19:00–22:00 hrs) may cause temporary 8–12% elevation.\n\n**Risk Assessment**\n- Risk level: ${riskLevel}\n${exceeds ? `- Station is currently ${exceedsPct}% above the CPCB permissible limit for ${parameter}.\n- Sustained exceedance triggers mandatory show-cause notice under EP Act §15.` : `- Values are within CPCB norms. Continue standard monitoring schedule.`}\n\n**Recommended Actions**\n- ${exceeds ? `Issue corrective direction to responsible industry unit within 24 hours.` : `Maintain current compliance posture.`}\n- Cross-verify with CAAQMS / NWMP readings if deviation exceeds ±15%.\n- Schedule follow-up inspection if 72-hour mean remains ${exceeds ? "above limit" : "near upper threshold"}.`
     });
   }
 
   // Forecast
   const forecastMatch = url.match(/\/forecast\/([^?]+)/);
   if (forecastMatch) {
+    const locId = forecastMatch[1];
     const qIdx = url.indexOf("?");
     const params =
       qIdx >= 0 ? new URLSearchParams(url.slice(qIdx)) : new URLSearchParams();
     const parameter = params.get("parameter") || "PM2.5";
-    return mockResponse(getForecastData(parameter));
+
+    // Anchor to real station value so each station shows a unique forecast curve
+    let anchor = getStableValue(locId, parameter);
+    if (anchor === undefined && locId.startsWith("live-") && _liveSnapshotCache?.stations?.length) {
+      const pidAlias: Record<string, string> = { "OZONE": "O3" };
+      const idx = parseInt(locId.replace("live-", ""), 10);
+      const station = _liveSnapshotCache.stations?.[idx];
+      if (station?.pollutants) {
+        const key = Object.keys(station.pollutants).find(k => (pidAlias[k] || k) === parameter);
+        if (key) {
+          const v = parseFloat(station.pollutants[key]?.avg || "0");
+          if (v > 0) anchor = v;
+        }
+      }
+    }
+    return mockResponse(getForecastData(parameter, anchor));
   }
 
   // Readings

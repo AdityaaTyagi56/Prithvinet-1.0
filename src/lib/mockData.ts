@@ -80,6 +80,18 @@ function getBase(p: string): number {
 }
 
 // ─── Per-station stable values (deterministic — no rand()) ───
+// Air: station-level baselines reflecting each site's industrial context
+const AIR_STATION_VALUES: Record<string, Record<string, number>> = {
+  'air-1': { 'PM2.5': 94,  PM10: 168, SO2: 82, NO2: 58, CO: 2.4, O3: 38 }, // Bhilai Steel Plant Gate
+  'air-2': { 'PM2.5': 78,  PM10: 132, SO2: 34, NO2: 52, CO: 1.8, O3: 44 }, // Raipur Civic Centre
+  'air-3': { 'PM2.5': 112, PM10: 185, SO2: 94, NO2: 44, CO: 2.8, O3: 36 }, // Korba Thermal Power (worst)
+  'air-4': { 'PM2.5': 88,  PM10: 155, SO2: 48, NO2: 62, CO: 2.1, O3: 40 }, // Durg Industrial Area
+  'air-5': { 'PM2.5': 65,  PM10: 118, SO2: 28, NO2: 38, CO: 1.4, O3: 46 }, // Bilaspur Station Road
+  'air-6': { 'PM2.5': 58,  PM10: 102, SO2: 22, NO2: 32, CO: 1.2, O3: 48 }, // Rajnandgaon Market
+  'air-7': { 'PM2.5': 28,  PM10: 68,  SO2: 12, NO2: 18, CO: 0.6, O3: 52 }, // Jagdalpur Forest Edge (cleanest)
+  'air-8': { 'PM2.5': 42,  PM10: 85,  SO2: 18, NO2: 24, CO: 0.9, O3: 50 }, // Ambikapur Residential
+};
+
 // Water: CPCB NWMP river monitoring data for Chhattisgarh rivers
 const WATER_STATION_VALUES: Record<string, Record<string, number>> = {
   'wtr-1': { pH: 7.2, BOD: 14.8, COD: 68,  TDS: 890,  DO: 6.2, Turbidity: 4.8  }, // Mahanadi — Rajim (Class B)
@@ -102,8 +114,9 @@ const NOISE_STATION_VALUES: Record<string, Record<string, number>> = {
 
 // ─── Reading generator ──────────────────────────────────────
 function reading(locationId: string, param: string, baseValue: number) {
-  // Use deterministic per-station lookup for water/noise — no rand()
+  // Use deterministic per-station lookup for all station types — no rand()
   const stableVal =
+    AIR_STATION_VALUES[locationId]?.[param] ??
     WATER_STATION_VALUES[locationId]?.[param] ??
     NOISE_STATION_VALUES[locationId]?.[param];
 
@@ -121,6 +134,16 @@ function reading(locationId: string, param: string, baseValue: number) {
     location_id: locationId, parameter_id: param, parameter: param,
     value: val, recorded_at: new Date().toISOString(),
   };
+}
+
+/** Returns the stable baseline value for a given station + parameter.
+ *  Used by api.ts to anchor forecast charts to the station's actual level. */
+export function getStableValue(locationId: string, parameter: string): number | undefined {
+  return (
+    AIR_STATION_VALUES[locationId]?.[parameter] ??
+    WATER_STATION_VALUES[locationId]?.[parameter] ??
+    NOISE_STATION_VALUES[locationId]?.[parameter]
+  );
 }
 
 export function getLatestReadings(locationId: string, type?: PollutionType) {
