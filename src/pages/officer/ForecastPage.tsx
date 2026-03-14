@@ -1,3 +1,4 @@
+import { Brain, Sparkles } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { getBytezStatus, runBytezChat } from '../../lib/bytez';
@@ -196,26 +197,34 @@ Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations
             </div>
           )}
 
-          <div className="mt-6 rounded-lg border border-green-200 bg-green-50/30 p-4">
-            <div className="text-sm font-semibold text-[#14532d] mb-2">AI Forecast Insight (Bytez fallback enabled)</div>
-            <div className="mb-2 flex items-center gap-2 text-[11px]">
-              <span className={`rounded px-2 py-0.5 border ${bytezStatus.configured ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                {bytezStatus.configured ? 'Configured' : 'Missing Key'}
-              </span>
-              <span className="rounded px-2 py-0.5 border bg-blue-50 text-blue-700 border-blue-200">
-                {bytezStatus.providerLabel}
-              </span>
-              <span className="text-gray-500">{bytezStatus.model}</span>
+          <div className="mt-6 bg-white rounded-2xl border border-emerald-100 shadow-md shadow-emerald-500/5 overflow-hidden">
+            <div className="px-5 py-4 bg-gradient-to-r from-emerald-50 via-white to-green-50 border-b border-emerald-100 flex items-center justify-between">
+              <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                <div className="p-1.5 bg-emerald-600 rounded-lg shadow-sm">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </div>
+                AI Forecast Insight
+              </h3>
             </div>
-            {aiLoading ? (
-              <div className="text-sm text-gray-500">Analyzing trend with Claude...</div>
-            ) : aiError ? (
-              <div className="text-sm text-amber-700">{aiError}</div>
-            ) : aiInsight ? (
-              <div className="text-sm text-gray-700 whitespace-pre-wrap">{aiInsight}</div>
-            ) : (
-              <div className="text-sm text-gray-500">No AI insight yet.</div>
-            )}
+            
+            <div className="p-5">
+              {aiLoading ? (
+                <div className="flex items-center gap-3 text-sm text-emerald-600 font-medium animate-pulse">
+                  <Brain className="h-4 w-4" />
+                  Analyzing trend data...
+                </div>
+              ) : aiError ? (
+                <div className="flex items-center gap-2 text-sm text-red-600 font-medium bg-red-50 p-3 rounded-xl border border-red-100">
+                  {aiError}
+                </div>
+              ) : aiInsight ? (
+                <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed font-medium bg-gradient-to-br from-emerald-50/50 to-white p-4 rounded-xl border border-emerald-100/50 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.05)]">
+                  {aiInsight}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500 italic px-2">No AI insight yet. Select a location to generate.</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
