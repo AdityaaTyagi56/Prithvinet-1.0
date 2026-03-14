@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+32,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,43,28,NO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+1,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,2,1,NH3,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+4,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,5,3,SO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+8,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,9,7,SO2,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+59,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,118,24,CO,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+1,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,1,1,NH3,Chhattisgarh,"Rampur, Korba - CECB"
+48,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,91,6,SO2,Chhattisgarh,"Rampur, Korba - CECB"
+160,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,500,58,PM10,Chhattisgarh,"Urja Nagar, Korba - CECB"
+8,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,21,5,OZONE,Chhattisgarh,"AIIMS, Raipur - CECB"
+69,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,108,24,PM10,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"

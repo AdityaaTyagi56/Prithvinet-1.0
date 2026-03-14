@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+59,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,118,24,CO,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+30,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,35,27,CO,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+13,Raipur,India,13-03-2026 15:00:00,21.371751,81.664929,19,10,CO,Chhattisgarh,"Siltara Phase-II, Raipur - CECB"
+24,Bhilai,India,13-03-2026 15:00:00,21.224231,81.408350,71,6,CO,Chhattisgarh,"Hathkhoj, Bhilai - CECB"
+35,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,98,11,CO,Chhattisgarh,"Rampur, Korba - CECB"
+45,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,104,14,CO,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+48,Milupara,India,13-03-2026 15:00:00,22.1910172,83.5197009,118,25,CO,Chhattisgarh,"Govt. Higher Secondary School, Milupara - CECB"
+51,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,62,24,CO,Chhattisgarh,"AIIMS, Raipur - CECB"
+26,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,36,17,CO,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+32,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,62,14,CO,Chhattisgarh,"Urja Nagar, Korba - CECB"

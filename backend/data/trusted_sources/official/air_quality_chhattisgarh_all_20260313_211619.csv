@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+32,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,43,28,NO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+1,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,2,1,NH3,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+4,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,5,3,SO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+8,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,9,7,SO2,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+125,Chhal,India,13-03-2026 15:00:00,22.118125,83.140608,279,56,PM10,Chhattisgarh,"Nawapara SECL Colony, Chhal - CECB"
+8,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,21,5,OZONE,Chhattisgarh,"AIIMS, Raipur - CECB"
+69,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,108,24,PM10,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+2,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,2,2,NH3,Chhattisgarh,"Krishak Nagar, Raipur - CECB"
+109,Raipur,India,13-03-2026 15:00:00,21.371751,81.664929,158,57,PM10,Chhattisgarh,"Siltara Phase-II, Raipur - CECB"
+59,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,118,24,CO,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"

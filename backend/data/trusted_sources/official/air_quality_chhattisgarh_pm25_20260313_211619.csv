@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+33,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,63,7,PM2.5,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+48,Bhilai,India,13-03-2026 15:00:00,21.224231,81.408350,66,14,PM2.5,Chhattisgarh,"Hathkhoj, Bhilai - CECB"
+84,Bilaspur,India,13-03-2026 15:00:00,22.08815,82.13737,133,37,PM2.5,Chhattisgarh,"Mangala, Bilaspur - NTPC"
+191,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,500,44,PM2.5,Chhattisgarh,"Urja Nagar, Korba - CECB"
+31,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,37,21,PM2.5,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+161,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,288,27,PM2.5,Chhattisgarh,"Rampur, Korba - CECB"
+221,Kunjemura,India,13-03-2026 15:00:00,22.126650,83.483212,330,65,PM2.5,Chhattisgarh,"OP Jindal School, Kunjemura - CECB"
+203,Milupara,India,13-03-2026 15:00:00,22.1910172,83.5197009,317,74,PM2.5,Chhattisgarh,"Govt. Higher Secondary School, Milupara - CECB"
+59,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,254,26,PM2.5,Chhattisgarh,"AIIMS, Raipur - CECB"
+148,Chhal,India,13-03-2026 15:00:00,22.118125,83.140608,282,36,PM2.5,Chhattisgarh,"Nawapara SECL Colony, Chhal - CECB"

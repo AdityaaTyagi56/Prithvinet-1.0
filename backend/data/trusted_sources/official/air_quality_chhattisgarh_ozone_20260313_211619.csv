@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+8,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,21,5,OZONE,Chhattisgarh,"AIIMS, Raipur - CECB"
+10,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,15,2,OZONE,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+16,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,31,1,OZONE,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+80,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,130,5,OZONE,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+11,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,13,8,OZONE,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+24,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,85,1,OZONE,Chhattisgarh,"Krishak Nagar, Raipur - CECB"
+13,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,18,1,OZONE,Chhattisgarh,"Rampur, Korba - CECB"
+4,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,7,2,OZONE,Chhattisgarh,"Urja Nagar, Korba - CECB"
+14,Bhilai,India,13-03-2026 15:00:00,21.224231,81.408350,17,5,OZONE,Chhattisgarh,"Hathkhoj, Bhilai - CECB"
+36,Chhal,India,13-03-2026 15:00:00,22.118125,83.140608,152,32,OZONE,Chhattisgarh,"Nawapara SECL Colony, Chhal - CECB"

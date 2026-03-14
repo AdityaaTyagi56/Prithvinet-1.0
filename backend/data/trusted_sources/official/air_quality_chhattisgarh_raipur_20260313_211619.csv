@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+45,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,104,14,CO,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+10,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,15,2,OZONE,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+21,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,33,15,NO2,Chhattisgarh,"Krishak Nagar, Raipur - CECB"
+18,Raipur,India,13-03-2026 15:00:00,21.371751,81.664929,61,3,SO2,Chhattisgarh,"Siltara Phase-II, Raipur - CECB"
+8,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,21,5,OZONE,Chhattisgarh,"AIIMS, Raipur - CECB"
+69,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,108,24,PM10,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+2,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,2,2,NH3,Chhattisgarh,"Krishak Nagar, Raipur - CECB"
+109,Raipur,India,13-03-2026 15:00:00,21.371751,81.664929,158,57,PM10,Chhattisgarh,"Siltara Phase-II, Raipur - CECB"
+7,Raipur,India,13-03-2026 15:00:00,21.258815,81.578979,16,3,SO2,Chhattisgarh,"AIIMS, Raipur - CECB"
+71,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,117,43,PM10,Chhattisgarh,"Krishak Nagar, Raipur - CECB"

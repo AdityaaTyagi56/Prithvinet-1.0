@@ -1,0 +1,24 @@
+{
+  "location_id": "301b5a3f-7f3e-4d17-8fcb-2529fe95d057",
+  "location_name": "Bharat Steel",
+  "parameter": "SO2",
+  "n_training_points": 744,
+  "trained_at": "2026-03-14T06:04:20.075414+00:00",
+  "model_version": "prophet-quality-v2",
+  "prophet_kwargs": {
+    "changepoint_prior_scale": "0.15",
+    "seasonality_prior_scale": "15.0",
+    "seasonality_mode": "multiplicative",
+    "yearly_seasonality": "False",
+    "weekly_seasonality": "True",
+    "daily_seasonality": "True",
+    "interval_width": "0.95"
+  },
+  "cv_metrics": {
+    "mae": 4.974,
+    "rmse": 5.746,
+    "mape": 0.38343,
+    "coverage": 0.767,
+    "n_cv_windows": 44
+  }
+}
