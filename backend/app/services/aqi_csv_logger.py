@@ -45,25 +45,67 @@ def append_readings_to_csv(
     readings: List[Dict],
     target_date: Optional[date] = None,
 ) -> int:
-    """Append reading dicts to the daily CSV. Returns rows written."""
+    """Append reading dicts to the daily CSV but strictly prevents duplicates and uses reading timestamps. Returns rows written."""
     if not readings:
         return 0
 
-    if target_date is None:
-        target_date = datetime.now(timezone.utc).date()
+    from collections import defaultdict
+    by_date = defaultdict(list)
+    
+    # 1. Group records by their internal timestamp
+    for row in readings:
+        ts = row.get("timestamp", "")
+        if ts and len(ts) >= 10:
+            d_str = ts[:10]  # Grab YYYY-MM-DD
+        else:
+            d_str = datetime.now(timezone.utc).date().isoformat()
+        by_date[d_str].append(row)
+        
+    total_written = 0
+    
+    for date_str, rows in by_date.items():
+        try:
+            current_date = date.fromisoformat(date_str)
+        except ValueError:
+            current_date = datetime.now(timezone.utc).date()
+            
+        # Optional override target_date handling just in case
+        if target_date is not None:
+            current_date = target_date
 
-    csv_path = get_daily_csv_path(target_date)
-    file_exists = csv_path.exists() and csv_path.stat().st_size > 0
+        csv_path = get_daily_csv_path(current_date)
+        
+        # 2. Prevent Duplicates
+        existing_keys = set()
+        if csv_path.exists() and csv_path.stat().st_size > 0:
+            with open(csv_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    existing_keys.add(f"{r.get('station_name')}|{r.get('timestamp')}")
+                    
+        new_rows = []
+        for row in rows:
+            key = f"{row.get('station_name')}|{row.get('timestamp')}"
+            if key not in existing_keys:
+                new_rows.append(row)
+                existing_keys.add(key)
+                
+        if not new_rows:
+            continue
 
-    with open(csv_path, "a", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
-        if not file_exists:
-            writer.writeheader()
-        for row in readings:
-            writer.writerow({col: row.get(col, "") for col in CSV_COLUMNS})
+        file_exists = csv_path.exists() and csv_path.stat().st_size > 0
 
-    logging.info("CSV logger: appended %d rows to %s", len(readings), csv_path.name)
-    return len(readings)
+        with open(csv_path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
+            if not file_exists:
+                writer.writeheader()
+            for row in new_rows:
+                writer.writerow({col: row.get(col, "") for col in CSV_COLUMNS})
+
+        logging.info("CSV logger: appended %d new unique rows to %s", len(new_rows), csv_path.name)
+        total_written += len(new_rows)
+        
+    return total_written
 
 
 def list_available_logs() -> List[Dict]:

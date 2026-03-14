@@ -149,15 +149,19 @@ def records_to_csv_rows(records: list) -> list:
 
 def _write_json_snapshot(csv_rows: list, records_raw: list) -> None:
     """Write public/aqi-live.json for the frontend to consume."""
-    from datetime import date as date_type
+    
     PUBLIC_JSON.parent.mkdir(parents=True, exist_ok=True)
 
     # Build the logs list from CSV logger
     logs = list_available_logs()
 
+    # Determine IST Today's Date
+    ist_tz = timezone(timedelta(hours=5, minutes=30))
+    ist_today = datetime.now(ist_tz).date()
+
     # Also read today's full CSV data
-    today_str = date_type.today().isoformat()
-    today_rows = read_daily_csv(date_type.today())
+    today_str = ist_today.isoformat()
+    today_rows = read_daily_csv(ist_today)
 
     # Build station summary from latest raw records
     stations = {}
