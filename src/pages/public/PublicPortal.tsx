@@ -46,6 +46,8 @@ export function PublicPortal({ pollutionType }: PublicPortalProps) {
     }
 
     loadOverview();
+    const interval = setInterval(loadOverview, 10000);
+    return () => clearInterval(interval);
   }, [pollutionType]);
 
   const getIndexClass = (val: number) => {

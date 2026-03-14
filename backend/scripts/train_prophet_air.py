@@ -201,7 +201,7 @@ async def _train_once(session: AsyncSession, model_dir: Path) -> None:
         model.add_regressor("is_winter")
         model.fit(frame)
 
-        future = model.make_future_dataframe(periods=HORIZON_HOURS, freq="H")
+        future = model.make_future_dataframe(periods=HORIZON_HOURS, freq="h")
         future["is_winter"] = _is_winter(pd.to_datetime(future["ds"]))
         forecast = model.predict(future)
 

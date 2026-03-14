@@ -29,10 +29,9 @@ from prophet import Prophet
 DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "trusted_sources"
 MODEL_DIR = Path(__file__).resolve().parents[1] / "ml_models"
 
-# Read all project trusted-source CSVs (root + official subfolder).
+# Read all project trusted-source CSVs
 CSV_GLOBS = [
     str(DATA_DIR / "*.csv"),
-    str(DATA_DIR / "official" / "*.csv"),
 ]
 
 MIN_POINTS = 200  # minimum hourly points to attempt training
