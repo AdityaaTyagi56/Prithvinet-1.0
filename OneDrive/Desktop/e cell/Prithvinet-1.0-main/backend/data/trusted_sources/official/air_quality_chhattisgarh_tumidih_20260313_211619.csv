@@ -1,0 +1,8 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+59,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,118,24,CO,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+1,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,2,1,NH3,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+NA,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,NA,NA,NO2,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+80,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,130,5,OZONE,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+238,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,348,35,PM2.5,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+8,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,19,6,SO2,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+167,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,229,55,PM10,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"

@@ -1,0 +1,21 @@
+{
+  "generated_at_utc": "2026-03-10T16:55:33.810842Z",
+  "date_window": {
+    "start": "2026-02-08",
+    "end": "2026-03-10"
+  },
+  "row_count": 55800,
+  "location_count": 25,
+  "source": {
+    "provider": "Open-Meteo Air Quality API",
+    "dataset": "Copernicus Atmosphere Monitoring Service (CAMS) global forecast/analysis products",
+    "variables": [
+      "pm2_5",
+      "nitrogen_dioxide",
+      "sulphur_dioxide"
+    ],
+    "api_docs": "https://open-meteo.com/en/docs/air-quality-api"
+  },
+  "api_url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+  "output_csv": "/Users/adityatyagi/Downloads/E-cell/Prithvinet/backend/data/trusted_sources/air_quality_dataset_20260310_165533.csv"
+}

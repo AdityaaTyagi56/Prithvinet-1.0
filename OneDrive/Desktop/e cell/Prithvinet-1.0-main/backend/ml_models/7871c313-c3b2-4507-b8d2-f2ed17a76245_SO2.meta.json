@@ -1,0 +1,24 @@
+{
+  "location_id": "7871c313-c3b2-4507-b8d2-f2ed17a76245",
+  "location_name": "Central Station",
+  "parameter": "SO2",
+  "n_training_points": 744,
+  "trained_at": "2026-03-14T06:04:23.218859+00:00",
+  "model_version": "prophet-quality-v2",
+  "prophet_kwargs": {
+    "changepoint_prior_scale": "0.15",
+    "seasonality_prior_scale": "15.0",
+    "seasonality_mode": "multiplicative",
+    "yearly_seasonality": "False",
+    "weekly_seasonality": "True",
+    "daily_seasonality": "True",
+    "interval_width": "0.95"
+  },
+  "cv_metrics": {
+    "mae": 4.974,
+    "rmse": 5.746,
+    "mape": 0.38343,
+    "coverage": 0.773,
+    "n_cv_windows": 44
+  }
+}
