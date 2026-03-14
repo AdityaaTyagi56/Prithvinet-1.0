@@ -37,25 +37,19 @@ export function NoupeDataBridge() {
     
     if (snapshotObj && snapshotObj.stations) {
       // Find a matching active government station for this industry's region
-      const matchingStation = snapshotObj.stations.find((s: any) => 
-        s.city.toLowerCase() === industry.region.toLowerCase() ||
-        (industry.region === 'Durg' && s.city.toLowerCase() === 'bhilai')
-      );
+      const matchingStation = snapshotObj.stations.find((s: any) => {
+        const sCity = (s.city || "").toLowerCase();
+        const iRegion = (industry.region || "").toLowerCase();
+        return sCity === iRegion || (iRegion === 'durg' && sCity === 'bhilai');
+      });
 
       if (matchingStation && matchingStation.pollutants) {
         // Override mock data with real-time API values if available
-        if (matchingStation.pollutants['PM2.5']?.avg) {
-          copy.live_emissions['PM2.5'] = parseFloat(matchingStation.pollutants['PM2.5'].avg);
-        }
-        if (matchingStation.pollutants['PM10']?.avg) {
-          copy.live_emissions['PM10'] = parseFloat(matchingStation.pollutants['PM10'].avg);
-        }
-        if (matchingStation.pollutants['SO2']?.avg) {
-          copy.live_emissions['SO2'] = parseFloat(matchingStation.pollutants['SO2'].avg);
-        }
-        if (matchingStation.pollutants['NO2']?.avg) {
-          copy.live_emissions['NO2'] = parseFloat(matchingStation.pollutants['NO2'].avg);
-        }
+        const p = matchingStation.pollutants;
+        if (p['PM2.5']?.avg && !isNaN(parseFloat(p['PM2.5'].avg))) copy.live_emissions['PM2.5'] = parseFloat(p['PM2.5'].avg);
+        if (p['PM10']?.avg && !isNaN(parseFloat(p['PM10'].avg))) copy.live_emissions['PM10'] = parseFloat(p['PM10'].avg);
+        if (p['SO2']?.avg && !isNaN(parseFloat(p['SO2'].avg))) copy.live_emissions['SO2'] = parseFloat(p['SO2'].avg);
+        if (p['NO2']?.avg && !isNaN(parseFloat(p['NO2'].avg))) copy.live_emissions['NO2'] = parseFloat(p['NO2'].avg);
       }
     }
     return copy;

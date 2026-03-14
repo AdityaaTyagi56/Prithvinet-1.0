@@ -339,15 +339,17 @@ function mockGet(
     if (live && live.stations) {
       const liveIndustries = baseIndustries.map(ind => {
         const copy = { ...ind, live_emissions: { ...ind.live_emissions } };
-        const matchingStation = live.stations.find((s: any) => 
-          s.city.toLowerCase() === ind.region.toLowerCase() ||
-          (ind.region === 'Durg' && s.city.toLowerCase() === 'bhilai')
-        );
+        const matchingStation = live.stations.find((s: any) => {
+          const sCity = (s.city || "").toLowerCase();
+          const iRegion = (ind.region || "").toLowerCase();
+          return sCity === iRegion || (iRegion === 'durg' && sCity === 'bhilai');
+        });
         if (matchingStation && matchingStation.pollutants) {
-          if (matchingStation.pollutants['PM2.5']?.avg) copy.live_emissions['PM2.5'] = parseFloat(matchingStation.pollutants['PM2.5'].avg);
-          if (matchingStation.pollutants['PM10']?.avg) copy.live_emissions['PM10'] = parseFloat(matchingStation.pollutants['PM10'].avg);
-          if (matchingStation.pollutants['SO2']?.avg) copy.live_emissions['SO2'] = parseFloat(matchingStation.pollutants['SO2'].avg);
-          if (matchingStation.pollutants['NO2']?.avg) copy.live_emissions['NO2'] = parseFloat(matchingStation.pollutants['NO2'].avg);
+          const p = matchingStation.pollutants;
+          if (p['PM2.5']?.avg && !isNaN(parseFloat(p['PM2.5'].avg))) copy.live_emissions['PM2.5'] = parseFloat(p['PM2.5'].avg);
+          if (p['PM10']?.avg && !isNaN(parseFloat(p['PM10'].avg))) copy.live_emissions['PM10'] = parseFloat(p['PM10'].avg);
+          if (p['SO2']?.avg && !isNaN(parseFloat(p['SO2'].avg))) copy.live_emissions['SO2'] = parseFloat(p['SO2'].avg);
+          if (p['NO2']?.avg && !isNaN(parseFloat(p['NO2'].avg))) copy.live_emissions['NO2'] = parseFloat(p['NO2'].avg);
         }
         return copy;
       });
