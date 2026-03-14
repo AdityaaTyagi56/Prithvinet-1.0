@@ -1,61 +1,64 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+export type WsStatus = 'connecting' | 'live' | 'stale';
+
+/**
+ * WebSocket hook with three-state status.
+ *
+ * Critical: on disconnect the hook sets status = 'stale' but never resets
+ * any sensor values — callers keep showing their last known reading with a
+ * yellow indicator while the connection is re-established.
+ */
 export function useWebSocket(url: string, onMessage: (data: any) => void) {
-  const [isConnected, setIsConnected] = useState(false);
+  const [wsStatus, setWsStatus] = useState<WsStatus>('connecting');
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<number>(1000);
+  const reconnectDelayRef = useRef<number>(1000);
 
   const connect = useCallback(() => {
     if (!url) {
-      setIsConnected(false);
+      setWsStatus('stale');
       return;
     }
 
+    setWsStatus('connecting');
     const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
     const ws = new WebSocket(`${wsUrl}${url}`);
 
     ws.onopen = () => {
-      setIsConnected(true);
-      reconnectTimeoutRef.current = 1000;
+      setWsStatus('live');
+      reconnectDelayRef.current = 1000;
     };
 
     ws.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
-        onMessage(data);
+        onMessage(JSON.parse(event.data));
       } catch (e) {
         console.error('Failed to parse WS message', e);
       }
     };
 
     ws.onclose = () => {
-      setIsConnected(false);
+      // Mark stale but DO NOT reset displayed data — keep showing last known values
+      setWsStatus('stale');
       setTimeout(() => {
-        reconnectTimeoutRef.current = Math.min(reconnectTimeoutRef.current * 2, 30000);
+        reconnectDelayRef.current = Math.min(reconnectDelayRef.current * 2, 30_000);
         connect();
-      }, reconnectTimeoutRef.current);
+      }, reconnectDelayRef.current);
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      ws.close();
-    };
+    ws.onerror = () => ws.close();
 
     wsRef.current = ws;
   }, [url, onMessage]);
 
   useEffect(() => {
-    if (!url) {
-      return;
-    }
-
+    if (!url) return;
     connect();
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
+    return () => { wsRef.current?.close(); };
   }, [connect]);
 
-  return { isConnected };
+  return {
+    wsStatus,
+    isConnected: wsStatus === 'live', // legacy compat for useLiveReadings
+  };
 }

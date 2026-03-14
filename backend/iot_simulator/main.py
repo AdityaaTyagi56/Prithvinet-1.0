@@ -29,6 +29,10 @@ LOG_EVERY_N = 100
 SPIKE_PROBABILITY = 0.02          # 2% chance of major violation per reading
 BUFFER_FILE = Path("iot_buffer.jsonl")
 
+# Persistent state file — values survive simulator restarts (Docker volume keeps it alive)
+STATE_FILE = Path(os.getenv("IOT_STATE_FILE", "/tmp/prithvinet_sim_state.json"))
+STATE_SAVE_INTERVAL = 60  # Save baselines to disk every 60 seconds
+
 RNG = random.Random(42)
 NP_SEED = 42
 
@@ -121,6 +125,36 @@ async def _load_station_names(session: AsyncSession) -> Dict[str, str]:
         )
     )
     return {str(row[0]): (row[1] or "Unknown") for row in result.fetchall()}
+
+
+# ── Persistent state ──────────────────────────────────────────────────────────
+
+def _load_persisted_state() -> Optional[Dict[str, Dict[str, float]]]:
+    """
+    Load baseline values from the state file on disk.
+    Returns None if the file doesn't exist or is corrupt.
+    On a clean restart the simulator continues from where it left off
+    instead of jumping back to the DB's last saved value.
+    """
+    if not STATE_FILE.exists():
+        return None
+    try:
+        with STATE_FILE.open() as fp:
+            data = json.load(fp)
+        logging.info("Loaded persistent state from %s (%d stations)", STATE_FILE, len(data))
+        return data
+    except Exception as exc:
+        logging.warning("Could not read state file %s: %s — falling back to DB", STATE_FILE, exc)
+        return None
+
+
+def _save_state(baselines: Dict[str, Dict[str, float]]) -> None:
+    """Persist current baselines so restarts continue from the same values."""
+    try:
+        with STATE_FILE.open("w") as fp:
+            json.dump(baselines, fp)
+    except Exception as exc:
+        logging.warning("Failed to save state: %s", exc)
 
 
 # ── Simulation math ───────────────────────────────────────────────────────────
@@ -255,8 +289,16 @@ async def run_simulator() -> None:
     session_factory = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with session_factory() as session:
-        baselines = await _load_station_baselines(session)
         station_names = await _load_station_names(session)
+
+        # Try disk state first (survives restarts without jumps),
+        # then fall back to latest DB readings
+        baselines = _load_persisted_state()
+        if baselines is None:
+            logging.info("No state file found — loading baselines from DB")
+            baselines = await _load_station_baselines(session)
+            # Persist what we just loaded so next restart is smooth
+            _save_state(baselines)
 
     await engine.dispose()
 
@@ -268,6 +310,7 @@ async def run_simulator() -> None:
 
     total_readings = 0
     tick_index = 0
+    last_save_tick = 0
 
     async with httpx.AsyncClient() as client:
         while True:
@@ -303,7 +346,8 @@ async def run_simulator() -> None:
                             }
                         )
 
-                    # Update running baseline so drift is gradual over time
+                    # Random walk baseline update: new value is 2% of current reading
+                    # + 98% of previous baseline — smooth continuous drift
                     baselines[loc_id][param] = base_value * 0.98 + value * 0.02
 
                     total_readings += 1
@@ -323,6 +367,12 @@ async def run_simulator() -> None:
                     total_readings,
                     sample,
                 )
+
+            # Save state to disk every STATE_SAVE_INTERVAL seconds
+            elapsed_since_save = (tick_index - last_save_tick) * TICK_SECONDS
+            if elapsed_since_save >= STATE_SAVE_INTERVAL:
+                _save_state(baselines)
+                last_save_tick = tick_index
 
             tick_index += 1
             await asyncio.sleep(TICK_SECONDS)

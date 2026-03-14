@@ -119,13 +119,11 @@ const INDUSTRY_LOCATIONS: { id: string; name: string; lat: number; lng: number; 
 ];
 
 // ── Station popup with pollutant values ──
-function StationPopupContent({ locationId, name, type, value }: {
-  locationId: string;
+function StationPopupContent({ readings, name, type }: {
+  readings: ReturnType<typeof getLatestReadings>;
   name: string;
   type: PollutionType;
-  value: number;
 }) {
-  const readings = useMemo(() => getLatestReadings(locationId, type), [locationId, type]);
   const params = PARAMS_BY_TYPE[type];
 
   return (
@@ -224,6 +222,19 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
   });
   const [panelOpen, setPanelOpen] = useState(true);
 
+  /**
+   * Pre-generate all station readings ONCE per map mount.
+   * Empty deps ensures getLatestReadings() is never called again (no re-randomizing).
+   * Popup content receives these stable values regardless of how many times they're opened.
+   */
+  const stableReadings = useMemo(() => {
+    const map: Record<string, ReturnType<typeof getLatestReadings>> = {};
+    [...AIR_LOCATIONS, ...WATER_LOCATIONS, ...NOISE_LOCATIONS].forEach(loc => {
+      map[loc.id] = getLatestReadings(loc.id, loc.type);
+    });
+    return map;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const toggle = (key: keyof typeof layers) =>
     setLayers(prev => ({ ...prev, [key]: !prev[key] }));
 
@@ -273,10 +284,9 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
           <Marker key={loc.id} position={[loc.latitude, loc.longitude]} icon={ICONS.air}>
             <Popup maxWidth={280}>
               <StationPopupContent
-                locationId={loc.id}
+                readings={stableReadings[loc.id] || []}
                 name={loc.name}
                 type="air"
-                value={0}
               />
             </Popup>
           </Marker>
@@ -287,10 +297,9 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
           <Marker key={loc.id} position={[loc.latitude, loc.longitude]} icon={ICONS.water}>
             <Popup maxWidth={280}>
               <StationPopupContent
-                locationId={loc.id}
+                readings={stableReadings[loc.id] || []}
                 name={loc.name}
                 type="water"
-                value={0}
               />
             </Popup>
           </Marker>
@@ -301,10 +310,9 @@ export function PollutionMap({ locations = [], pollutionType = 'air' }: Pollutio
           <Marker key={loc.id} position={[loc.latitude, loc.longitude]} icon={ICONS.noise}>
             <Popup maxWidth={280}>
               <StationPopupContent
-                locationId={loc.id}
+                readings={stableReadings[loc.id] || []}
                 name={loc.name}
                 type="noise"
-                value={0}
               />
             </Popup>
           </Marker>

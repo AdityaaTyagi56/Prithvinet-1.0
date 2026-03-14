@@ -29,5 +29,25 @@ services:
       timeout: 5s
       retries: 5
 
+  iot_simulator:
+    build:
+      context: ./backend/iot_simulator
+      dockerfile: Dockerfile
+    container_name: prithvinet-simulator
+    restart: unless-stopped
+    environment:
+      - BACKEND_URL=http://backend:8000
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:secret@db:5432/prithvinet}
+      # Persistent state file location inside the container
+      - IOT_STATE_FILE=/sim_state/prithvinet_sim_state.json
+    volumes:
+      # Named volume: survives container restarts so values never jump back to DB baseline
+      - simulator_state:/sim_state
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pg_data:
+  # Stores the IoT simulator's last-known sensor baselines across restarts
+  simulator_state:

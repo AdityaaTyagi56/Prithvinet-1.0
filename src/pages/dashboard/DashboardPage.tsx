@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useAuthStore } from '../../store/authStore';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useAlertStore } from '../../store/alertStore';
 import { useReadingsStore } from '../../store/readingsStore';
 import { AlertTriangle, Activity } from 'lucide-react';
 import { api } from '../../lib/api';
 import { getLatestReadings, PARAMS_BY_TYPE, UNITS, LIMITS } from '../../lib/mockData';
 import type { PollutionType } from '../../lib/mockData';
+import { useInterpolatedValue } from '../../hooks/useInterpolatedValue';
+import type { Reading } from '../../store/readingsStore';
 
 interface LocationItem {
   id: string;
@@ -22,13 +23,75 @@ const TYPE_LABELS: Record<PollutionType, string> = {
   noise: '🔊 Noise Level — Ambient Sound Monitoring',
 };
 
+function getStatusColor(param: string, value: number): string {
+  const limit = LIMITS[param] || 100;
+  if (param === 'pH') {
+    if (value < 6.5 || value > 8.5) return 'text-red-600';
+    if (value < 6.8 || value > 8.2) return 'text-amber-600';
+    return 'text-green-600';
+  }
+  if (param === 'DO') {
+    if (value < limit) return 'text-red-600';
+    if (value < limit * 1.3) return 'text-amber-600';
+    return 'text-green-600';
+  }
+  if (value > limit) return 'text-red-600';
+  if (value > limit * 0.75) return 'text-amber-600';
+  return 'text-green-600';
+}
+
+const SkeletonCard = () => (
+  <div className="bg-gray-50 p-4 rounded border border-gray-200 animate-pulse">
+    <div className="h-3 w-12 bg-gray-200 rounded mb-3" />
+    <div className="h-8 w-16 bg-gray-200 rounded mb-2" />
+    <div className="h-2 w-20 bg-gray-100 rounded" />
+  </div>
+);
+
+const ReadingCard = React.memo(function ReadingCard({
+  param,
+  reading,
+}: {
+  param: string;
+  reading: Reading | undefined;
+}) {
+  const rawValue = reading?.value ?? null;
+  const smoothValue = useInterpolatedValue(rawValue, 4800);
+  const unit = UNITS[param] || '';
+  const limit = LIMITS[param];
+
+  return (
+    <div className="bg-gray-50 p-4 rounded border border-gray-200 hover:shadow transition-shadow">
+      <div className="flex justify-between items-start">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{param}</p>
+        <Activity className="text-[#14532d]/40 h-4 w-4" />
+      </div>
+      <h3 className={`text-2xl font-bold mt-2 transition-colors duration-300 ${smoothValue != null ? getStatusColor(param, smoothValue) : 'text-gray-300'}`}>
+        {smoothValue != null ? smoothValue.toFixed(1) : '--'}
+      </h3>
+      <div className="text-[10px] text-gray-400 mt-1">
+        {unit} {limit ? `(Limit: ${limit})` : ''}
+      </div>
+      <div className="mt-2 text-[10px] text-gray-400">
+        {reading ? new Date(reading.recorded_at).toLocaleTimeString() : 'Awaiting data...'}
+      </div>
+    </div>
+  );
+});
+
 export function DashboardPage({ pollutionType }: DashboardPageProps) {
-  const user = useAuthStore(state => state.user);
   const alerts = useAlertStore(state => state.alerts);
   const latestReadings = useReadingsStore(state => state.latestReadings);
   const addReading = useReadingsStore(state => state.addReading);
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+
+  /**
+   * Tracks the current value per parameter so every 5s tick applies a tiny
+   * random-walk step (±0.8%) rather than re-randomizing from a fixed base.
+   * This eliminates the visual jump that occurred when values jumped ±15% independently.
+   */
+  const currentValuesRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     async function loadLocations() {
@@ -47,16 +110,44 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
     loadLocations();
   }, [pollutionType]);
 
-  // Load initial readings and simulate live updates
+  // Load initial readings and simulate live updates with smooth random walk
   useEffect(() => {
     if (!selectedLocationId) return;
-    const readings = getLatestReadings(selectedLocationId, pollutionType);
-    readings.forEach(r => addReading(r));
 
+    // Seed initial values — only on first load for this location
+    const initial = getLatestReadings(selectedLocationId, pollutionType);
+    initial.forEach(r => {
+      // Only set if not already tracking this param (avoids reset on re-render)
+      if (currentValuesRef.current[r.parameter] == null) {
+        currentValuesRef.current[r.parameter] = r.value;
+      }
+      addReading(r);
+    });
+
+    // Every 5 seconds apply a tiny ±0.8% random-walk step to each parameter.
+    // Values drift naturally — no jumps — because each step builds on the
+    // previous value rather than re-randomizing from a fixed base.
     const interval = setInterval(() => {
-      const updated = getLatestReadings(selectedLocationId, pollutionType);
-      updated.forEach(r => addReading(r));
+      const now = new Date().toISOString();
+      PARAMS_BY_TYPE[pollutionType].forEach(param => {
+        const prev = currentValuesRef.current[param];
+        if (prev == null) return;
+
+        // Random walk: move ±0.8% from previous value
+        const step = prev * (Math.random() * 0.016 - 0.008);
+        const next = Math.max(0.1, Math.round((prev + step) * 100) / 100);
+        currentValuesRef.current[param] = next;
+
+        addReading({
+          location_id: selectedLocationId,
+          parameter_id: param,
+          parameter: param,
+          value: next,
+          recorded_at: now,
+        });
+      });
     }, 5000);
+
     return () => clearInterval(interval);
   }, [selectedLocationId, pollutionType, addReading]);
 
@@ -90,29 +181,10 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
   const locationReadings = selectedLocationId ? latestReadings[selectedLocationId] || {} : {};
   const params = PARAMS_BY_TYPE[pollutionType];
 
-  const getStatusColor = (param: string, value: number) => {
-    const limit = LIMITS[param] || 100;
-    // For pH: out-of-range is bad (both too low and too high)
-    if (param === 'pH') {
-      if (value < 6.5 || value > 8.5) return 'text-red-600';
-      if (value < 6.8 || value > 8.2) return 'text-amber-600';
-      return 'text-green-600';
-    }
-    // For DO: higher is better
-    if (param === 'DO') {
-      if (value < limit) return 'text-red-600';
-      if (value < limit * 1.3) return 'text-amber-600';
-      return 'text-green-600';
-    }
-    // For everything else: lower is better
-    if (value > limit) return 'text-red-600';
-    if (value > limit * 0.75) return 'text-amber-600';
-    return 'text-green-600';
-  };
+  const dataReady = locations.length > 0 && selectedLocationId !== '';
 
   return (
     <div className="space-y-6">
-
       <div className="gov-card overflow-hidden">
         <div className="gov-card-header flex items-center justify-between">
           <span>{TYPE_LABELS[pollutionType]} — Live Telemetry</span>
@@ -121,7 +193,7 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
             value={selectedLocationId}
             onChange={(e) => setSelectedLocationId(e.target.value)}
           >
-            {locations.length === 0 && <option value="">No locations found</option>}
+            {locations.length === 0 && <option value="">Loading stations...</option>}
             {locations.map((loc) => (
               <option key={loc.id} value={loc.id} className="text-gray-800">{loc.name}</option>
             ))}
@@ -132,10 +204,17 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
           {selectedLocation && (
             <div className="text-sm text-gray-600 mb-4">
               Station: <span className="font-semibold text-[#14532d]">{selectedLocation.name}</span>
-              <span className="ml-2 inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                LIVE
-              </span>
+              {dataReady ? (
+                <span className="ml-2 inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  LIVE
+                </span>
+              ) : (
+                <span className="ml-2 inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">
+                  <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                  Connecting...
+                </span>
+              )}
             </div>
           )}
 
@@ -155,29 +234,12 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
           )}
 
           <div className={`grid grid-cols-2 md:grid-cols-3 ${params.length > 3 ? 'xl:grid-cols-6' : ''} gap-3`}>
-            {params.map(param => {
-              const reading = locationReadings[param];
-              const value = reading?.value;
-              const unit = UNITS[param] || '';
-              const limit = LIMITS[param];
-              return (
-                <div key={param} className="bg-gray-50 p-4 rounded border border-gray-200 hover:shadow transition-shadow">
-                  <div className="flex justify-between items-start">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{param}</p>
-                    <Activity className="text-[#14532d]/40 h-4 w-4" />
-                  </div>
-                  <h3 className={`text-2xl font-bold mt-2 ${value != null ? getStatusColor(param, value) : 'text-gray-400'}`}>
-                    {value != null ? value.toFixed(1) : '--'}
-                  </h3>
-                  <div className="text-[10px] text-gray-400 mt-1">
-                    {unit} {limit ? `(Limit: ${limit})` : ''}
-                  </div>
-                  <div className="mt-2 text-[10px] text-gray-400">
-                    {reading ? new Date(reading.recorded_at).toLocaleTimeString() : 'Awaiting data...'}
-                  </div>
-                </div>
-              );
-            })}
+            {!dataReady
+              ? params.map(p => <SkeletonCard key={p} />)
+              : params.map(param => (
+                  <ReadingCard key={param} param={param} reading={locationReadings[param]} />
+                ))
+            }
           </div>
         </div>
       </div>
