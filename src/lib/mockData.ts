@@ -349,6 +349,10 @@ export const DEMO_USERS: Record<string, { id: string; email: string; name: strin
     role: 'regional_officer', designation: 'Regional Officer, Bhilai',
     region_office_id: 'ro-bhilai',
   },
+  'citizen@prithvinet.in': {
+    id: 'usr-005', email: 'citizen@prithvinet.in', name: 'Citizen User',
+    role: 'citizen', designation: 'Normal Citizen',
+  },
 };
 
 export function getDemoUser(email?: string) {

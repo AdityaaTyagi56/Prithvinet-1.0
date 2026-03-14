@@ -25,6 +25,7 @@ const ROLE_TABS: Record<string, TabId[]> = {
   admin:            ['overview', 'telemetry', 'forecast', 'compliance', 'alerts', 'regional', 'industries', 'aqi-logs'],
   member_secretary: ['overview', 'telemetry', 'forecast', 'compliance', 'alerts', 'regional', 'industries', 'aqi-logs'],
   regional_officer: ['overview', 'telemetry', 'forecast', 'alerts', 'regional', 'aqi-logs'],
+  citizen:          ['overview', 'telemetry', 'forecast', 'alerts', 'regional', 'aqi-logs'],
 };
 const DEFAULT_TABS: TabId[] = ['overview', 'telemetry', 'forecast', 'aqi-logs'];
 
@@ -33,6 +34,7 @@ const ROLE_CONFIG: Record<string, { label: string; color: string; icon: React.Re
   admin:            { label: 'Administrator', color: 'bg-red-600', icon: <Shield className="h-3 w-3" /> },
   member_secretary: { label: 'Member Secretary', color: 'bg-purple-600', icon: <Briefcase className="h-3 w-3" /> },
   regional_officer: { label: 'Regional Officer', color: 'bg-blue-600', icon: <MapPin className="h-3 w-3" /> },
+  citizen:          { label: 'Normal Citizen', color: 'bg-emerald-600', icon: <User className="h-3 w-3" /> },
 };
 
 // Bilingual labels

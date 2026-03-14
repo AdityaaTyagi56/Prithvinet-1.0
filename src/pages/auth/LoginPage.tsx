@@ -130,7 +130,7 @@ export function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Official Email Address
+                  Email Address
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-600 transition-colors">
@@ -197,6 +197,16 @@ export function LoginPage() {
                 <div className="text-xs space-y-1">
                   <div
                     className="flex justify-between items-center cursor-pointer hover:bg-white p-2.5 rounded-lg transition-all group border border-transparent hover:border-green-100"
+                    onClick={() => setEmail("citizen@prithvinet.in")}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-green-900 group-hover:text-green-700">Normal Citizen</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-700 uppercase">Citizen</span>
+                    </div>
+                    <span className="font-mono text-green-700 bg-green-100/50 px-2 py-1 rounded">citizen@prith...</span>
+                  </div>
+                  <div
+                    className="flex justify-between items-center cursor-pointer hover:bg-white p-2.5 rounded-lg transition-all group border border-transparent hover:border-green-100"
                     onClick={() => setEmail("admin@cecb.gov.in")}
                   >
                     <div className="flex items-center gap-2">
@@ -240,7 +250,7 @@ export function LoginPage() {
             </div>
             
             <div className="mt-8 text-center text-[11px] text-gray-400 font-medium">
-              For authorized CECB personnel only. <br/> Access is logged and monitored.
+              For authorized users and citizens. <br/> Access is logged and monitored.
             </div>
             </div>
           </div>
