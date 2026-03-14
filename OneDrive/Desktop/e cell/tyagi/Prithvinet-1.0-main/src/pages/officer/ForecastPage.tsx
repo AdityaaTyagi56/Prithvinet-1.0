@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { getBytezStatus, runBytezChat } from '../../lib/bytez';
 import { ForecastChart } from '../../components/charts/ForecastChart';
-import { PARAMS_BY_TYPE, UNITS } from '../../lib/mockData';
+import { PARAMS_BY_TYPE, UNITS, getForecastData } from '../../lib/mockData';
 import type { PollutionType } from '../../lib/mockData';
 
 interface ForecastPageProps {
@@ -51,8 +51,8 @@ Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations
       const jsonStr = match ? match[0] : result;
       return JSON.parse(jsonStr);
     } catch (e) {
-      console.error("JSON Parse Error for Bytez Forecast:", result);
-      throw new Error("Failed to generate proactive forecast data.");
+      console.warn("Bytez forecast JSON unavailable, using demo forecast data.");
+      return getForecastData(param);
     }
   };
 

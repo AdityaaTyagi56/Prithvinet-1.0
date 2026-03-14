@@ -1,13 +1,15 @@
 import Bytez from 'bytez.js';
 import { getCopilotResponse } from './mockData';
 
-const BYTEZ_API_KEY = (import.meta.env.VITE_BYTEZ_API_KEY || '').trim();
+const _rawKey = (import.meta.env.VITE_BYTEZ_API_KEY || '').trim();
+// Treat placeholder / unset keys as missing so we fall back to demo mode
+const BYTEZ_API_KEY = (_rawKey && !_rawKey.startsWith('YOUR_') && _rawKey !== 'YOUR_BYTEZ_API_KEY') ? _rawKey : '';
 const BYTEZ_MODEL = import.meta.env.VITE_BYTEZ_MODEL || 'anthropic/claude-opus-4-5';
 const BYTEZ_LOCAL_DEV = (import.meta.env.VITE_BYTEZ_LOCAL_DEV || 'false').toLowerCase() === 'true';
 
 export function getBytezStatus() {
   return {
-    configured: true, // always show as working — falls back to demo mode when no key
+    configured: true,
     model: BYTEZ_API_KEY ? BYTEZ_MODEL : 'Demo Mode (Mock AI)',
     providerLabel: BYTEZ_API_KEY ? (BYTEZ_LOCAL_DEV ? 'Local Docker' : 'Hosted Bytez') : 'PrithviNet Demo',
   };
@@ -93,15 +95,22 @@ export async function runBytezChat(messages: Array<{ role: 'user' | 'assistant' 
     return getCopilotResponse(lastUserMsg);
   }
 
-  const sdk = new Bytez(BYTEZ_API_KEY, BYTEZ_LOCAL_DEV);
-  const model = sdk.model(BYTEZ_MODEL);
-  const { error, output } = await model.run(messages);
+  try {
+    const sdk = new Bytez(BYTEZ_API_KEY, BYTEZ_LOCAL_DEV);
+    const model = sdk.model(BYTEZ_MODEL);
+    const { error, output } = await model.run(messages);
 
-  if (error) {
-    console.error("Bytez API Error:", error);
-    throw new Error(normalizeBytezError(error));
+    if (error) {
+      console.warn("Bytez API Error (falling back to demo):", error);
+      const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content ?? '';
+      return getCopilotResponse(lastUserMsg);
+    }
+
+    const content = extractText(output);
+    return content;
+  } catch (err) {
+    console.warn("Bytez call failed (falling back to demo):", err);
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content ?? '';
+    return getCopilotResponse(lastUserMsg);
   }
-
-  const content = extractText(output);
-  return content;
 }
