@@ -719,98 +719,116 @@ export function AqiLogsPage() {
 
           {/* AI Analysis Card */}
           {analysis && (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-purple-900 flex items-center gap-1.5">
-                  <Brain className="h-4 w-4 text-purple-600" />
+            <div className="bg-white rounded-2xl border border-purple-100 shadow-md shadow-purple-500/5 overflow-hidden">
+              <div className="px-5 py-4 bg-gradient-to-r from-purple-100/80 via-white to-purple-50 border-b border-purple-100 flex items-center justify-between">
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <div className="p-1.5 bg-purple-600 rounded-lg shadow-sm">
+                    <Brain className="h-4 w-4 text-white" />
+                  </div>
                   AI Daily Analysis — {analysis.date}
                 </h3>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${RISK_COLORS[analysis.ai_insight?.risk_level || 'unknown']}`}>
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs px-2.5 py-1 rounded-md border font-bold shadow-sm ${RISK_COLORS[analysis.ai_insight?.risk_level || 'unknown']}`}>
                     {(analysis.ai_insight?.risk_level || 'unknown').toUpperCase()} RISK
                   </span>
                   <button
                     onClick={runAnalysis}
                     disabled={loadingAnalysis}
-                    className="text-xs text-purple-600 hover:text-purple-800 flex items-center gap-1"
+                    className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-100 rounded-lg transition-colors border border-transparent hover:border-purple-200"
                     title="Regenerate analysis"
                   >
-                    <RefreshCw className={`h-3 w-3 ${loadingAnalysis ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-4 w-4 ${loadingAnalysis ? 'animate-spin' : ''}`} />
                   </button>
                 </div>
               </div>
 
-              <div className="p-4 space-y-4">
+              <div className="p-5 space-y-6">
                 {/* Pollutant Stats Grid */}
                 {analysis.aggregates && (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {Object.entries(analysis.aggregates.pollutant_stats).map(([param, stat]) => (
-                      <div key={param} className="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-                        <div className="text-xs font-semibold text-gray-500">{param}</div>
-                        <div className="text-lg font-bold text-gray-800">{stat.avg?.toFixed(1) ?? '—'}</div>
-                        <div className="text-[10px] text-gray-400">
-                          min {stat.min ?? '—'} / max {stat.max ?? '—'} ({stat.count})
+                      <div key={param} className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-3 border border-gray-200 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] relative overflow-hidden group hover:border-purple-300 transition-colors">
+                        <div className="absolute -right-4 -top-4 w-12 h-12 bg-purple-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div className="relative">
+                          <div className="text-[11px] font-bold text-gray-500 tracking-wider mb-1">{param}</div>
+                          <div className="text-2xl font-black text-gray-800 tracking-tight leading-none mb-1">{stat.avg?.toFixed(1) ?? '—'}</div>
+                          <div className="flex items-center text-[10px] text-gray-400 font-medium mt-1">
+                            <span className="text-emerald-600 font-semibold">min {stat.min ?? '—'}</span>
+                            <span className="mx-1.5 opacity-30">|</span>
+                            <span className="text-red-500 font-semibold">max {stat.max ?? '—'}</span>
+                            <span className="ml-auto bg-gray-100 px-1.5 rounded text-gray-500 border border-gray-200 text-[9px]">{stat.count}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Trend */}
-                {analysis.ai_insight?.trend && (
-                  <div className="flex gap-2">
-                    <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Trend Analysis</div>
-                      <p className="text-sm text-gray-700 leading-relaxed">{analysis.ai_insight.trend}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Trend */}
+                  {analysis.ai_insight?.trend && (
+                    <div className="flex gap-3 p-4 bg-blue-50/50 rounded-xl border border-blue-100/60 shadow-sm">
+                      <div className="p-2 bg-blue-100 rounded-lg h-fit aspect-square">
+                        <TrendingUp className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-bold text-blue-800 uppercase tracking-wider mb-1">Trend Analysis</div>
+                        <p className="text-sm text-gray-700 leading-relaxed font-medium">{analysis.ai_insight.trend}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {/* Recommendations */}
+                  {analysis.ai_insight?.recommendations?.length > 0 && (
+                    <div className="flex gap-3 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100/60 shadow-sm">
+                      <div className="p-2 bg-emerald-100 rounded-lg h-fit aspect-square">
+                        <Lightbulb className="h-4 w-4 text-emerald-600" />
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-2">Recommendations</div>
+                        <ul className="space-y-1.5">
+                          {analysis.ai_insight.recommendations.map((rec, i) => (
+                            <li key={i} className="text-sm text-gray-700 flex items-start gap-2 font-medium">
+                              <CheckCircle className="h-3.5 w-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                              <span className="leading-snug">{rec}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Risk Areas */}
                 {analysis.ai_insight?.risk_areas?.length > 0 && (
-                  <div className="flex gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Risk Areas</div>
-                      <ul className="space-y-1">
-                        {analysis.ai_insight.risk_areas.map((area, i) => (
-                          <li key={i} className="text-sm text-gray-700 flex items-start gap-1.5">
-                            <span className="text-amber-400 mt-1">&#9679;</span>
-                            {area}
-                          </li>
-                        ))}
-                      </ul>
+                  <div className="flex gap-3 p-4 bg-amber-50/50 rounded-xl border border-amber-100/60 shadow-sm">
+                    <div className="p-2 bg-amber-100 rounded-lg h-fit mt-1 aspect-square">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
                     </div>
-                  </div>
-                )}
-
-                {/* Recommendations */}
-                {analysis.ai_insight?.recommendations?.length > 0 && (
-                  <div className="flex gap-2">
-                    <Lightbulb className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Recommendations</div>
-                      <ul className="space-y-1">
-                        {analysis.ai_insight.recommendations.map((rec, i) => (
-                          <li key={i} className="text-sm text-gray-700 flex items-start gap-1.5">
-                            <CheckCircle className="h-3.5 w-3.5 text-green-400 mt-0.5 flex-shrink-0" />
-                            {rec}
-                          </li>
+                    <div className="w-full">
+                      <div className="text-[11px] font-bold text-amber-800 uppercase tracking-wider mb-3">Risk Areas</div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                        {analysis.ai_insight.risk_areas.map((area, i) => (
+                          <div key={i} className="flex items-start gap-2.5 p-2 bg-white rounded-lg border border-amber-100 shadow-sm">
+                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold mt-0.5 shrink-0">{i + 1}</span>
+                            <span className="text-sm text-gray-800 font-medium leading-tight pt-0.5">{area}</span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Forecast Context */}
                 {analysis.ai_insight?.forecast_context && (
-                  <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-100">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <Shield className="h-3.5 w-3.5 text-indigo-500" />
-                      <span className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">Forecast Enhancement Context</span>
+                  <div className="flex gap-3 p-3.5 bg-gradient-to-r from-indigo-50/80 to-purple-50/80 rounded-xl border border-indigo-100/80 shadow-sm">
+                    <div className="p-1.5 bg-indigo-200/50 rounded-md h-fit">
+                      <Shield className="h-3.5 w-3.5 text-indigo-700" />
                     </div>
-                    <p className="text-xs text-indigo-800 leading-relaxed">{analysis.ai_insight.forecast_context}</p>
+                    <div>
+                      <div className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider mb-1">Forecast Enhancement Context</div>
+                      <p className="text-xs text-indigo-900 font-medium leading-relaxed">{analysis.ai_insight.forecast_context}</p>
+                    </div>
                   </div>
                 )}
 
