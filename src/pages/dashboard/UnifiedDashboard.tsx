@@ -7,11 +7,9 @@ import { ForecastPage } from '../officer/ForecastPage';
 import { AlertsDashboard } from './AlertsDashboard';
 import { RegionalAnalytics } from './RegionalAnalytics';
 import { IndustryTracker } from './IndustryTracker';
-import { CopilotChat } from '../../components/copilot/CopilotChat';
 import { AshokEmblem } from '../../components/AshokEmblem';
 import { MissionLifeLogo, AzadiLogo } from '../../components/GovLogos';
 import {
-  MessageSquare,
   LogOut,
   Wind,
   Droplets,
@@ -97,7 +95,6 @@ const NAV_ITEMS_EN: { id: TabId; label: string; labelHi: string; icon: React.Rea
 export function UnifiedDashboard() {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
-  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [pollutionType, setPollutionType] = useState<PollutionType>('air');
   const [lang, setLang] = useState<'en' | 'hi'>('en');
@@ -519,34 +516,6 @@ export function UnifiedDashboard() {
           </div>
         </div>
       </footer>
-
-      {/* ═══ AI Assistant Widget ═══ */}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end">
-        {isCopilotOpen && (
-          <div className="mb-3 w-[400px] shadow-xl rounded-lg overflow-hidden border border-green-200 bg-white">
-            <div className="bg-gradient-to-r from-[#14532d] to-[#166534] flex justify-between items-center px-4 py-2.5">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-green-200" />
-                <span className="font-semibold text-white text-sm">PrithviNet AI Assistant</span>
-              </div>
-              <button
-                onClick={() => setIsCopilotOpen(false)}
-                className="text-green-200 hover:text-white text-lg leading-none"
-              >
-                &times;
-              </button>
-            </div>
-            <CopilotChat />
-          </div>
-        )}
-        <button
-          onClick={() => setIsCopilotOpen(!isCopilotOpen)}
-          className="bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#15803d] text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transition-all text-sm font-medium border border-green-700"
-        >
-          <MessageSquare className="h-5 w-5" />
-          {isCopilotOpen ? 'Close' : 'AI Assistant'}
-        </button>
-      </div>
     </div>
   );
 }
