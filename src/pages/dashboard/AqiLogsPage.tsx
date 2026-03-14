@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../lib/api';
-import { hasLiveData, getCachedSnapshot } from '../../lib/liveData';
+import { hasLiveData, getCachedSnapshot, fetchLiveSnapshot } from '../../lib/liveData';
 import {
   Download,
   Brain,
@@ -314,7 +314,20 @@ export function AqiLogsPage() {
   const [sortKey, setSortKey] = useState<SortKey>('timestamp');
   const [sortAsc, setSortAsc] = useState(true);
 
-  const snap = getCachedSnapshot();
+  const [snapshotObj, setSnapshotObj] = useState(getCachedSnapshot());
+  const snap = snapshotObj;
+
+  // Auto-refresh snapshot every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const fresh = await fetchLiveSnapshot(true);
+      if (fresh) {
+        setSnapshotObj({ ...fresh });
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchedAt = snap?.fetched_at ? new Date(snap.fetched_at) : null;
 
   // Fetch available log dates
