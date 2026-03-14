@@ -16,6 +16,85 @@ const TYPE_LABELS: Record<PollutionType, string> = {
   noise: '📈 AI-Powered Noise Level Forecast (48 Hours)',
 };
 
+const renderFormattedInsight = (text: string) => {
+  const blocks = text.split('\n\n').filter(b => b.trim());
+  
+  if (blocks.length <= 1) {
+    // Fallback if formatting isn't block-based
+    return <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed font-medium">{text}</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {blocks.map((block, idx) => {
+        if (block.includes('**')) {
+          const lines = block.split('\n').filter(l => l.trim().length > 0);
+          const titleLine = lines[0];
+          const listItems = lines.slice(1);
+          
+          let titleText = titleLine.replace(/\*\*/g, '').trim();
+          titleText = titleText.replace(/^[-*]\s*/, '').trim();
+
+          // Colors based on keywords
+          let bgColors = "bg-gradient-to-br from-emerald-50/80 to-emerald-50/20 border-emerald-100";
+          let iconColor = "text-emerald-700";
+          let dotColor = "bg-emerald-500 shadow-emerald-500/50";
+          
+          if (titleText.toLowerCase().includes('air')) { 
+            bgColors = "bg-gradient-to-br from-blue-50/80 to-blue-50/20 border-blue-100"; 
+            iconColor = "text-blue-700"; 
+            dotColor = "bg-blue-500 shadow-blue-500/50";
+          } else if (titleText.toLowerCase().includes('water')) { 
+            bgColors = "bg-gradient-to-br from-cyan-50/80 to-cyan-50/20 border-cyan-100"; 
+            iconColor = "text-cyan-800"; 
+            dotColor = "bg-cyan-500 shadow-cyan-500/50";
+          } else if (titleText.toLowerCase().includes('noise')) { 
+            bgColors = "bg-gradient-to-br from-indigo-50/80 to-indigo-50/20 border-indigo-100"; 
+            iconColor = "text-indigo-700"; 
+            dotColor = "bg-indigo-500 shadow-indigo-500/50";
+          } else if (titleText.toLowerCase().includes('alert')) { 
+            bgColors = "bg-gradient-to-br from-red-50/80 to-red-50/20 border-red-100"; 
+            iconColor = "text-red-700"; 
+            dotColor = "bg-red-500 shadow-red-500/50";
+          } else if (titleText.toLowerCase().includes('recommend') || titleText.toLowerCase().includes('action')) { 
+            bgColors = "bg-gradient-to-br from-amber-50/80 to-amber-50/20 border-amber-100"; 
+            iconColor = "text-amber-800"; 
+            dotColor = "bg-amber-500 shadow-amber-500/50";
+          }
+
+          return (
+            <div key={idx} className={`p-4 rounded-xl border ${bgColors} shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300 hover:-translate-y-0.5`}>
+              <div className={`absolute -right-6 -top-6 w-20 h-20 rounded-full opacity-10 group-hover:scale-[1.8] transition-transform duration-700 ${dotColor.split(' ')[0]}`}></div>
+              <h4 className={`text-[13px] font-bold mb-3 flex items-center gap-2 ${iconColor} tracking-wide`}>
+                {titleText}
+              </h4>
+              <ul className="space-y-2 relative z-10">
+                {listItems.map((line, lIdx) => {
+                  let cleanLine = line.replace(/^- /, '').replace(/^\d+\.\s/, '').replace(/\*\*/g, '').trim();
+                  return (
+                    <li key={lIdx} className="text-gray-700 text-[13px] flex items-start gap-2.5">
+                      <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 shadow-sm ${dotColor}`}></span>
+                      <span className="leading-snug font-medium flex-1">{cleanLine}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          );
+        }
+        return (
+          <div key={idx} className="flex items-center gap-3 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+            <div className="p-1.5 bg-gray-100 rounded-lg">
+              <Brain className="w-4 h-4 text-gray-500" />
+            </div>
+            <p className="text-[13px] font-semibold text-gray-600 tracking-wide uppercase">{block.replace(/\*\*/g, '')}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export function ForecastPage({ pollutionType }: ForecastPageProps) {
   const bytezStatus = getBytezStatus();
   const [locations, setLocations] = useState<any[]>([]);
@@ -218,8 +297,8 @@ Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations
                   {aiError}
                 </div>
               ) : aiInsight ? (
-                <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed font-medium bg-gradient-to-br from-emerald-50/50 to-white p-4 rounded-xl border border-emerald-100/50 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.05)]">
-                  {aiInsight}
+                <div className="w-full">
+                  {renderFormattedInsight(aiInsight)}
                 </div>
               ) : (
                 <div className="text-sm text-gray-500 italic px-2">No AI insight yet. Select a location to generate.</div>
