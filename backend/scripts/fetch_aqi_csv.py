@@ -230,13 +230,25 @@ def main():
     api_key = _load_key()
 
     if args.loop:
-        logging.info("Starting AQI fetch loop (every 60 min)...")
+        logging.info("Starting strict hourly AQI fetch loop (anchored to top of the hour)...")
         while True:
             try:
                 fetch_and_save(api_key)
             except Exception as e:
                 logging.error("Fetch failed: %s", e)
-            time.sleep(3600)
+            
+            # Mathematical lock to EXACTLY the next hour, preventing script execution drift
+            # (e.g., 1:00:00 -> 2:00:05 -> 3:00:15)
+            import time
+            now = time.time()
+            next_hour = ((now // 3600) + 1) * 3600
+            
+            # Add a 3-minute grace period (180s) past the hour mark to give the 
+            # Government API servers time to formulate their cache before we scrape it.
+            sleep_seconds = (next_hour + 180) - now 
+            
+            logging.info(f"Sleeping for {int(sleep_seconds)} seconds until the next synchronized scrape...")
+            time.sleep(sleep_seconds)
     else:
         fetch_and_save(api_key)
 
