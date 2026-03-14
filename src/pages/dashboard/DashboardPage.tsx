@@ -95,6 +95,11 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
   const currentValuesRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
+    // Clear tracked values when pollution type changes to prevent stale data
+    currentValuesRef.current = {};
+  }, [pollutionType]);
+
+  useEffect(() => {
     async function loadLocations() {
       try {
         const res = await api.get(`/locations?type=${pollutionType}`);
@@ -162,8 +167,8 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
         const prev = currentValuesRef.current[param];
         if (prev == null) return;
 
-        // Random walk: move ±0.8% from previous value
-        const step = prev * (Math.random() * 0.016 - 0.008);
+        // Random walk: move ±0.2% from previous value (very stable drift)
+        const step = prev * (Math.random() * 0.004 - 0.002);
         const next = Math.max(0.1, Math.round((prev + step) * 100) / 100);
         currentValuesRef.current[param] = next;
 

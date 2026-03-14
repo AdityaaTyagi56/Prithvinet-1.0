@@ -72,16 +72,50 @@ export const LIMITS: Record<string, number> = {
 
 // ─── Base values ────────────────────────────────────────────
 const AIR_BASE: Record<string, number> = { 'PM2.5': 82, PM10: 145, SO2: 38, NO2: 48, CO: 1.8, O3: 42 };
-const WATER_BASE: Record<string, number> = { pH: 7.4, BOD: 22, COD: 180, TDS: 1450, DO: 5.8, Turbidity: 7.2 };
+
+// ── CPCB NWMP verified baselines per water station ──────────
+// These match the real values from sync_water_govapi.py (CPCB 2020 report)
+const WATER_STATION_VALUES: Record<string, Record<string, number>> = {
+  'wtr-1': { pH: 7.2, BOD: 2.1,  COD: 14,  TDS: 320,  DO: 6.8, Turbidity: 4.2 },  // Mahanadi
+  'wtr-2': { pH: 7.4, BOD: 1.8,  COD: 12,  TDS: 280,  DO: 7.1, Turbidity: 3.8 },  // Sheonath
+  'wtr-3': { pH: 6.9, BOD: 4.8,  COD: 38,  TDS: 890,  DO: 5.2, Turbidity: 8.1 },  // Hasdeo/Kharoon
+  'wtr-4': { pH: 7.1, BOD: 2.4,  COD: 18,  TDS: 410,  DO: 6.5, Turbidity: 5.0 },  // Arpa
+  'wtr-5': { pH: 6.9, BOD: 4.8,  COD: 42,  TDS: 980,  DO: 5.2, Turbidity: 9.4 },  // Kharoon Outfall
+  'wtr-6': { pH: 7.5, BOD: 1.4,  COD: 10,  TDS: 180,  DO: 7.8, Turbidity: 2.6 },  // Indravati
+};
+const WATER_BASE: Record<string, number> = { pH: 7.2, BOD: 2.1, COD: 14, TDS: 320, DO: 6.8, Turbidity: 4.2 };
+
+// ── CG research baselines per noise station ─────────────────
+// These match sync_noise_pattern.py verified values
+const NOISE_STATION_VALUES: Record<string, Record<string, number>> = {
+  'nse-1': { Leq: 68, Lmax: 82, Lmin: 52, L10: 74, L90: 56, Ln: 62 },  // Raipur Commercial
+  'nse-2': { Leq: 79, Lmax: 92, Lmin: 58, L10: 84, L90: 62, Ln: 71 },  // Bhilai Industrial
+  'nse-3': { Leq: 82, Lmax: 96, Lmin: 60, L10: 88, L90: 64, Ln: 74 },  // Korba Industrial
+  'nse-4': { Leq: 54, Lmax: 68, Lmin: 38, L10: 60, L90: 42, Ln: 44 },  // Bilaspur Residential
+  'nse-5': { Leq: 72, Lmax: 86, Lmin: 54, L10: 78, L90: 58, Ln: 65 },  // Raipur Industrial
+  'nse-6': { Leq: 48, Lmax: 62, Lmin: 34, L10: 54, L90: 38, Ln: 40 },  // Rajnandgaon Hospital
+};
 const NOISE_BASE: Record<string, number> = { Leq: 68, Lmax: 82, Lmin: 42, L10: 74, L90: 48, Ln: 62 };
 
-function getBase(p: string): number {
+export function getBase(p: string): number {
   return AIR_BASE[p] ?? WATER_BASE[p] ?? NOISE_BASE[p] ?? 50;
 }
 
-// ─── Reading generator ──────────────────────────────────────
+// ── Deterministic seed from string (produces same number for same input) ──
+function hashSeed(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+// ─── Reading generator (deterministic — same locationId+param = same value) ──
 function reading(locationId: string, param: string, baseValue: number) {
-  const jitter = rand(-baseValue * 0.15, baseValue * 0.15);
+  // Use a deterministic hash so the same location+param always produces the same value
+  const seed = hashSeed(locationId + param);
+  const fraction = (seed % 10000) / 10000;           // 0..1 deterministic
+  const jitter = (fraction * 2 - 1) * baseValue * 0.03; // ±3% — very small, stable
   let val = Math.round((baseValue + jitter) * 100) / 100;
   if (param === 'pH') val = Math.max(6, Math.min(9, val));
   else val = Math.max(0, val);
@@ -93,6 +127,17 @@ function reading(locationId: string, param: string, baseValue: number) {
 
 export function getLatestReadings(locationId: string, type?: PollutionType) {
   const t = type || (locationId.startsWith('wtr') ? 'water' : locationId.startsWith('nse') ? 'noise' : 'air');
+
+  // For water/noise: use real station-specific values instead of generic base
+  if (t === 'water') {
+    const stationVals = WATER_STATION_VALUES[locationId] || WATER_BASE;
+    return PARAMS_BY_TYPE[t].map(p => reading(locationId, p, stationVals[p] ?? WATER_BASE[p] ?? 50));
+  }
+  if (t === 'noise') {
+    const stationVals = NOISE_STATION_VALUES[locationId] || NOISE_BASE;
+    return PARAMS_BY_TYPE[t].map(p => reading(locationId, p, stationVals[p] ?? NOISE_BASE[p] ?? 50));
+  }
+
   return PARAMS_BY_TYPE[t].map(p => reading(locationId, p, getBase(p)));
 }
 
