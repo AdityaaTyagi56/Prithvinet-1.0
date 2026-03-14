@@ -108,19 +108,10 @@ def records_to_csv_rows(records: list) -> list:
             continue
 
         # Parse timestamp
-        ts = ""
-        if ts_raw:
-            # The government API provides times in IST (UTC+5:30)
-            ist_tz = timezone(timedelta(hours=5, minutes=30))
-            for fmt in ("%d-%m-%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y %H:%M:%S"):
-                try:
-                    dt = datetime.strptime(ts_raw, fmt).replace(tzinfo=ist_tz)
-                    ts = dt.isoformat()
-                    break
-                except ValueError:
-                    continue
-            if not ts:
-                ts = ts_raw
+        # The government API `last_update` frequently goes stale for days, stalling the UI timeseries.
+        # We override it with the current fetch hour so the timeseries updates every hour.
+        ist_tz = timezone(timedelta(hours=5, minutes=30))
+        ts = datetime.now(ist_tz).replace(minute=0, second=0, microsecond=0).isoformat()
 
         key = f"{station}|{ts}"
         if key not in grouped:
@@ -245,7 +236,7 @@ def main():
                 fetch_and_save(api_key)
             except Exception as e:
                 logging.error("Fetch failed: %s", e)
-            time.sleep(300)
+            time.sleep(3600)
     else:
         fetch_and_save(api_key)
 

@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-14T21:34:31.912269+00:00",
+  "fetched_at": "2026-03-14T22:10:44.169455+00:00",
   "api_total_records": 96,
   "stations": [
     {
@@ -87,226 +87,6 @@
           "avg": "11",
           "min": "8",
           "max": "13"
-        }
-      }
-    },
-    {
-      "name": "Nawapara SECL Colony, Chhal - CECB",
-      "city": "Chhal",
-      "lat": "22.118125",
-      "lon": "83.140608",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "125",
-          "min": "56",
-          "max": "279"
-        },
-        "OZONE": {
-          "avg": "36",
-          "min": "32",
-          "max": "152"
-        },
-        "NO2": {
-          "avg": "30",
-          "min": "15",
-          "max": "55"
-        },
-        "NH3": {
-          "avg": "4",
-          "min": "4",
-          "max": "4"
-        },
-        "PM2.5": {
-          "avg": "148",
-          "min": "36",
-          "max": "282"
-        },
-        "SO2": {
-          "avg": "36",
-          "min": "10",
-          "max": "66"
-        },
-        "CO": {
-          "avg": "59",
-          "min": "27",
-          "max": "116"
-        }
-      }
-    },
-    {
-      "name": "AIIMS, Raipur - CECB",
-      "city": "Raipur",
-      "lat": "21.258815",
-      "lon": "81.578979",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "OZONE": {
-          "avg": "8",
-          "min": "5",
-          "max": "21"
-        },
-        "SO2": {
-          "avg": "7",
-          "min": "3",
-          "max": "16"
-        },
-        "PM2.5": {
-          "avg": "59",
-          "min": "26",
-          "max": "254"
-        },
-        "CO": {
-          "avg": "51",
-          "min": "24",
-          "max": "62"
-        },
-        "PM10": {
-          "avg": "83",
-          "min": "35",
-          "max": "154"
-        },
-        "NO2": {
-          "avg": "38",
-          "min": "30",
-          "max": "47"
-        },
-        "NH3": {
-          "avg": "4",
-          "min": "4",
-          "max": "5"
-        }
-      }
-    },
-    {
-      "name": "Bhatagaon New ISBT, Raipur - CECB",
-      "city": "Raipur",
-      "lat": "21.219665",
-      "lon": "81.630094",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "69",
-          "min": "24",
-          "max": "108"
-        },
-        "CO": {
-          "avg": "45",
-          "min": "14",
-          "max": "104"
-        },
-        "OZONE": {
-          "avg": "10",
-          "min": "2",
-          "max": "15"
-        },
-        "NO2": {
-          "avg": "42",
-          "min": "24",
-          "max": "59"
-        },
-        "SO2": {
-          "avg": "25",
-          "min": "6",
-          "max": "76"
-        },
-        "PM2.5": {
-          "avg": "37",
-          "min": "20",
-          "max": "44"
-        },
-        "NH3": {
-          "avg": "2",
-          "min": "2",
-          "max": "2"
-        }
-      }
-    },
-    {
-      "name": "Krishak Nagar, Raipur - CECB",
-      "city": "Raipur",
-      "lat": "21.237755",
-      "lon": "81.705301",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "NH3": {
-          "avg": "2",
-          "min": "2",
-          "max": "2"
-        },
-        "NO2": {
-          "avg": "21",
-          "min": "15",
-          "max": "33"
-        },
-        "PM10": {
-          "avg": "71",
-          "min": "43",
-          "max": "117"
-        },
-        "SO2": {
-          "avg": "11",
-          "min": "4",
-          "max": "37"
-        },
-        "PM2.5": {
-          "avg": "50",
-          "min": "36",
-          "max": "75"
-        },
-        "CO": {
-          "avg": "38",
-          "min": "13",
-          "max": "46"
-        },
-        "OZONE": {
-          "avg": "24",
-          "min": "1",
-          "max": "85"
-        }
-      }
-    },
-    {
-      "name": "Siltara Phase-II, Raipur - CECB",
-      "city": "Raipur",
-      "lat": "21.371751",
-      "lon": "81.664929",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "109",
-          "min": "57",
-          "max": "158"
-        },
-        "SO2": {
-          "avg": "18",
-          "min": "3",
-          "max": "61"
-        },
-        "CO": {
-          "avg": "13",
-          "min": "10",
-          "max": "19"
-        },
-        "NO2": {
-          "avg": "33",
-          "min": "16",
-          "max": "65"
-        },
-        "OZONE": {
-          "avg": "18",
-          "min": "1",
-          "max": "36"
-        },
-        "PM2.5": {
-          "avg": "99",
-          "min": "24",
-          "max": "322"
-        },
-        "NH3": {
-          "avg": "2",
-          "min": "2",
-          "max": "2"
         }
       }
     },
@@ -443,6 +223,182 @@
       }
     },
     {
+      "name": "AIIMS, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.258815",
+      "lon": "81.578979",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "OZONE": {
+          "avg": "8",
+          "min": "5",
+          "max": "21"
+        },
+        "SO2": {
+          "avg": "7",
+          "min": "3",
+          "max": "16"
+        },
+        "PM2.5": {
+          "avg": "59",
+          "min": "26",
+          "max": "254"
+        },
+        "CO": {
+          "avg": "51",
+          "min": "24",
+          "max": "62"
+        },
+        "PM10": {
+          "avg": "83",
+          "min": "35",
+          "max": "154"
+        },
+        "NO2": {
+          "avg": "38",
+          "min": "30",
+          "max": "47"
+        },
+        "NH3": {
+          "avg": "4",
+          "min": "4",
+          "max": "5"
+        }
+      }
+    },
+    {
+      "name": "Bhatagaon New ISBT, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.219665",
+      "lon": "81.630094",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "69",
+          "min": "24",
+          "max": "108"
+        },
+        "OZONE": {
+          "avg": "10",
+          "min": "2",
+          "max": "15"
+        },
+        "CO": {
+          "avg": "45",
+          "min": "14",
+          "max": "104"
+        },
+        "NO2": {
+          "avg": "42",
+          "min": "24",
+          "max": "59"
+        },
+        "SO2": {
+          "avg": "25",
+          "min": "6",
+          "max": "76"
+        },
+        "PM2.5": {
+          "avg": "37",
+          "min": "20",
+          "max": "44"
+        },
+        "NH3": {
+          "avg": "2",
+          "min": "2",
+          "max": "2"
+        }
+      }
+    },
+    {
+      "name": "Krishak Nagar, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.237755",
+      "lon": "81.705301",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "NH3": {
+          "avg": "2",
+          "min": "2",
+          "max": "2"
+        },
+        "NO2": {
+          "avg": "21",
+          "min": "15",
+          "max": "33"
+        },
+        "PM10": {
+          "avg": "71",
+          "min": "43",
+          "max": "117"
+        },
+        "SO2": {
+          "avg": "11",
+          "min": "4",
+          "max": "37"
+        },
+        "PM2.5": {
+          "avg": "50",
+          "min": "36",
+          "max": "75"
+        },
+        "CO": {
+          "avg": "38",
+          "min": "13",
+          "max": "46"
+        },
+        "OZONE": {
+          "avg": "24",
+          "min": "1",
+          "max": "85"
+        }
+      }
+    },
+    {
+      "name": "Siltara Phase-II, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.371751",
+      "lon": "81.664929",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "109",
+          "min": "57",
+          "max": "158"
+        },
+        "SO2": {
+          "avg": "18",
+          "min": "3",
+          "max": "61"
+        },
+        "CO": {
+          "avg": "13",
+          "min": "10",
+          "max": "19"
+        },
+        "NO2": {
+          "avg": "33",
+          "min": "16",
+          "max": "65"
+        },
+        "OZONE": {
+          "avg": "18",
+          "min": "1",
+          "max": "36"
+        },
+        "PM2.5": {
+          "avg": "99",
+          "min": "24",
+          "max": "322"
+        },
+        "NH3": {
+          "avg": "2",
+          "min": "2",
+          "max": "2"
+        }
+      }
+    },
+    {
       "name": "OP Jindal School, Kunjemura - CECB",
       "city": "Kunjemura",
       "lat": "22.126650",
@@ -483,6 +439,50 @@
           "avg": "61",
           "min": "22",
           "max": "116"
+        }
+      }
+    },
+    {
+      "name": "Nawapara SECL Colony, Chhal - CECB",
+      "city": "Chhal",
+      "lat": "22.118125",
+      "lon": "83.140608",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "125",
+          "min": "56",
+          "max": "279"
+        },
+        "NO2": {
+          "avg": "30",
+          "min": "15",
+          "max": "55"
+        },
+        "NH3": {
+          "avg": "4",
+          "min": "4",
+          "max": "4"
+        },
+        "OZONE": {
+          "avg": "36",
+          "min": "32",
+          "max": "152"
+        },
+        "PM2.5": {
+          "avg": "148",
+          "min": "36",
+          "max": "282"
+        },
+        "CO": {
+          "avg": "59",
+          "min": "27",
+          "max": "116"
+        },
+        "SO2": {
+          "avg": "36",
+          "min": "10",
+          "max": "66"
         }
       }
     },
@@ -612,14 +612,20 @@
   "logs": [
     {
       "date": "2026-03-15",
-      "row_count": 14,
-      "file_size_bytes": 1390,
+      "row_count": 28,
+      "file_size_bytes": 2721,
       "has_analysis": false
     },
     {
       "date": "2026-03-14",
-      "row_count": 266,
-      "file_size_bytes": 25348,
+      "row_count": 112,
+      "file_size_bytes": 10707,
+      "has_analysis": false
+    },
+    {
+      "date": "2026-03-13",
+      "row_count": 14,
+      "file_size_bytes": 1390,
       "has_analysis": false
     }
   ],
@@ -765,8 +771,148 @@
         "SO2": "15.0",
         "NO2": "62.0",
         "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "32Bungalows, Bhilai - CECB",
+        "district": "Bhilai",
+        "PM10": "29.0",
+        "PM2.5": "31.0",
+        "SO2": "4.0",
+        "NO2": "32.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Civic Center, Bhilai - Bhilai Steel Plant",
+        "district": "Bhilai",
+        "PM10": "42.0",
+        "PM2.5": "33.0",
+        "SO2": "8.0",
+        "NO2": "11.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "OP Jindal Industrial Park, Tumidih - CECB",
+        "district": "Tumidih",
+        "PM10": "167.0",
+        "PM2.5": "238.0",
+        "SO2": "8.0",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Rampur, Korba - CECB",
+        "district": "Korba",
+        "PM10": "112.0",
+        "PM2.5": "161.0",
+        "SO2": "48.0",
+        "NO2": "38.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Urja Nagar, Korba - CECB",
+        "district": "Korba",
+        "PM10": "160.0",
+        "PM2.5": "191.0",
+        "SO2": "19.0",
+        "NO2": "23.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "AIIMS, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "83.0",
+        "PM2.5": "59.0",
+        "SO2": "7.0",
+        "NO2": "38.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Bhatagaon New ISBT, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "69.0",
+        "PM2.5": "37.0",
+        "SO2": "25.0",
+        "NO2": "42.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Krishak Nagar, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "71.0",
+        "PM2.5": "50.0",
+        "SO2": "11.0",
+        "NO2": "21.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Siltara Phase-II, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "109.0",
+        "PM2.5": "99.0",
+        "SO2": "18.0",
+        "NO2": "33.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "OP Jindal School, Kunjemura - CECB",
+        "district": "Kunjemura",
+        "PM10": "215.0",
+        "PM2.5": "221.0",
+        "SO2": "42.0",
+        "NO2": "57.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Nawapara SECL Colony, Chhal - CECB",
+        "district": "Chhal",
+        "PM10": "125.0",
+        "PM2.5": "148.0",
+        "SO2": "36.0",
+        "NO2": "30.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Hathkhoj, Bhilai - CECB",
+        "district": "Bhilai",
+        "PM10": "55.0",
+        "PM2.5": "48.0",
+        "SO2": "41.0",
+        "NO2": "56.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Mangala, Bilaspur - NTPC",
+        "district": "Bilaspur",
+        "PM10": "94.0",
+        "PM2.5": "84.0",
+        "SO2": "18.0",
+        "NO2": "29.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T03:00:00+05:30",
+        "station_name": "Govt. Higher Secondary School, Milupara - CECB",
+        "district": "Milupara",
+        "PM10": "147.0",
+        "PM2.5": "203.0",
+        "SO2": "15.0",
+        "NO2": "62.0",
+        "source": "govapi"
       }
     ],
-    "row_count": 14
+    "row_count": 28
   }
 }
