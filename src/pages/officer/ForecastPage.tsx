@@ -1,9 +1,8 @@
 import { Brain, Sparkles } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
-import { getBytezStatus, runBytezChat } from '../../lib/bytez';
 import { ForecastChart } from '../../components/charts/ForecastChart';
-import { PARAMS_BY_TYPE, UNITS, getForecastData } from '../../lib/mockData';
+import { PARAMS_BY_TYPE, UNITS } from '../../lib/mockData';
 import type { PollutionType } from '../../lib/mockData';
 
 interface ForecastPageProps {
@@ -96,7 +95,6 @@ const renderFormattedInsight = (text: string) => {
 };
 
 export function ForecastPage({ pollutionType }: ForecastPageProps) {
-  const bytezStatus = getBytezStatus();
   const [locations, setLocations] = useState<any[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const params = PARAMS_BY_TYPE[pollutionType];
@@ -111,59 +109,6 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
 
   const getLocationName = (id: string) =>
     locations.find((loc) => loc.id === id)?.name || 'Selected location';
-
-  const generateBytezForecastData = async (param: string, locName: string, unit: string, currentVal: number | null) => {
-    const valContext = currentVal !== null ? `The MUST-HAVE initial anchor reading for right now is ${currentVal} ${unit}. Make sure the forecast smoothly progresses from this base initial value.` : `Make sure it represents a realistic scenario.`;
-    
-    const prompt = `Generate realistic 48-hour future environmental forecasting data points for ${param} (${unit}) at ${locName}. 
-Start from this hour: ${new Date().toISOString()}. ${valContext}
-You MUST return ONLY a valid JSON array of 48 objects. Each object MUST have:
-"timestamp" (ISO 8601 string, incrementing by 1 hour), "point" (number, realistic forecasted value), "lower" (number, lower bound), "upper" (number, upper bound).
-Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations, or extra text. ONLY raw JSON.`;
-
-    const result = await runBytezChat([
-      { role: 'system', content: 'You are an environmental data prediction AI. You output ONLY valid JSON arrays and nothing else.' },
-      { role: 'user', content: prompt }
-    ]);
-
-    try {
-      const match = result.match(/\[\s*\{.*\}\s*\]/s);
-      const jsonStr = match ? match[0] : result;
-      return JSON.parse(jsonStr);
-    } catch (e) {
-      console.warn("Bytez forecast JSON unavailable, using demo forecast data.");
-      return getForecastData(param, currentVal);
-    }
-  };
-
-  const generateBytezInsight = async (forecastSeries: any[]) => {
-    if (!forecastSeries?.length) {
-      return 'AI insight unavailable right now.';
-    }
-
-    const points = forecastSeries.slice(0, 12).map((p) => ({
-      timestamp: p.timestamp,
-      point: p.point,
-      lower: p.lower,
-      upper: p.upper,
-    }));
-
-    return runBytezChat([
-      {
-        role: 'system',
-        content:
-          'You are an environmental forecasting analyst. Respond with exactly 3 short bullet points: trend summary, risk level with reason, and one actionable recommendation for the next 24 hours.',
-      },
-      {
-        role: 'user',
-        content:
-          `Location: ${getLocationName(selectedLocation)}\n` +
-          `Parameter: ${parameter} (${unit || 'unit'})\n` +
-          `Horizon: 48 hours\n` +
-          `Forecast sample points: ${JSON.stringify(points)}`,
-      },
-    ]);
-  };
 
   // Reset parameter when pollution type changes
   useEffect(() => {
@@ -186,50 +131,28 @@ Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations
       setAiInsight('');
       setAiError('');
 
-      // Fetch the most recent live data to anchor the prediction
-      api.get(`/readings/latest/${selectedLocation}?type=${pollutionType}`)
+      // Fetch predictions from the actual ML backend
+      api.get(`/forecast/${selectedLocation}?parameter=${parameter}`)
         .then(res => {
-          let currentVal: number | null = null;
-          if (res.data?.readings && res.data.readings.length > 0) {
-            // Find current reading for the selected parameter
-            const match = res.data.readings.find((r: any) => r.parameter === parameter);
-            if (match && typeof match.value === 'number') {
-              currentVal = match.value;
-            }
-          }
-          return currentVal;
-        })
-        .catch(err => {
-          console.warn("Could not fetch base reading, forecasting without anchor.", err);
-          return null;
-        })
-        .then(currentVal => {
-          // We actively predict data using Bytez instead of hardcoded backend, passing the live anchor reading
-          return generateBytezForecastData(parameter, getLocationName(selectedLocation), unit, currentVal);
-        })
-        .then(async (generatedData) => {
-          setForecastData(generatedData);
+          setForecastData(res.data);
           setLoading(false);
           
-          try {
-            const fallbackInsight = await generateBytezInsight(generatedData);
-            setAiInsight(fallbackInsight);
-          } catch (bytezError) {
-            console.error(bytezError);
-            setAiError(bytezError instanceof Error ? bytezError.message : 'AI insight unavailable right now.');
-          }
+          // Then fetch the AI insight based on this actual forecast
+          return api.get(`/forecast/${selectedLocation}/ai-insight?parameter=${parameter}`);
+        })
+        .then(res => {
+          setAiInsight(res.data.insight);
         })
         .catch(err => {
           console.error(err);
-          setForecastData([]);
-          setLoading(false);
-          setAiError(err.message || "Forecast generation failed");
+          setAiError(err.message || "Failed to fetch AI insight");
         })
         .finally(() => {
           setAiLoading(false);
+          setLoading(false);
         });
     }
-  }, [selectedLocation, parameter, unit]);
+  }, [selectedLocation, parameter]);
 
   return (
     <div className="space-y-6">
