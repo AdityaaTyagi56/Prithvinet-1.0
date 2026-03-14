@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCachedSnapshot, fetchLiveSnapshot } from '../lib/liveData';
+import { getIndustryTracker, getAlerts, getLocations } from '../lib/mockData';
 
 /**
  * This component acts as a silent data bridge for the Noupe Chatbot.
@@ -28,25 +29,35 @@ export function NoupeDataBridge() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!snapshotObj) return null;
-
   // Format the data into an easy-to-read schema for the LLM
-  const summary = {
+  const summary: any = {
     system: "PrithviNet Live Active Telemetry",
     ml_forecast_engine: "Prophet Time-Series (24 Active District Level Models Trained on NO2, SO2, PM2.5)",
-    last_synced: snapshotObj.fetched_at,
-    total_live_stations_monitored: snapshotObj.stations?.length,
-    today_records: snapshotObj.today?.row_count || 0,
-    historical_logs_available: snapshotObj.logs?.map(l => l.date) || [],
-    stations: snapshotObj.stations?.map(s => ({
-      name: s.name,
-      city: s.city,
-      pollution_levels: Object.entries(s.pollutants || {}).reduce((acc, [param, data]) => {
-        acc[param] = Object.assign({}, data);
-        return acc;
-      }, {} as Record<string, any>)
-    }))
+    industrial_compliance_tracked: getIndustryTracker(),
+    active_alerts: getAlerts(),
+    static_station_locations: {
+      air: getLocations('air'),
+      water: getLocations('water'),
+      noise: getLocations('noise')
+    }
   };
+
+  if (snapshotObj) {
+    summary.live_sensor_data = {
+      last_synced: snapshotObj.fetched_at,
+      total_live_stations_monitored: snapshotObj.stations?.length,
+      today_records: snapshotObj.today?.row_count || 0,
+      historical_logs_available: snapshotObj.logs?.map((l: any) => l.date) || [],
+      stations: snapshotObj.stations?.map((s: any) => ({
+        name: s.name,
+        city: s.city,
+        pollution_levels: Object.entries(s.pollutants || {}).reduce((acc: any, [param, data]: any) => {
+          acc[param] = Object.assign({}, data);
+          return acc;
+        }, {})
+      }))
+    };
+  }
 
   return (
     <div 
@@ -66,8 +77,8 @@ export function NoupeDataBridge() {
       aria-hidden="true"
     >
       [NOUPE_SYSTEM_CONTEXT_START]
-      The following is the live real-time JSON data from PrithviNet's continuous monitoring sensors.
-      Use this specific data to answer the user's questions about the current environmental status.
+      The following is the combined live JSON data from PrithviNet's continuous monitoring sensors and Industrial Compliance Tracker.
+      Use this specific data to answer the user's questions about the current environmental status, industrial violations, and active alerts.
       LIVE_JSON_DATA=
       {JSON.stringify(summary, null, 2)}
       [NOUPE_SYSTEM_CONTEXT_END]
