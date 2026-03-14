@@ -30,10 +30,41 @@ export function NoupeDataBridge() {
   }, []);
 
   // Format the data into an easy-to-read schema for the LLM
+  
+  // Dynamically map Government API station pollutants to Private Industries in the same district
+  const dynamicIndustries = getIndustryTracker().map(industry => {
+    const copy = { ...industry, live_emissions: { ...industry.live_emissions } };
+    
+    if (snapshotObj && snapshotObj.stations) {
+      // Find a matching active government station for this industry's region
+      const matchingStation = snapshotObj.stations.find((s: any) => 
+        s.city.toLowerCase() === industry.region.toLowerCase() ||
+        (industry.region === 'Durg' && s.city.toLowerCase() === 'bhilai')
+      );
+
+      if (matchingStation && matchingStation.pollutants) {
+        // Override mock data with real-time API values if available
+        if (matchingStation.pollutants['PM2.5']?.avg) {
+          copy.live_emissions['PM2.5'] = parseFloat(matchingStation.pollutants['PM2.5'].avg);
+        }
+        if (matchingStation.pollutants['PM10']?.avg) {
+          copy.live_emissions['PM10'] = parseFloat(matchingStation.pollutants['PM10'].avg);
+        }
+        if (matchingStation.pollutants['SO2']?.avg) {
+          copy.live_emissions['SO2'] = parseFloat(matchingStation.pollutants['SO2'].avg);
+        }
+        if (matchingStation.pollutants['NO2']?.avg) {
+          copy.live_emissions['NO2'] = parseFloat(matchingStation.pollutants['NO2'].avg);
+        }
+      }
+    }
+    return copy;
+  });
+
   const summary: any = {
     system: "PrithviNet Live Active Telemetry",
     ml_forecast_engine: "Prophet Time-Series (24 Active District Level Models Trained on NO2, SO2, PM2.5)",
-    industrial_compliance_tracked: getIndustryTracker(),
+    industrial_compliance_tracked: dynamicIndustries,
     active_alerts: getAlerts(),
     static_station_locations: {
       air: getLocations('air'),
