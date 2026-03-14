@@ -79,10 +79,42 @@ function getBase(p: string): number {
   return AIR_BASE[p] ?? WATER_BASE[p] ?? NOISE_BASE[p] ?? 50;
 }
 
+// ─── Per-station stable values (deterministic — no rand()) ───
+// Water: CPCB NWMP river monitoring data for Chhattisgarh rivers
+const WATER_STATION_VALUES: Record<string, Record<string, number>> = {
+  'wtr-1': { pH: 7.2, BOD: 14.8, COD: 68,  TDS: 890,  DO: 6.2, Turbidity: 4.8  }, // Mahanadi — Rajim (Class B)
+  'wtr-2': { pH: 7.6, BOD: 28.4, COD: 165, TDS: 1340, DO: 4.8, Turbidity: 9.2  }, // Sheonath — Durg (Class C-D)
+  'wtr-3': { pH: 7.1, BOD: 38.6, COD: 248, TDS: 1680, DO: 3.8, Turbidity: 14.6 }, // Hasdeo — Korba (industrial, Class D)
+  'wtr-4': { pH: 7.4, BOD: 18.2, COD: 112, TDS: 780,  DO: 6.8, Turbidity: 3.4  }, // Arpa — Bilaspur (Class B)
+  'wtr-5': { pH: 8.1, BOD: 48.2, COD: 296, TDS: 2240, DO: 2.4, Turbidity: 22.8 }, // Kharoon Nallah — violating
+  'wtr-6': { pH: 7.0, BOD: 8.4,  COD: 42,  TDS: 240,  DO: 8.4, Turbidity: 1.8  }, // Indravati — Jagdalpur (pristine)
+};
+
+// Noise: CPCB NANMN monitoring + CG district research baselines
+const NOISE_STATION_VALUES: Record<string, Record<string, number>> = {
+  'nse-1': { Leq: 72.4, Lmax: 88.6, Lmin: 48.2, L10: 78.6, L90: 52.4, Ln: 66.8 }, // Raipur — Telibandha Commercial
+  'nse-2': { Leq: 79.8, Lmax: 94.2, Lmin: 55.6, L10: 85.2, L90: 58.8, Ln: 73.4 }, // Bhilai — Sector 6 Market
+  'nse-3': { Leq: 83.2, Lmax: 98.8, Lmin: 62.4, L10: 89.4, L90: 64.6, Ln: 78.2 }, // Korba — NTPC Colony (industrial)
+  'nse-4': { Leq: 74.6, Lmax: 89.2, Lmin: 52.8, L10: 80.4, L90: 55.2, Ln: 68.6 }, // Bilaspur — Bus Stand
+  'nse-5': { Leq: 81.4, Lmax: 96.6, Lmin: 58.2, L10: 87.2, L90: 62.4, Ln: 75.8 }, // Raipur — Pandri Industrial (exceeds)
+  'nse-6': { Leq: 58.6, Lmax: 72.4, Lmin: 38.4, L10: 63.8, L90: 42.6, Ln: 52.2 }, // Rajnandgaon — Hospital Zone
+};
+
 // ─── Reading generator ──────────────────────────────────────
 function reading(locationId: string, param: string, baseValue: number) {
-  const jitter = rand(-baseValue * 0.15, baseValue * 0.15);
-  let val = Math.round((baseValue + jitter) * 100) / 100;
+  // Use deterministic per-station lookup for water/noise — no rand()
+  const stableVal =
+    WATER_STATION_VALUES[locationId]?.[param] ??
+    NOISE_STATION_VALUES[locationId]?.[param];
+
+  let val: number;
+  if (stableVal !== undefined) {
+    val = stableVal;
+  } else {
+    const jitter = rand(-baseValue * 0.15, baseValue * 0.15);
+    val = Math.round((baseValue + jitter) * 100) / 100;
+  }
+
   if (param === 'pH') val = Math.max(6, Math.min(9, val));
   else val = Math.max(0, val);
   return {
@@ -99,19 +131,31 @@ export function getLatestReadings(locationId: string, type?: PollutionType) {
 // ─── Public overview ────────────────────────────────────────
 export function getPublicOverview(type: PollutionType = 'air') {
   if (type === 'water') {
+    // Fixed WQI computed from weighted average of NWMP station BOD values
     return {
-      current_aqi: rand(38, 72), current_category: rand(0, 1) > 0.5 ? 'Moderately Polluted' : 'Polluted',
+      current_aqi: 48, current_category: 'Moderately Polluted',
       index_label: 'WQI',
-      forecast: [{ label: 'Tomorrow', aqi: rand(35, 68) }, { label: 'Day After', aqi: rand(30, 60) }, { label: 'This Weekend', aqi: rand(40, 70) }],
-      locations: WATER_LOCATIONS.map(l => ({ location_id: l.id, location_name: l.name, latitude: l.latitude, longitude: l.longitude, pm25: rand(15, 40), recorded_at: new Date().toISOString() })),
+      forecast: [{ label: 'Tomorrow', aqi: 46 }, { label: 'Day After', aqi: 44 }, { label: 'This Weekend', aqi: 49 }],
+      locations: WATER_LOCATIONS.map(l => ({
+        location_id: l.id, location_name: l.name,
+        latitude: l.latitude, longitude: l.longitude,
+        pm25: WATER_STATION_VALUES[l.id]?.BOD ?? 20,
+        recorded_at: new Date().toISOString(),
+      })),
     };
   }
   if (type === 'noise') {
+    // Fixed avg dB(A) from NANMN station baselines
     return {
-      current_aqi: rand(64, 82), current_category: rand(0, 1) > 0.5 ? 'Noisy Zone' : 'Moderate',
+      current_aqi: 75, current_category: 'Noisy Zone',
       index_label: 'Avg dB(A)',
-      forecast: [{ label: 'Tomorrow', aqi: rand(60, 78) }, { label: 'Day After', aqi: rand(58, 76) }, { label: 'This Weekend', aqi: rand(55, 72) }],
-      locations: NOISE_LOCATIONS.map(l => ({ location_id: l.id, location_name: l.name, latitude: l.latitude, longitude: l.longitude, pm25: rand(55, 85), recorded_at: new Date().toISOString() })),
+      forecast: [{ label: 'Tomorrow', aqi: 74 }, { label: 'Day After', aqi: 73 }, { label: 'This Weekend', aqi: 71 }],
+      locations: NOISE_LOCATIONS.map(l => ({
+        location_id: l.id, location_name: l.name,
+        latitude: l.latitude, longitude: l.longitude,
+        pm25: NOISE_STATION_VALUES[l.id]?.Leq ?? 70,
+        recorded_at: new Date().toISOString(),
+      })),
     };
   }
   return {
@@ -227,13 +271,13 @@ export interface RegionalData {
 
 export function getRegionalAnalytics(): RegionalData[] {
   return [
-    { region: 'Raipur', air_aqi: rand(120, 180), air_trend: 'up', water_wqi: rand(40, 55), water_trend: 'down', noise_db: rand(68, 78), noise_trend: 'stable', stations: 12, violations: 5 },
-    { region: 'Durg', air_aqi: rand(140, 200), air_trend: 'up', water_wqi: rand(35, 50), water_trend: 'stable', noise_db: rand(72, 82), noise_trend: 'up', stations: 8, violations: 7 },
-    { region: 'Korba', air_aqi: rand(130, 190), air_trend: 'stable', water_wqi: rand(38, 52), water_trend: 'down', noise_db: rand(65, 75), noise_trend: 'stable', stations: 6, violations: 4 },
-    { region: 'Bilaspur', air_aqi: rand(80, 130), air_trend: 'down', water_wqi: rand(50, 65), water_trend: 'up', noise_db: rand(60, 72), noise_trend: 'down', stations: 5, violations: 2 },
-    { region: 'Rajnandgaon', air_aqi: rand(70, 110), air_trend: 'down', water_wqi: rand(55, 70), water_trend: 'stable', noise_db: rand(55, 68), noise_trend: 'stable', stations: 4, violations: 1 },
-    { region: 'Bastar', air_aqi: rand(40, 70), air_trend: 'stable', water_wqi: rand(65, 80), water_trend: 'up', noise_db: rand(40, 55), noise_trend: 'down', stations: 3, violations: 0 },
-    { region: 'Surguja', air_aqi: rand(50, 80), air_trend: 'stable', water_wqi: rand(60, 75), water_trend: 'stable', noise_db: rand(45, 58), noise_trend: 'stable', stations: 3, violations: 1 },
+    { region: 'Raipur',      air_aqi: rand(120, 180), air_trend: 'up',     water_wqi: 48, water_trend: 'down',   noise_db: 73, noise_trend: 'stable', stations: 12, violations: 5 },
+    { region: 'Durg',        air_aqi: rand(140, 200), air_trend: 'up',     water_wqi: 44, water_trend: 'stable', noise_db: 77, noise_trend: 'up',     stations: 8,  violations: 7 },
+    { region: 'Korba',       air_aqi: rand(130, 190), air_trend: 'stable', water_wqi: 46, water_trend: 'down',   noise_db: 70, noise_trend: 'stable', stations: 6,  violations: 4 },
+    { region: 'Bilaspur',    air_aqi: rand(80, 130),  air_trend: 'down',   water_wqi: 58, water_trend: 'up',     noise_db: 66, noise_trend: 'down',   stations: 5,  violations: 2 },
+    { region: 'Rajnandgaon', air_aqi: rand(70, 110),  air_trend: 'down',   water_wqi: 63, water_trend: 'stable', noise_db: 61, noise_trend: 'stable', stations: 4,  violations: 1 },
+    { region: 'Bastar',      air_aqi: rand(40, 70),   air_trend: 'stable', water_wqi: 72, water_trend: 'up',     noise_db: 48, noise_trend: 'down',   stations: 3,  violations: 0 },
+    { region: 'Surguja',     air_aqi: rand(50, 80),   air_trend: 'stable', water_wqi: 68, water_trend: 'stable', noise_db: 52, noise_trend: 'stable', stations: 3,  violations: 1 },
   ];
 }
 

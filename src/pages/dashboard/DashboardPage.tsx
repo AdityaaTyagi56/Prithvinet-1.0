@@ -153,9 +153,10 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
       addReading(r);
     });
 
-    // Every 5 seconds apply a tiny ±0.8% random-walk step to each parameter.
-    // Values drift naturally — no jumps — because each step builds on the
-    // previous value rather than re-randomizing from a fixed base.
+    // Every 5 seconds apply a tiny ±0.8% random-walk step to air parameters only.
+    // Water and noise values are stable point-in-time readings — no live drift.
+    if (pollutionType !== 'air') return () => {};
+
     const interval = setInterval(() => {
       const now = new Date().toISOString();
       PARAMS_BY_TYPE[pollutionType].forEach(param => {
