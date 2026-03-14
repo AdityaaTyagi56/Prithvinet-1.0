@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-14T10:57:24.577546+00:00",
+  "fetched_at": "2026-03-14T19:02:47.076678+00:00",
   "api_total_records": 96,
   "stations": [
     {
@@ -91,134 +91,46 @@
       }
     },
     {
-      "name": "OP Jindal Industrial Park, Tumidih - CECB",
-      "city": "Tumidih",
-      "lat": "22.06631475",
-      "lon": "83.33820077",
+      "name": "Nawapara SECL Colony, Chhal - CECB",
+      "city": "Chhal",
+      "lat": "22.118125",
+      "lon": "83.140608",
       "last_update": "13-03-2026 15:00:00",
       "pollutants": {
+        "PM10": {
+          "avg": "125",
+          "min": "56",
+          "max": "279"
+        },
+        "NO2": {
+          "avg": "30",
+          "min": "15",
+          "max": "55"
+        },
+        "NH3": {
+          "avg": "4",
+          "min": "4",
+          "max": "4"
+        },
+        "OZONE": {
+          "avg": "36",
+          "min": "32",
+          "max": "152"
+        },
+        "PM2.5": {
+          "avg": "148",
+          "min": "36",
+          "max": "282"
+        },
         "CO": {
           "avg": "59",
-          "min": "24",
-          "max": "118"
-        },
-        "NH3": {
-          "avg": "1",
-          "min": "1",
-          "max": "2"
-        },
-        "NO2": {
-          "avg": "NA",
-          "min": "NA",
-          "max": "NA"
-        },
-        "OZONE": {
-          "avg": "80",
-          "min": "5",
-          "max": "130"
-        },
-        "SO2": {
-          "avg": "8",
-          "min": "6",
-          "max": "19"
-        },
-        "PM10": {
-          "avg": "167",
-          "min": "55",
-          "max": "229"
-        },
-        "PM2.5": {
-          "avg": "238",
-          "min": "35",
-          "max": "348"
-        }
-      }
-    },
-    {
-      "name": "Rampur, Korba - CECB",
-      "city": "Korba",
-      "lat": "22.368195",
-      "lon": "82.746431",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "NH3": {
-          "avg": "1",
-          "min": "1",
-          "max": "1"
-        },
-        "SO2": {
-          "avg": "48",
-          "min": "6",
-          "max": "91"
-        },
-        "NO2": {
-          "avg": "38",
-          "min": "16",
-          "max": "73"
-        },
-        "CO": {
-          "avg": "35",
-          "min": "11",
-          "max": "98"
-        },
-        "PM2.5": {
-          "avg": "161",
           "min": "27",
-          "max": "288"
-        },
-        "PM10": {
-          "avg": "112",
-          "min": "35",
-          "max": "150"
-        },
-        "OZONE": {
-          "avg": "13",
-          "min": "1",
-          "max": "18"
-        }
-      }
-    },
-    {
-      "name": "Urja Nagar, Korba - CECB",
-      "city": "Korba",
-      "lat": "22.348441",
-      "lon": "82.549611",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "160",
-          "min": "58",
-          "max": "500"
-        },
-        "PM2.5": {
-          "avg": "191",
-          "min": "44",
-          "max": "500"
-        },
-        "NH3": {
-          "avg": "1",
-          "min": "1",
-          "max": "1"
+          "max": "116"
         },
         "SO2": {
-          "avg": "19",
-          "min": "9",
-          "max": "32"
-        },
-        "CO": {
-          "avg": "32",
-          "min": "14",
-          "max": "62"
-        },
-        "NO2": {
-          "avg": "23",
-          "min": "15",
-          "max": "30"
-        },
-        "OZONE": {
-          "avg": "4",
-          "min": "2",
-          "max": "7"
+          "avg": "36",
+          "min": "10",
+          "max": "66"
         }
       }
     },
@@ -399,6 +311,138 @@
       }
     },
     {
+      "name": "OP Jindal Industrial Park, Tumidih - CECB",
+      "city": "Tumidih",
+      "lat": "22.06631475",
+      "lon": "83.33820077",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "CO": {
+          "avg": "59",
+          "min": "24",
+          "max": "118"
+        },
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "2"
+        },
+        "NO2": {
+          "avg": "NA",
+          "min": "NA",
+          "max": "NA"
+        },
+        "OZONE": {
+          "avg": "80",
+          "min": "5",
+          "max": "130"
+        },
+        "SO2": {
+          "avg": "8",
+          "min": "6",
+          "max": "19"
+        },
+        "PM10": {
+          "avg": "167",
+          "min": "55",
+          "max": "229"
+        },
+        "PM2.5": {
+          "avg": "238",
+          "min": "35",
+          "max": "348"
+        }
+      }
+    },
+    {
+      "name": "Rampur, Korba - CECB",
+      "city": "Korba",
+      "lat": "22.368195",
+      "lon": "82.746431",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "1"
+        },
+        "SO2": {
+          "avg": "48",
+          "min": "6",
+          "max": "91"
+        },
+        "NO2": {
+          "avg": "38",
+          "min": "16",
+          "max": "73"
+        },
+        "CO": {
+          "avg": "35",
+          "min": "11",
+          "max": "98"
+        },
+        "PM2.5": {
+          "avg": "161",
+          "min": "27",
+          "max": "288"
+        },
+        "PM10": {
+          "avg": "112",
+          "min": "35",
+          "max": "150"
+        },
+        "OZONE": {
+          "avg": "13",
+          "min": "1",
+          "max": "18"
+        }
+      }
+    },
+    {
+      "name": "Urja Nagar, Korba - CECB",
+      "city": "Korba",
+      "lat": "22.348441",
+      "lon": "82.549611",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "160",
+          "min": "58",
+          "max": "500"
+        },
+        "PM2.5": {
+          "avg": "191",
+          "min": "44",
+          "max": "500"
+        },
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "1"
+        },
+        "SO2": {
+          "avg": "19",
+          "min": "9",
+          "max": "32"
+        },
+        "CO": {
+          "avg": "32",
+          "min": "14",
+          "max": "62"
+        },
+        "NO2": {
+          "avg": "23",
+          "min": "15",
+          "max": "30"
+        },
+        "OZONE": {
+          "avg": "4",
+          "min": "2",
+          "max": "7"
+        }
+      }
+    },
+    {
       "name": "OP Jindal School, Kunjemura - CECB",
       "city": "Kunjemura",
       "lat": "22.126650",
@@ -438,50 +482,6 @@
         "CO": {
           "avg": "61",
           "min": "22",
-          "max": "116"
-        }
-      }
-    },
-    {
-      "name": "Nawapara SECL Colony, Chhal - CECB",
-      "city": "Chhal",
-      "lat": "22.118125",
-      "lon": "83.140608",
-      "last_update": "13-03-2026 15:00:00",
-      "pollutants": {
-        "PM10": {
-          "avg": "125",
-          "min": "56",
-          "max": "279"
-        },
-        "NO2": {
-          "avg": "30",
-          "min": "15",
-          "max": "55"
-        },
-        "NH3": {
-          "avg": "4",
-          "min": "4",
-          "max": "4"
-        },
-        "OZONE": {
-          "avg": "36",
-          "min": "32",
-          "max": "152"
-        },
-        "PM2.5": {
-          "avg": "148",
-          "min": "36",
-          "max": "282"
-        },
-        "SO2": {
-          "avg": "36",
-          "min": "10",
-          "max": "66"
-        },
-        "CO": {
-          "avg": "59",
-          "min": "27",
           "max": "116"
         }
       }
@@ -611,17 +611,23 @@
   ],
   "logs": [
     {
-      "date": "2026-03-14",
+      "date": "2026-03-15",
       "row_count": 14,
       "file_size_bytes": 1390,
+      "has_analysis": false
+    },
+    {
+      "date": "2026-03-14",
+      "row_count": 28,
+      "file_size_bytes": 2706,
       "has_analysis": false
     }
   ],
   "today": {
-    "date": "2026-03-14",
+    "date": "2026-03-15",
     "rows": [
       {
-        "timestamp": "2026-03-13T15:00:00+00:00",
+        "timestamp": "2026-03-15T00:32:47+05:30",
         "station_name": "32Bungalows, Bhilai - CECB",
         "district": "Bhilai",
         "PM10": "29.0",
@@ -631,7 +637,7 @@
         "source": "govapi"
       },
       {
-        "timestamp": "2026-03-13T15:00:00+00:00",
+        "timestamp": "2026-03-15T00:32:47+05:30",
         "station_name": "Civic Center, Bhilai - Bhilai Steel Plant",
         "district": "Bhilai",
         "PM10": "42.0",
@@ -641,87 +647,7 @@
         "source": "govapi"
       },
       {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "OP Jindal Industrial Park, Tumidih - CECB",
-        "district": "Tumidih",
-        "PM10": "167.0",
-        "PM2.5": "238.0",
-        "SO2": "8.0",
-        "NO2": "",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "Rampur, Korba - CECB",
-        "district": "Korba",
-        "PM10": "112.0",
-        "PM2.5": "161.0",
-        "SO2": "48.0",
-        "NO2": "38.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "Urja Nagar, Korba - CECB",
-        "district": "Korba",
-        "PM10": "160.0",
-        "PM2.5": "191.0",
-        "SO2": "19.0",
-        "NO2": "23.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "AIIMS, Raipur - CECB",
-        "district": "Raipur",
-        "PM10": "83.0",
-        "PM2.5": "59.0",
-        "SO2": "7.0",
-        "NO2": "38.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "Bhatagaon New ISBT, Raipur - CECB",
-        "district": "Raipur",
-        "PM10": "69.0",
-        "PM2.5": "37.0",
-        "SO2": "25.0",
-        "NO2": "42.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "Krishak Nagar, Raipur - CECB",
-        "district": "Raipur",
-        "PM10": "71.0",
-        "PM2.5": "50.0",
-        "SO2": "11.0",
-        "NO2": "21.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "Siltara Phase-II, Raipur - CECB",
-        "district": "Raipur",
-        "PM10": "109.0",
-        "PM2.5": "99.0",
-        "SO2": "18.0",
-        "NO2": "33.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
-        "station_name": "OP Jindal School, Kunjemura - CECB",
-        "district": "Kunjemura",
-        "PM10": "215.0",
-        "PM2.5": "221.0",
-        "SO2": "42.0",
-        "NO2": "57.0",
-        "source": "govapi"
-      },
-      {
-        "timestamp": "2026-03-13T15:00:00+00:00",
+        "timestamp": "2026-03-15T00:32:47+05:30",
         "station_name": "Nawapara SECL Colony, Chhal - CECB",
         "district": "Chhal",
         "PM10": "125.0",
@@ -731,7 +657,87 @@
         "source": "govapi"
       },
       {
-        "timestamp": "2026-03-13T15:00:00+00:00",
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "AIIMS, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "83.0",
+        "PM2.5": "59.0",
+        "SO2": "7.0",
+        "NO2": "38.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "Bhatagaon New ISBT, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "69.0",
+        "PM2.5": "37.0",
+        "SO2": "25.0",
+        "NO2": "42.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "Krishak Nagar, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "71.0",
+        "PM2.5": "50.0",
+        "SO2": "11.0",
+        "NO2": "21.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "Siltara Phase-II, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "109.0",
+        "PM2.5": "99.0",
+        "SO2": "18.0",
+        "NO2": "33.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "OP Jindal Industrial Park, Tumidih - CECB",
+        "district": "Tumidih",
+        "PM10": "167.0",
+        "PM2.5": "238.0",
+        "SO2": "8.0",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "Rampur, Korba - CECB",
+        "district": "Korba",
+        "PM10": "112.0",
+        "PM2.5": "161.0",
+        "SO2": "48.0",
+        "NO2": "38.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "Urja Nagar, Korba - CECB",
+        "district": "Korba",
+        "PM10": "160.0",
+        "PM2.5": "191.0",
+        "SO2": "19.0",
+        "NO2": "23.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
+        "station_name": "OP Jindal School, Kunjemura - CECB",
+        "district": "Kunjemura",
+        "PM10": "215.0",
+        "PM2.5": "221.0",
+        "SO2": "42.0",
+        "NO2": "57.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-15T00:32:47+05:30",
         "station_name": "Hathkhoj, Bhilai - CECB",
         "district": "Bhilai",
         "PM10": "55.0",
@@ -741,7 +747,7 @@
         "source": "govapi"
       },
       {
-        "timestamp": "2026-03-13T15:00:00+00:00",
+        "timestamp": "2026-03-15T00:32:47+05:30",
         "station_name": "Mangala, Bilaspur - NTPC",
         "district": "Bilaspur",
         "PM10": "94.0",
@@ -751,7 +757,7 @@
         "source": "govapi"
       },
       {
-        "timestamp": "2026-03-13T15:00:00+00:00",
+        "timestamp": "2026-03-15T00:32:47+05:30",
         "station_name": "Govt. Higher Secondary School, Milupara - CECB",
         "district": "Milupara",
         "PM10": "147.0",

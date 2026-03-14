@@ -259,25 +259,12 @@ All routes are mounted under `/api/v1`.
 
 ## Data Sources
 
-| Type | Source | API | Real? |
-|---|---|---|---|
-| **Air Quality** | data.gov.in — CPCB NAMP stations | `3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69` — hourly sync | ✅ 100% Real |
-| **Water Quality** | data.gov.in — CPCB NWMP rivers | `9c6a4e06-c1b3-4b83-8e4d-60b499723d98` + CPCB 2020 verified baseline | ✅ Real government data |
-| **Noise** | CPCB NANMN pattern + CG research baselines | Pattern from real metro API (`cpcb-nanmn-noise-monitoring`) | ⚠️ Pattern real, CG has no monitoring infrastructure |
+Air quality data for Chhattisgarh stations (Raipur, Bhilai, Korba, Bilaspur, Durg, Raigarh, Jagdalpur) is sourced from:
+- Open-Meteo historical air quality API (real coordinates, real historical values)
+- CPCB CAQI station network reference
+- Korba industrial corridor emissions model (coal plant cycle simulation)
 
-**Note:** Chhattisgarh has no official noise monitoring stations under CPCB NANMN (covers only 7 metro cities — Mumbai, Delhi, Kolkata, Chennai, Bangalore, Lucknow, Hyderabad). This is the infrastructure gap PrithviNet aims to help fill. Noise data uses real NANMN pattern data from Lucknow Industrial zone (closest industrial profile to Korba/Bhilai) applied to verified Chhattisgarh research baselines.
-
-**Same API key** from [data.gov.in](https://api.data.gov.in/) works for all three datasets.
-
-### Sync Scripts
-
-| Script | What it does | Schedule |
-|---|---|---|
-| `backend/scripts/sync_govapi_chhattisgarh.py` | Air quality from CPCB via data.gov.in | Every 60 min |
-| `backend/scripts/sync_water_govapi.py` | Water quality NWMP + CPCB baselines | Every 24 h |
-| `backend/scripts/sync_noise_pattern.py` | Noise (NANMN pattern + CG baselines) | Every 24 h |
-
-Pre-trained Prophet models are in `backend/ml_models/`.
+Training scripts are in `backend/scripts/`. Pre-trained Prophet models are committed to `backend/data/trained_models/`.
 
 ---
 

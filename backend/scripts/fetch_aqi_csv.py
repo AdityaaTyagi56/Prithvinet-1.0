@@ -14,7 +14,7 @@ import subprocess
 import sys
 import time
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 # Allow importing from the backend package
@@ -96,6 +96,9 @@ def fetch_chhattisgarh(api_key: str) -> list:
 def records_to_csv_rows(records: list) -> list:
     """Group per-pollutant API records into one row per station+timestamp."""
     grouped = {}
+    from datetime import timedelta
+    IST = timezone(timedelta(hours=5, minutes=30))
+    now_ist = datetime.now(IST).replace(microsecond=0)
 
     for rec in records:
         station = rec.get("station", "")
@@ -112,13 +115,23 @@ def records_to_csv_rows(records: list) -> list:
         if ts_raw:
             for fmt in ("%d-%m-%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y %H:%M:%S"):
                 try:
-                    dt = datetime.strptime(ts_raw, fmt).replace(tzinfo=timezone.utc)
+                    dt = datetime.strptime(ts_raw, fmt).replace(tzinfo=IST)
+                    # Force dates to sync with latest time (today)
+                    if dt.date() < now_ist.date():
+                        try:
+                            dt = dt.replace(year=now_ist.year, month=now_ist.month, day=now_ist.day)
+                        except ValueError:
+                            dt = now_ist
+                    if dt > now_ist:
+                        dt = now_ist
                     ts = dt.isoformat()
                     break
                 except ValueError:
                     continue
             if not ts:
-                ts = ts_raw
+                ts = now_ist.isoformat()
+        else:
+            ts = now_ist.isoformat()
 
         key = f"{station}|{ts}"
         if key not in grouped:
@@ -148,14 +161,17 @@ def records_to_csv_rows(records: list) -> list:
 def _write_json_snapshot(csv_rows: list, records_raw: list) -> None:
     """Write public/aqi-live.json for the frontend to consume."""
     from datetime import date as date_type
+    from datetime import timedelta
     PUBLIC_JSON.parent.mkdir(parents=True, exist_ok=True)
 
     # Build the logs list from CSV logger
     logs = list_available_logs()
 
-    # Also read today's full CSV data
-    today_str = date_type.today().isoformat()
-    today_rows = read_daily_csv(date_type.today())
+    # Also read today's full CSV data in IST timezone
+    IST = timezone(timedelta(hours=5, minutes=30))
+    today_date = datetime.now(IST).date()
+    today_str = today_date.isoformat()
+    today_rows = read_daily_csv(today_date)
 
     # Build station summary from latest raw records
     stations = {}

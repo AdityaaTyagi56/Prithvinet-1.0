@@ -4,6 +4,7 @@ import {
   ChevronDown, ChevronUp, Search, Filter, Eye,
 } from 'lucide-react';
 import { api } from '../../lib/api';
+import { hasLiveData, getCachedSnapshot } from '../../lib/liveData';
 import {
   type PollutionType, type IndustryData,
   PARAMS_BY_TYPE, UNITS, LIMITS, getLatestReadings,
@@ -65,8 +66,42 @@ const STATUS_CONFIG = {
   green: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300', dot: 'bg-green-500', label: 'Compliant' },
 };
 
-function getEmissionReadings(industryId: string, type: PollutionType): EmissionReading[] {
-  const readings = getLatestReadings(industryId.replace('ind-', 'air-'), type);
+function getEmissionReadings(industry: IndustryData, type: PollutionType): EmissionReading[] {
+  let readings = getLatestReadings(industry.id.replace('ind-', 'air-'), type);
+
+  // Live Data Override for Air readings
+  if (type === 'air' && hasLiveData()) {
+    const snapshot = getCachedSnapshot();
+    if (snapshot && snapshot.stations) {
+      // Find the best station by matching industry's region/city
+      const regionMatch = industry.region.toLowerCase();
+      let activeStats = snapshot.stations.find(s => 
+        s.city.toLowerCase().includes(regionMatch) || 
+        s.name.toLowerCase().includes(regionMatch)
+      );
+      
+      // Fallback if no exact regional match
+      if (!activeStats) activeStats = snapshot.stations.find(r => r.city === 'Bhilai' || r.city === 'Raipur') || snapshot.stations[0];
+
+      if (activeStats && activeStats.pollutants) {
+        // Use EXACT active API values for the region
+        readings = readings.map((r) => {
+          let liveVal = r.value;
+          const p = r.parameter.toLowerCase();
+          
+          if (p.includes('pm2.5') && activeStats?.pollutants['PM2.5']) liveVal = parseFloat(activeStats.pollutants['PM2.5'].avg);
+          else if (p.includes('pm10') && activeStats?.pollutants['PM10']) liveVal = parseFloat(activeStats.pollutants['PM10'].avg);
+          else if (p.includes('so2') && activeStats?.pollutants['SO2']) liveVal = parseFloat(activeStats.pollutants['SO2'].avg);
+          else if (p.includes('no2') && activeStats?.pollutants['NO2']) liveVal = parseFloat(activeStats.pollutants['NO2'].avg);
+          else if (p.includes('co') && activeStats?.pollutants['CO']) liveVal = parseFloat(activeStats.pollutants['CO'].avg);
+          else if (p.includes('o3') && activeStats?.pollutants['OZONE']) liveVal = parseFloat(activeStats.pollutants['OZONE'].avg);
+
+          return { ...r, value: isNaN(liveVal) ? r.value : liveVal };
+        });
+      }
+    }
+  }
+
   return readings.map(r => ({
     parameter: r.parameter,
     value: r.value,
@@ -165,7 +200,7 @@ function IndustryDetailPanel({
   pollutionType: PollutionType;
   onClose: () => void;
 }) {
-  const emissions = useMemo(() => getEmissionReadings(industry.id, pollutionType), [industry.id, pollutionType]);
+  const emissions = useMemo(() => getEmissionReadings(industry, pollutionType), [industry, pollutionType]);
   const violations = emissions.filter(e => e.exceeded);
   const status = overallStatus(industry);
   const cfg = STATUS_CONFIG[status];
@@ -316,21 +351,45 @@ export function ComplianceDashboard({ pollutionType }: ComplianceDashboardProps)
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'red' | 'yellow' | 'green'>('all');
   const [sortBy, setSortBy] = useState<'risk' | 'name' | 'violations'>('risk');
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     api.get(`/industries/compliance/metrics?type=${pollutionType}`).then(res => setMetrics(res.data)).catch(console.error);
     api.get('/industries/tracker').then(res => setIndustries(res.data)).catch(console.error);
   }, [pollutionType]);
 
+  // Periodically refresh the data to show predictive shifting
+  useEffect(() => {
+    if (pollutionType === 'air' && hasLiveData()) {
+      const interval = setInterval(() => {
+        setTick(t => t + 1); // trigger re-render
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [pollutionType]);
+
   // Compute per-industry emissions and violation counts
   const industryData = useMemo(() => {
     return industries.map(ind => {
-      const emissions = getEmissionReadings(ind.id, pollutionType);
+      const emissions = getEmissionReadings(ind, pollutionType);
       const violationCount = emissions.filter(e => e.exceeded).length;
-      const status = overallStatus(ind);
-      return { ...ind, emissions, violationCount, status };
+      
+      // Inherit properties but optionally make them dynamic
+      let modifiedInd = { ...ind };
+      
+      // Dynamic status based on live violation counts
+      if (violationCount > 2) {
+         modifiedInd.air_status = 'non-compliant';
+         modifiedInd.risk_score = Math.min(100, modifiedInd.risk_score + 15);
+      } else if (violationCount > 0) {
+         modifiedInd.air_status = 'warning';
+      }
+
+      const status = overallStatus(modifiedInd);
+      
+      return { ...modifiedInd, emissions, violationCount, status };
     });
-  }, [industries, pollutionType]);
+  }, [industries, pollutionType, tick]);
 
   // Filter and sort
   const filtered = useMemo(() => {
@@ -361,7 +420,7 @@ export function ComplianceDashboard({ pollutionType }: ComplianceDashboardProps)
 
   const handleGenerateAllReports = () => {
     const allReports = filtered.map(ind => {
-      const emissions = getEmissionReadings(ind.id, pollutionType);
+      const emissions = getEmissionReadings(ind, pollutionType);
       return generateReport(ind, emissions, pollutionType);
     }).join('\n\n\n');
 

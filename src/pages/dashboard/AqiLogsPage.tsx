@@ -598,11 +598,14 @@ export function AqiLogsPage() {
                         </td>
                         <td className="px-3 py-2 text-xs text-gray-800 font-medium whitespace-nowrap">{row.station_name}</td>
                         <td className="px-3 py-2 text-xs text-gray-600 whitespace-nowrap">{row.district}</td>
-                        {(['PM10', 'PM2.5', 'SO2', 'NO2'] as const).map(p => (
-                          <td key={p} className={`px-3 py-2 text-xs whitespace-nowrap text-right font-mono ${pollutantColor(p, (row as any)[p])}`}>
-                            {parseFloat((row as any)[p])?.toFixed(1) || '—'}
-                          </td>
-                        ))}
+                        {(['PM10', 'PM2.5', 'SO2', 'NO2'] as const).map(p => {
+                          const val = parseFloat((row as any)[p]);
+                          return (
+                            <td key={p} className={`px-3 py-2 text-xs whitespace-nowrap text-right font-mono ${pollutantColor(p, (row as any)[p])}`}>
+                              {!isNaN(val) ? val.toFixed(1) : '—'}
+                            </td>
+                          );
+                        })}
                       </tr>
                     ))}
                   </tbody>
@@ -707,15 +710,18 @@ export function AqiLogsPage() {
                 {/* Pollutant Stats Grid */}
                 {analysis.aggregates && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {Object.entries(analysis.aggregates.pollutant_stats).map(([param, stat]) => (
-                      <div key={param} className="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-                        <div className="text-xs font-semibold text-gray-500">{param}</div>
-                        <div className="text-lg font-bold text-gray-800">{stat.avg?.toFixed(1) ?? '—'}</div>
-                        <div className="text-[10px] text-gray-400">
-                          min {stat.min ?? '—'} / max {stat.max ?? '—'} ({stat.count})
+                    {Object.entries(analysis.aggregates.pollutant_stats).map(([param, rawStat]) => {
+                      const stat = rawStat as any;
+                      return (
+                        <div key={param} className="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+                          <div className="text-xs font-semibold text-gray-500">{param}</div>
+                          <div className="text-lg font-bold text-gray-800">{stat.avg?.toFixed(1) ?? '—'}</div>
+                          <div className="text-[10px] text-gray-400">
+                            min {stat.min ?? '—'} / max {stat.max ?? '—'} ({stat.count})
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
