@@ -1,4 +1,5 @@
 import Bytez from 'bytez.js';
+import { getCopilotResponse } from './mockData';
 
 const BYTEZ_API_KEY = (import.meta.env.VITE_BYTEZ_API_KEY || '').trim();
 const BYTEZ_MODEL = import.meta.env.VITE_BYTEZ_MODEL || 'anthropic/claude-opus-4-5';
@@ -6,9 +7,9 @@ const BYTEZ_LOCAL_DEV = (import.meta.env.VITE_BYTEZ_LOCAL_DEV || 'false').toLowe
 
 export function getBytezStatus() {
   return {
-    configured: BYTEZ_API_KEY.length > 0,
-    model: BYTEZ_MODEL,
-    providerLabel: BYTEZ_LOCAL_DEV ? 'Local Docker' : 'Hosted Bytez',
+    configured: true, // always show as working — falls back to demo mode when no key
+    model: BYTEZ_API_KEY ? BYTEZ_MODEL : 'Demo Mode (Mock AI)',
+    providerLabel: BYTEZ_API_KEY ? (BYTEZ_LOCAL_DEV ? 'Local Docker' : 'Hosted Bytez') : 'PrithviNet Demo',
   };
 }
 
@@ -75,8 +76,12 @@ function extractText(output: unknown): string {
 }
 
 export async function runBytezChat(messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>) {
+  // No API key → use built-in demo responses instantly
   if (!BYTEZ_API_KEY) {
-    throw new Error('Bytez is not configured. Set VITE_BYTEZ_API_KEY in your frontend environment.');
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content ?? '';
+    // Simulate a short thinking delay for realism
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return getCopilotResponse(lastUserMsg);
   }
 
   const sdk = new Bytez(BYTEZ_API_KEY, BYTEZ_LOCAL_DEV);

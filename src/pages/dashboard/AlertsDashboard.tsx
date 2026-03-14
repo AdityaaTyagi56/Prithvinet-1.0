@@ -185,7 +185,7 @@ export function AlertsDashboard() {
                     <div className="text-xs font-semibold text-[#1a365d] mb-1">Recommended Action:</div>
                     <p className="text-sm text-gray-700 leading-relaxed">{alert.recommended_action}</p>
                     <div className="flex gap-2 mt-3">
-                      <button className="bg-[#1a365d] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-[#2a4a7f] transition-colors">
+                      <button className="bg-[#14532d] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-[#166534] transition-colors">
                         Acknowledge
                       </button>
                       <button className="bg-red-600 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-red-700 transition-colors">

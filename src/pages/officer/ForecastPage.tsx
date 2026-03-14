@@ -129,7 +129,7 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
               <select 
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
-                className="w-full rounded border border-gray-300 bg-white text-gray-800 px-3 py-2 focus:outline-none focus:border-[#1a365d] focus:ring-1 focus:ring-[#1a365d]"
+                className="w-full rounded-lg border border-gray-300 bg-white text-gray-800 px-3 py-2 focus:outline-none focus:border-green-700 focus:ring-1 focus:ring-green-700"
               >
                 {locations.map(loc => (
                   <option key={loc.id} value={loc.id}>{loc.name}</option>
@@ -141,7 +141,7 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
               <select 
                 value={parameter}
                 onChange={(e) => setParameter(e.target.value)}
-                className="w-full rounded border border-gray-300 bg-white text-gray-800 px-3 py-2 focus:outline-none focus:border-[#1a365d] focus:ring-1 focus:ring-[#1a365d]"
+                className="w-full rounded-lg border border-gray-300 bg-white text-gray-800 px-3 py-2 focus:outline-none focus:border-green-700 focus:ring-1 focus:ring-green-700"
               >
                 {params.map(p => (
                   <option key={p} value={p}>{p} {UNITS[p] ? `(${UNITS[p]})` : ''}</option>
@@ -162,8 +162,8 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
             </div>
           )}
 
-          <div className="mt-6 rounded border border-[#d6e4ff] bg-[#f8fbff] p-4">
-            <div className="text-sm font-semibold text-[#1a365d] mb-2">AI Forecast Insight (Bytez fallback enabled)</div>
+          <div className="mt-6 rounded-lg border border-green-200 bg-green-50/30 p-4">
+            <div className="text-sm font-semibold text-[#14532d] mb-2">AI Forecast Insight (Bytez fallback enabled)</div>
             <div className="mb-2 flex items-center gap-2 text-[11px]">
               <span className={`rounded px-2 py-0.5 border ${bytezStatus.configured ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
                 {bytezStatus.configured ? 'Configured' : 'Missing Key'}

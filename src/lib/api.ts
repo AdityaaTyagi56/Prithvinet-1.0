@@ -17,7 +17,7 @@ import {
 import type { PollutionType } from "./mockData";
 
 // ========= DEMO MODE – no backend needed =========
-const DEMO_MODE = false;
+const DEMO_MODE = true;
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 

@@ -57,7 +57,7 @@ export function RegionalAnalytics() {
       {/* Summary Row */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="gov-card p-4 text-center">
-          <MapPin className="h-5 w-5 mx-auto text-[#1a365d] mb-1" />
+          <MapPin className="h-5 w-5 mx-auto text-[#14532d] mb-1" />
           <div className="text-2xl font-bold text-gray-900">{data.length}</div>
           <div className="text-xs text-gray-500">Regions</div>
         </div>

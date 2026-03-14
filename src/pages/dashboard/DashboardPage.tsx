@@ -131,7 +131,7 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
         <div className="p-5">
           {selectedLocation && (
             <div className="text-sm text-gray-600 mb-4">
-              Station: <span className="font-semibold text-[#1a365d]">{selectedLocation.name}</span>
+              Station: <span className="font-semibold text-[#14532d]">{selectedLocation.name}</span>
               <span className="ml-2 inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 LIVE
@@ -164,7 +164,7 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
                 <div key={param} className="bg-gray-50 p-4 rounded border border-gray-200 hover:shadow transition-shadow">
                   <div className="flex justify-between items-start">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{param}</p>
-                    <Activity className="text-[#1a365d]/40 h-4 w-4" />
+                    <Activity className="text-[#14532d]/40 h-4 w-4" />
                   </div>
                   <h3 className={`text-2xl font-bold mt-2 ${value != null ? getStatusColor(param, value) : 'text-gray-400'}`}>
                     {value != null ? value.toFixed(1) : '--'}
