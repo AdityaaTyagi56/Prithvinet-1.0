@@ -8,6 +8,7 @@ import { ForecastPage } from './pages/officer/ForecastPage';
 import { PublicPortal } from './pages/public/PublicPortal';
 import { ComplianceDashboard } from './pages/admin/ComplianceDashboard';
 import { UnifiedDashboard } from './pages/dashboard/UnifiedDashboard';
+import { NoupeDataBridge } from './components/NoupeDataBridge';
 
 type AllowedRole = 'admin' | 'regulator' | string;
 
@@ -98,7 +99,9 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
+    <>
+      <NoupeDataBridge />
+      <BrowserRouter>
       <Routes>
         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
         <Route path="/public" element={<PublicPortal pollutionType="air" />} />
@@ -117,5 +120,6 @@ export default function App() {
         <Route path="/copilot" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
