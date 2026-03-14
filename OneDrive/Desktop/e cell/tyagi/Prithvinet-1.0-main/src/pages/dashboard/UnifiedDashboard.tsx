@@ -95,6 +95,8 @@ export function UnifiedDashboard() {
   const [highContrast, setHighContrast] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const t = LABEL[lang];
   const userRole = user?.role || 'admin';
@@ -109,6 +111,14 @@ export function UnifiedDashboard() {
 
   // If current tab isn't allowed, snap to overview
   const safeTab = allowedTabs.includes(activeTab) ? activeTab : 'overview';
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return navItems;
+    const q = searchQuery.toLowerCase();
+    return navItems.filter(item =>
+      item.label.toLowerCase().includes(q) || item.labelHi.includes(q)
+    );
+  }, [searchQuery, navItems]);
 
   const changeFontSize = useCallback((delta: number) => {
     setFontSize(prev => {
@@ -275,7 +285,9 @@ export function UnifiedDashboard() {
 
           {/* Right side — user info + role badge */}
           <div className="hidden lg:flex items-center gap-2 ml-3 flex-shrink-0">
-            <button className="flex items-center gap-1.5 bg-gradient-to-b from-[#f5c842] to-[#e6a817] hover:from-[#e6a817] hover:to-[#d49a0e] text-[#14532d] px-3 py-1.5 rounded text-xs font-bold transition-colors shadow-sm whitespace-nowrap">
+            <button
+              onClick={() => { setSearchOpen(true); setSearchQuery(''); }}
+              className="flex items-center gap-1.5 bg-gradient-to-b from-[#f5c842] to-[#e6a817] hover:from-[#e6a817] hover:to-[#d49a0e] text-[#14532d] px-3 py-1.5 rounded text-xs font-bold transition-colors shadow-sm whitespace-nowrap">
               <Search className="h-3.5 w-3.5" />
               Search
             </button>
@@ -491,10 +503,10 @@ export function UnifiedDashboard() {
                 Important Links
               </h4>
               <ul className="text-xs space-y-2">
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> Central Pollution Control Board (CPCB)</span></li>
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> National Clean Air Programme (NCAP)</span></li>
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> Air Quality Index Dashboard</span></li>
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> Right to Information (RTI)</span></li>
+                <li><a href="https://cpcb.nic.in/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> Central Pollution Control Board (CPCB)</a></li>
+                <li><a href="https://moef.gov.in/en/division/environment-impact-assessment-eia/national-clean-air-programme-ncap/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> National Clean Air Programme (NCAP)</a></li>
+                <li><a href="https://airquality.cpcb.gov.in/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> Air Quality Index Dashboard</a></li>
+                <li><a href="https://rtionline.gov.in/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> Right to Information (RTI)</a></li>
               </ul>
             </div>
             <div>
@@ -503,10 +515,10 @@ export function UnifiedDashboard() {
                 Quick Links
               </h4>
               <ul className="text-xs space-y-2">
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> CECB Official Website</span></li>
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> Parivesh Portal</span></li>
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> Environmental Guidelines</span></li>
-                <li><span className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1"><ExternalLink className="h-3 w-3" /> Citizen Grievances</span></li>
+                <li><a href="https://cgepb.gov.in/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> CECB Official Website</a></li>
+                <li><a href="https://parivesh.nic.in/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> Parivesh Portal</a></li>
+                <li><a href="https://cpcb.nic.in/guidelines-2/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> Environmental Guidelines</a></li>
+                <li><a href="https://pgportal.gov.in/" target="_blank" rel="noopener noreferrer" className="text-green-300/70 hover:text-white cursor-pointer flex items-center gap-1 transition-colors"><ExternalLink className="h-3 w-3" /> Citizen Grievances</a></li>
               </ul>
             </div>
             <div>
@@ -519,8 +531,8 @@ export function UnifiedDashboard() {
                   CECB Head Office, Sector 19, Atal Nagar<br />
                   Naya Raipur, Chhattisgarh - 492002
                 </p>
-                <p className="flex items-center gap-1.5"><Mail className="h-3 w-3 text-green-300/60" /> info-cecb@gov.in</p>
-                <p className="flex items-center gap-1.5"><Phone className="h-3 w-3 text-green-300/60" /> 0771-2973100</p>
+                <p className="flex items-center gap-1.5"><Mail className="h-3 w-3 text-green-300/60" /> <a href="mailto:info-cecb@gov.in" className="hover:text-white transition-colors">info-cecb@gov.in</a></p>
+                <p className="flex items-center gap-1.5"><Phone className="h-3 w-3 text-green-300/60" /> <a href="tel:07712973100" className="hover:text-white transition-colors">0771-2973100</a></p>
               </div>
             </div>
           </div>
@@ -530,6 +542,62 @@ export function UnifiedDashboard() {
           </div>
         </div>
       </footer>
+
+      {/* ═══ Search Modal ═══ */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-start justify-center pt-20 px-4"
+          style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setSearchOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-[#0d2e14] border border-white/20 rounded-xl shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+              <Search className="h-4 w-4 text-[#f5c842] flex-shrink-0" />
+              <input
+                autoFocus
+                type="text"
+                placeholder="Search dashboard sections…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Escape') { setSearchOpen(false); }
+                  if (e.key === 'Enter' && searchResults.length > 0) {
+                    setActiveTab(searchResults[0].id); setSearchOpen(false); setSearchQuery('');
+                  }
+                }}
+                className="flex-1 bg-transparent text-white text-sm outline-none placeholder-green-300/40"
+              />
+              <button onClick={() => setSearchOpen(false)} className="text-green-300/50 hover:text-white transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ul className="py-2 max-h-72 overflow-y-auto">
+              {searchResults.length === 0 && (
+                <li className="px-4 py-3 text-green-300/50 text-sm">No results found.</li>
+              )}
+              {searchResults.map(item => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => { setActiveTab(item.id); setSearchOpen(false); setSearchQuery(''); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-100 hover:bg-white/10 transition-colors text-left"
+                  >
+                    <span className="text-[#f5c842]">{item.icon}</span>
+                    <span>{item.label}</span>
+                    <span className="ml-auto text-green-300/40 text-xs">{item.labelHi}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-green-300/30 flex-shrink-0" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="px-4 py-2 border-t border-white/10 text-[10px] text-green-300/30">
+              Press Enter to navigate · Esc to close
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
