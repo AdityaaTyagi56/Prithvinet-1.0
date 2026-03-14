@@ -7,6 +7,7 @@ import { getLatestReadings, PARAMS_BY_TYPE, UNITS, LIMITS } from '../../lib/mock
 import type { PollutionType } from '../../lib/mockData';
 import { useInterpolatedValue } from '../../hooks/useInterpolatedValue';
 import type { Reading } from '../../store/readingsStore';
+import { getCachedSnapshot } from '../../lib/liveData';
 
 interface LocationItem {
   id: string;
@@ -114,8 +115,36 @@ export function DashboardPage({ pollutionType }: DashboardPageProps) {
   useEffect(() => {
     if (!selectedLocationId) return;
 
+    // For live CPCB stations, seed from the real snapshot values instead of mock data
+    let initial: Reading[];
+    if (selectedLocationId.startsWith('live-') && pollutionType === 'air') {
+      const snap = getCachedSnapshot();
+      const idx = parseInt(selectedLocationId.replace('live-', ''), 10);
+      const station = snap?.stations?.[idx];
+      if (station?.pollutants) {
+        const pidAlias: Record<string, string> = {
+          'PM2.5': 'PM2.5', 'PM10': 'PM10', 'SO2': 'SO2',
+          'NO2': 'NO2', 'CO': 'CO', 'OZONE': 'O3', 'NH3': 'NH3',
+        };
+        const liveReadings: Reading[] = Object.entries(station.pollutants)
+          .map(([pid, vals]: [string, any]) => {
+            const param = pidAlias[pid] || pid;
+            const val = parseFloat(vals?.avg || '0');
+            return val > 0 ? {
+              location_id: selectedLocationId, parameter_id: param, parameter: param,
+              value: val, recorded_at: station.last_update,
+            } : null;
+          })
+          .filter((r): r is Reading => r !== null);
+        initial = liveReadings.length > 0 ? liveReadings : getLatestReadings(selectedLocationId, pollutionType);
+      } else {
+        initial = getLatestReadings(selectedLocationId, pollutionType);
+      }
+    } else {
+      initial = getLatestReadings(selectedLocationId, pollutionType);
+    }
+
     // Seed initial values — only on first load for this location
-    const initial = getLatestReadings(selectedLocationId, pollutionType);
     initial.forEach(r => {
       // Only set if not already tracking this param (avoids reset on re-render)
       if (currentValuesRef.current[r.parameter] == null) {

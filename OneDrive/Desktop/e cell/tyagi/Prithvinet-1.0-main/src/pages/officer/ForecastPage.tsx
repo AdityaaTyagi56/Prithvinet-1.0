@@ -52,7 +52,7 @@ Keep it brief. Do not output any markdown blocks (like \`\`\`json), explanations
       return JSON.parse(jsonStr);
     } catch (e) {
       console.warn("Bytez forecast JSON unavailable, using demo forecast data.");
-      return getForecastData(param);
+      return getForecastData(param, currentVal);
     }
   };
 

@@ -171,6 +171,30 @@ function mockGet(
       ? new URLSearchParams(parts[1])
       : new URLSearchParams();
     const type = params.get("type") as PollutionType | null;
+
+    // For live CPCB stations inject real pollutant values from the snapshot
+    if (locId.startsWith("live-") && _liveSnapshotCache?.stations?.length) {
+      const idx = parseInt(locId.replace("live-", ""), 10);
+      const station = _liveSnapshotCache.stations[idx];
+      if (station?.pollutants) {
+        const pidAlias: Record<string, string> = {
+          "PM2.5": "PM2.5", "PM10": "PM10", "SO2": "SO2",
+          "NO2": "NO2", "CO": "CO", "OZONE": "O3", "NH3": "NH3",
+        };
+        const readings = Object.entries(station.pollutants)
+          .map(([pid, vals]: [string, any]) => {
+            const param = pidAlias[pid] || pid;
+            const val = parseFloat(vals?.avg || "0");
+            return val > 0 ? {
+              location_id: locId, parameter_id: param, parameter: param,
+              value: val, recorded_at: station.last_update,
+            } : null;
+          })
+          .filter(Boolean);
+        if (readings.length > 0) return mockResponse({ readings });
+      }
+    }
+
     return mockResponse(getLatestReadings(locId, type || undefined));
   }
 

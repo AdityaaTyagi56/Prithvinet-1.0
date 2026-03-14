@@ -160,8 +160,9 @@ export function getComplianceMetrics(type: PollutionType = 'air') {
 }
 
 // ─── Forecast data (48h) ────────────────────────────────────
-export function getForecastData(parameter: string) {
-  const base = getBase(parameter);
+export function getForecastData(parameter: string, anchorValue?: number | null) {
+  // Use the real current reading as base if provided, so forecast starts from actual measured values
+  const base = (anchorValue != null && anchorValue > 0) ? anchorValue : getBase(parameter);
   const now = Date.now();
   const data = [];
   for (let i = 0; i < 48; i++) {
