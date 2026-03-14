@@ -477,8 +477,11 @@ async def _run_scheduler(session_factory: sessionmaker, govapi_key: str) -> None
     scheduler = AsyncIOScheduler(timezone="UTC")
 
     async def _job() -> None:
-        async with session_factory() as session:
-            await sync_once(session, govapi_key)
+        try:
+            async with session_factory() as session:
+                await sync_once(session, govapi_key)
+        except Exception as e:
+            logging.error(f"Scheduled job failed: {e}")
 
     scheduler.add_job(_job, trigger="interval", minutes=60, max_instances=1, coalesce=True)
     scheduler.start()

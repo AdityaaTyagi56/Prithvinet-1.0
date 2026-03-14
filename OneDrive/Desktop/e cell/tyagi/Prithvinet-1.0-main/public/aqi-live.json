@@ -1,0 +1,222 @@
+{
+  "fetched_at": "2026-03-14T10:45:43.865008+00:00",
+  "api_total_records": 10,
+  "stations": [
+    {
+      "name": "32Bungalows, Bhilai - CECB",
+      "city": "Bhilai",
+      "lat": "21.194815",
+      "lon": "81.314770",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "NO2": {
+          "avg": "32",
+          "min": "28",
+          "max": "43"
+        },
+        "NH3": {
+          "avg": "1",
+          "min": "1",
+          "max": "2"
+        },
+        "SO2": {
+          "avg": "4",
+          "min": "3",
+          "max": "5"
+        }
+      }
+    },
+    {
+      "name": "Civic Center, Bhilai - Bhilai Steel Plant",
+      "city": "Bhilai",
+      "lat": "21.185571",
+      "lon": "81.343175",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "SO2": {
+          "avg": "8",
+          "min": "7",
+          "max": "9"
+        }
+      }
+    },
+    {
+      "name": "Nawapara SECL Colony, Chhal - CECB",
+      "city": "Chhal",
+      "lat": "22.118125",
+      "lon": "83.140608",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "125",
+          "min": "56",
+          "max": "279"
+        }
+      }
+    },
+    {
+      "name": "AIIMS, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.258815",
+      "lon": "81.578979",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "OZONE": {
+          "avg": "8",
+          "min": "5",
+          "max": "21"
+        }
+      }
+    },
+    {
+      "name": "Bhatagaon New ISBT, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.219665",
+      "lon": "81.630094",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "69",
+          "min": "24",
+          "max": "108"
+        }
+      }
+    },
+    {
+      "name": "Krishak Nagar, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.237755",
+      "lon": "81.705301",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "NH3": {
+          "avg": "2",
+          "min": "2",
+          "max": "2"
+        }
+      }
+    },
+    {
+      "name": "Siltara Phase-II, Raipur - CECB",
+      "city": "Raipur",
+      "lat": "21.371751",
+      "lon": "81.664929",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "PM10": {
+          "avg": "109",
+          "min": "57",
+          "max": "158"
+        }
+      }
+    },
+    {
+      "name": "OP Jindal Industrial Park, Tumidih - CECB",
+      "city": "Tumidih",
+      "lat": "22.06631475",
+      "lon": "83.33820077",
+      "last_update": "13-03-2026 15:00:00",
+      "pollutants": {
+        "CO": {
+          "avg": "59",
+          "min": "24",
+          "max": "118"
+        }
+      }
+    }
+  ],
+  "logs": [
+    {
+      "date": "2026-03-14",
+      "row_count": 8,
+      "file_size_bytes": 721,
+      "has_analysis": false
+    }
+  ],
+  "today": {
+    "date": "2026-03-14",
+    "rows": [
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "32Bungalows, Bhilai - CECB",
+        "district": "Bhilai",
+        "PM10": "",
+        "PM2.5": "",
+        "SO2": "4.0",
+        "NO2": "32.0",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "Civic Center, Bhilai - Bhilai Steel Plant",
+        "district": "Bhilai",
+        "PM10": "",
+        "PM2.5": "",
+        "SO2": "8.0",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "Nawapara SECL Colony, Chhal - CECB",
+        "district": "Chhal",
+        "PM10": "125.0",
+        "PM2.5": "",
+        "SO2": "",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "AIIMS, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "",
+        "PM2.5": "",
+        "SO2": "",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "Bhatagaon New ISBT, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "69.0",
+        "PM2.5": "",
+        "SO2": "",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "Krishak Nagar, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "",
+        "PM2.5": "",
+        "SO2": "",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "Siltara Phase-II, Raipur - CECB",
+        "district": "Raipur",
+        "PM10": "109.0",
+        "PM2.5": "",
+        "SO2": "",
+        "NO2": "",
+        "source": "govapi"
+      },
+      {
+        "timestamp": "2026-03-13T15:00:00+00:00",
+        "station_name": "OP Jindal Industrial Park, Tumidih - CECB",
+        "district": "Tumidih",
+        "PM10": "",
+        "PM2.5": "",
+        "SO2": "",
+        "NO2": "",
+        "source": "govapi"
+      }
+    ],
+    "row_count": 8
+  }
+}

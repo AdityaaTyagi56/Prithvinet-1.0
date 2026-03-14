@@ -1,0 +1,9 @@
+timestamp,station_name,district,PM10,PM2.5,SO2,NO2,source
+2026-03-13T15:00:00+00:00,"32Bungalows, Bhilai - CECB",Bhilai,,,4.0,32.0,govapi
+2026-03-13T15:00:00+00:00,"Civic Center, Bhilai - Bhilai Steel Plant",Bhilai,,,8.0,,govapi
+2026-03-13T15:00:00+00:00,"Nawapara SECL Colony, Chhal - CECB",Chhal,125.0,,,,govapi
+2026-03-13T15:00:00+00:00,"AIIMS, Raipur - CECB",Raipur,,,,,govapi
+2026-03-13T15:00:00+00:00,"Bhatagaon New ISBT, Raipur - CECB",Raipur,69.0,,,,govapi
+2026-03-13T15:00:00+00:00,"Krishak Nagar, Raipur - CECB",Raipur,,,,,govapi
+2026-03-13T15:00:00+00:00,"Siltara Phase-II, Raipur - CECB",Raipur,109.0,,,,govapi
+2026-03-13T15:00:00+00:00,"OP Jindal Industrial Park, Tumidih - CECB",Tumidih,,,,,govapi
