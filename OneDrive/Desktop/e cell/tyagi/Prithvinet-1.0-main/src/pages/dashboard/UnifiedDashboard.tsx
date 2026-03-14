@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { PublicPortal } from '../public/PublicPortal';
 import { DashboardPage } from './DashboardPage';
+import { CopilotChat } from '../../components/copilot/CopilotChat';
 import { ComplianceDashboard } from '../admin/ComplianceDashboard';
 import { ForecastPage } from '../officer/ForecastPage';
 import { AlertsDashboard } from './AlertsDashboard';
@@ -11,40 +12,29 @@ import { AqiLogsPage } from './AqiLogsPage';
 import { AshokEmblem } from '../../components/AshokEmblem';
 import { MissionLifeLogo, AzadiLogo } from '../../components/GovLogos';
 import {
-  LogOut,
-  Wind,
-  Droplets,
-  Volume2,
-  Globe,
-  Eye,
-  Search,
-  Phone,
-  Mail,
-  ExternalLink,
-  ChevronRight,
-  LayoutDashboard,
-  Activity,
-  Brain,
-  ShieldCheck,
-  Bell,
-  MapPin,
-  Factory,
-  Home,
-  Sun,
-  Moon,
-  Accessibility,
-  Minus,
-  Plus,
-  RotateCcw,
-  User,
-  Menu,
-  X,
-  Flag,
-  FileSpreadsheet,
+  LogOut, Wind, Droplets, Volume2, Globe, Eye, Search, Phone, Mail,
+  ExternalLink, ChevronRight, LayoutDashboard, Activity, Brain, ShieldCheck,
+  Bell, MapPin, Factory, Home, Sun, Moon, User, Menu, X, Flag,
+  FileSpreadsheet, MessageSquare, Shield, Briefcase,
 } from 'lucide-react';
 import type { PollutionType } from '../../lib/mockData';
 
 type TabId = 'overview' | 'telemetry' | 'forecast' | 'compliance' | 'alerts' | 'regional' | 'industries' | 'aqi-logs';
+
+// ─── Role → Tab Permissions ─────────────────────────────────
+const ROLE_TABS: Record<string, TabId[]> = {
+  admin:            ['overview', 'telemetry', 'forecast', 'compliance', 'alerts', 'regional', 'industries', 'aqi-logs'],
+  member_secretary: ['overview', 'telemetry', 'forecast', 'compliance', 'alerts', 'regional', 'industries', 'aqi-logs'],
+  regional_officer: ['overview', 'telemetry', 'forecast', 'alerts', 'regional', 'aqi-logs'],
+};
+const DEFAULT_TABS: TabId[] = ['overview', 'telemetry', 'forecast', 'aqi-logs'];
+
+// ─── Role display config ────────────────────────────────────
+const ROLE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  admin:            { label: 'Administrator', color: 'bg-red-600', icon: <Shield className="h-3 w-3" /> },
+  member_secretary: { label: 'Member Secretary', color: 'bg-purple-600', icon: <Briefcase className="h-3 w-3" /> },
+  regional_officer: { label: 'Regional Officer', color: 'bg-blue-600', icon: <MapPin className="h-3 w-3" /> },
+};
 
 // Bilingual labels
 const LABEL = {
@@ -84,15 +74,15 @@ const LABEL = {
   },
 };
 
-const NAV_ITEMS_EN: { id: TabId; label: string; labelHi: string; icon: React.ReactNode }[] = [
-  { id: 'overview', label: 'National Overview', labelHi: 'राष्ट्रीय अवलोकन', icon: <LayoutDashboard className="h-3.5 w-3.5" /> },
-  { id: 'telemetry', label: 'Live Monitoring', labelHi: 'लाइव निगरानी', icon: <Activity className="h-3.5 w-3.5" /> },
-  { id: 'forecast', label: 'AI Forecast', labelHi: 'AI पूर्वानुमान', icon: <Brain className="h-3.5 w-3.5" /> },
-  { id: 'compliance', label: 'Compliance', labelHi: 'अनुपालन', icon: <ShieldCheck className="h-3.5 w-3.5" /> },
-  { id: 'alerts', label: 'Alerts', labelHi: 'अलर्ट', icon: <Bell className="h-3.5 w-3.5" /> },
-  { id: 'regional', label: 'Regional Analytics', labelHi: 'क्षेत्रीय विश्लेषण', icon: <MapPin className="h-3.5 w-3.5" /> },
-  { id: 'industries', label: 'Industry Tracker', labelHi: 'उद्योग ट्रैकर', icon: <Factory className="h-3.5 w-3.5" /> },
-  { id: 'aqi-logs', label: 'AQI Logs', labelHi: 'AQI लॉग', icon: <FileSpreadsheet className="h-3.5 w-3.5" /> },
+const ALL_NAV_ITEMS: { id: TabId; label: string; labelHi: string; icon: React.ReactNode }[] = [
+  { id: 'overview',    label: 'National Overview',  labelHi: 'राष्ट्रीय अवलोकन',   icon: <LayoutDashboard className="h-3.5 w-3.5" /> },
+  { id: 'telemetry',   label: 'Live Monitoring',    labelHi: 'लाइव निगरानी',        icon: <Activity className="h-3.5 w-3.5" /> },
+  { id: 'forecast',    label: 'AI Forecast',        labelHi: 'AI पूर्वानुमान',       icon: <Brain className="h-3.5 w-3.5" /> },
+  { id: 'compliance',  label: 'Compliance',         labelHi: 'अनुपालन',             icon: <ShieldCheck className="h-3.5 w-3.5" /> },
+  { id: 'alerts',      label: 'Alerts',             labelHi: 'अलर्ट',               icon: <Bell className="h-3.5 w-3.5" /> },
+  { id: 'regional',    label: 'Regional Analytics', labelHi: 'क्षेत्रीय विश्लेषण', icon: <MapPin className="h-3.5 w-3.5" /> },
+  { id: 'industries',  label: 'Industry Tracker',   labelHi: 'उद्योग ट्रैकर',       icon: <Factory className="h-3.5 w-3.5" /> },
+  { id: 'aqi-logs',    label: 'AQI Logs',           labelHi: 'AQI लॉग',             icon: <FileSpreadsheet className="h-3.5 w-3.5" /> },
 ];
 
 export function UnifiedDashboard() {
@@ -104,8 +94,21 @@ export function UnifiedDashboard() {
   const [fontSize, setFontSize] = useState(0);
   const [highContrast, setHighContrast] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
 
   const t = LABEL[lang];
+  const userRole = user?.role || 'admin';
+  const allowedTabs = ROLE_TABS[userRole] || DEFAULT_TABS;
+  const roleInfo = ROLE_CONFIG[userRole] || ROLE_CONFIG.admin;
+
+  // Filter nav items to only those allowed for the current role
+  const navItems = useMemo(
+    () => ALL_NAV_ITEMS.filter(item => allowedTabs.includes(item.id)),
+    [allowedTabs],
+  );
+
+  // If current tab isn't allowed, snap to overview
+  const safeTab = allowedTabs.includes(activeTab) ? activeTab : 'overview';
 
   const changeFontSize = useCallback((delta: number) => {
     setFontSize(prev => {
@@ -141,12 +144,11 @@ export function UnifiedDashboard() {
         {t.skipToMain}
       </a>
 
-      {/* ═══ 1. DARK GREEN TOP BAR (PARIVESH style) ═══ */}
+      {/* ═══ 1. DARK GREEN TOP BAR ═══ */}
       <div className="parivesh-topbar" role="navigation" aria-label="Accessibility toolbar">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Left: Indian flag + GOI text */}
           <div className="flex items-center gap-2.5 text-[11px]">
-            {/* Indian tricolor flag */}
             <div className="flex-shrink-0 w-6 h-[14px] rounded-[2px] overflow-hidden flex flex-col shadow-sm" aria-label="Indian Flag">
               <div className="flex-1 bg-[#FF9933]" />
               <div className="flex-1 bg-white relative">
@@ -163,47 +165,18 @@ export function UnifiedDashboard() {
 
           {/* Right: A- A A+ | Contrast | Screen Reader | Language */}
           <div className="flex items-center gap-0.5 text-[11px] text-white/80">
-            <button
-              onClick={() => changeFontSize(-1)}
-              className="px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors text-[11px]"
-              title="Decrease font size"
-              aria-label="Decrease font size"
-            >
-              A<sup>-</sup>
-            </button>
-            <button
-              onClick={resetFontSize}
-              className="px-1 py-0.5 rounded hover:bg-white/10 transition-colors text-[13px] font-bold"
-              title="Default font size"
-              aria-label="Reset font size"
-            >
-              A
-            </button>
-            <button
-              onClick={() => changeFontSize(1)}
-              className="px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors text-[15px] font-bold"
-              title="Increase font size"
-              aria-label="Increase font size"
-            >
-              A<sup>+</sup>
-            </button>
+            <button onClick={() => changeFontSize(-1)} className="px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors text-[11px]" title="Decrease font size" aria-label="Decrease font size">A<sup>-</sup></button>
+            <button onClick={resetFontSize} className="px-1 py-0.5 rounded hover:bg-white/10 transition-colors text-[13px] font-bold" title="Default font size" aria-label="Reset font size">A</button>
+            <button onClick={() => changeFontSize(1)} className="px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors text-[15px] font-bold" title="Increase font size" aria-label="Increase font size">A<sup>+</sup></button>
 
             <span className="text-white/25 mx-1.5">|</span>
 
-            {/* High contrast */}
-            <button
-              onClick={toggleContrast}
-              className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${highContrast ? 'bg-yellow-400 text-black' : 'hover:bg-white/10'}`}
-              title={highContrast ? 'Normal contrast' : 'High contrast'}
-              aria-label="Toggle high contrast"
-              aria-pressed={highContrast}
-            >
+            <button onClick={toggleContrast} className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${highContrast ? 'bg-yellow-400 text-black' : 'hover:bg-white/10'}`} title={highContrast ? 'Normal contrast' : 'High contrast'} aria-label="Toggle high contrast" aria-pressed={highContrast}>
               {highContrast ? <Sun className="h-3 w-3 inline" /> : <Moon className="h-3 w-3 inline" />}
             </button>
 
             <span className="text-white/25 mx-1.5 hidden sm:inline">|</span>
 
-            {/* Screen Reader */}
             <button className="hidden sm:flex items-center gap-1 hover:text-white transition-colors text-[11px]" title={t.screenReader}>
               <Eye className="h-3 w-3" />
               <span className="hidden md:inline">{t.screenReader}</span>
@@ -211,12 +184,7 @@ export function UnifiedDashboard() {
 
             <span className="text-white/25 mx-1.5 hidden sm:inline">|</span>
 
-            {/* Language toggle - styled like PARIVESH dropdown */}
-            <button
-              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-              className="flex items-center gap-1 px-2.5 py-0.5 rounded hover:bg-white/10 transition-colors text-[11px] font-semibold"
-              aria-label={lang === 'en' ? 'Switch to Hindi' : 'Switch to English'}
-            >
+            <button onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} className="flex items-center gap-1 px-2.5 py-0.5 rounded hover:bg-white/10 transition-colors text-[11px] font-semibold" aria-label={lang === 'en' ? 'Switch to Hindi' : 'Switch to English'}>
               <Globe className="h-3 w-3" />
               {lang === 'en' ? 'English' : 'हिंदी'}
               <ChevronRight className="h-2.5 w-2.5 rotate-90" />
@@ -225,13 +193,12 @@ export function UnifiedDashboard() {
         </div>
       </div>
 
-      {/* ═══ 2. WHITE HEADER BAND (PARIVESH style) ═══ */}
+      {/* ═══ 2. WHITE HEADER BAND ═══ */}
       <header className="parivesh-header" role="banner">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between py-3 sm:py-4">
             {/* LEFT: PrithviNet Logo + Brand */}
             <div className="flex items-center gap-3 flex-shrink-0">
-              {/* Circular green logo with leaf */}
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#14532d] via-[#16a34a] to-[#22c55e] flex items-center justify-center shadow-lg flex-shrink-0 border-2 border-green-200/50">
                 <svg viewBox="0 0 40 40" className="w-8 h-8 sm:w-9 sm:h-9" fill="none">
                   <path d="M20 4C20 4 8 12 8 24C8 30 13 36 20 36C27 36 32 30 32 24C32 12 20 4 20 4Z" fill="#4ade80" opacity="0.9" />
@@ -254,7 +221,7 @@ export function UnifiedDashboard() {
               </div>
             </div>
 
-            {/* CENTER: Ministry text (Hindi on top, English below) */}
+            {/* CENTER: Ministry text */}
             <div className="hidden md:flex flex-col items-center text-center flex-1 px-6">
               <div className="text-base sm:text-lg font-bold text-[#14532d] leading-snug">
                 {t.ministryHi}
@@ -269,17 +236,12 @@ export function UnifiedDashboard() {
 
             {/* RIGHT: Government logos + National Emblem */}
             <div className="flex items-center gap-4 sm:gap-5 flex-shrink-0">
-              {/* LiFE badge (Mission LiFE - Lifestyle for Environment) */}
               <div className="hidden lg:flex flex-col items-center">
                 <MissionLifeLogo height={42} />
               </div>
-
-              {/* Azadi Ka Amrit Mahotsav */}
               <div className="hidden lg:flex flex-col items-center">
                 <AzadiLogo height={52} />
               </div>
-
-              {/* National Emblem of India */}
               <div className="flex flex-col items-center">
                 <AshokEmblem size={52} className="drop-shadow-md" />
               </div>
@@ -288,22 +250,22 @@ export function UnifiedDashboard() {
         </div>
       </header>
 
-      {/* ═══ 3. GREEN NAVIGATION BAR (PARIVESH style) ═══ */}
+      {/* ═══ 3. GREEN NAVIGATION BAR ═══ */}
       <nav className="parivesh-nav" role="navigation" aria-label="Main navigation">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex items-center justify-between min-h-[42px]">
 
-          {/* Nav tabs — scrollable, never crowded */}
+          {/* Nav tabs — filtered by role */}
           <div className="flex overflow-x-auto hide-scrollbar shrink min-w-0">
-            {NAV_ITEMS_EN.map(item => (
+            {navItems.map(item => (
               <button
                 key={item.id}
                 onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
                 className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-[12px] sm:text-[13px] font-medium whitespace-nowrap transition-all ${
-                  activeTab === item.id
+                  safeTab === item.id
                     ? 'bg-[#0a3a1f] text-white border-b-2 border-[#FF9933]'
                     : 'text-green-100/90 hover:text-white hover:bg-white/10 border-b-2 border-transparent'
                 }`}
-                aria-current={activeTab === item.id ? 'page' : undefined}
+                aria-current={safeTab === item.id ? 'page' : undefined}
               >
                 {item.icon}
                 <span className="hidden sm:inline">{lang === 'en' ? item.label : item.labelHi}</span>
@@ -311,19 +273,26 @@ export function UnifiedDashboard() {
             ))}
           </div>
 
-          {/* Right side — fixed width, never shrinks */}
+          {/* Right side — user info + role badge */}
           <div className="hidden lg:flex items-center gap-2 ml-3 flex-shrink-0">
-            {/* Search button (yellow like PARIVESH) */}
             <button className="flex items-center gap-1.5 bg-gradient-to-b from-[#f5c842] to-[#e6a817] hover:from-[#e6a817] hover:to-[#d49a0e] text-[#14532d] px-3 py-1.5 rounded text-xs font-bold transition-colors shadow-sm whitespace-nowrap">
               <Search className="h-3.5 w-3.5" />
               Search
             </button>
-            {/* User — bordered like PARIVESH login button */}
+
+            {/* Role badge */}
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold text-white uppercase tracking-wide ${roleInfo.color}`}>
+              {roleInfo.icon}
+              {roleInfo.label}
+            </span>
+
+            {/* User name */}
             <div className="flex items-center gap-1 border border-white/30 rounded px-2.5 py-1 text-white text-[11px] bg-white/5 whitespace-nowrap">
               <User className="h-3 w-3 flex-shrink-0" />
-              <span className="max-w-[110px] truncate">{(user as any)?.name || user?.email}</span>
+              <span className="max-w-[120px] truncate">{(user as any)?.name || user?.email}</span>
             </div>
-            {/* Logout — bordered like PARIVESH register button */}
+
+            {/* Logout */}
             <button
               onClick={logout}
               className="flex items-center gap-1 border border-red-400/50 bg-red-700/30 hover:bg-red-700/55 text-white text-[11px] px-2.5 py-1 rounded transition-colors whitespace-nowrap"
@@ -363,7 +332,10 @@ export function UnifiedDashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs text-white">
                 <User className="h-4 w-4 text-green-200" />
-                {(user as any)?.name || user?.email}
+                <span>{(user as any)?.name || user?.email}</span>
+                <span className={`ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold text-white uppercase ${roleInfo.color}`}>
+                  {roleInfo.label}
+                </span>
               </div>
               <button
                 onClick={logout}
@@ -376,7 +348,7 @@ export function UnifiedDashboard() {
         )}
       </nav>
 
-      {/* ═══ 4. DOMAIN SELECTOR BAR (Air / Water / Noise) ═══ */}
+      {/* ═══ 4. DOMAIN SELECTOR + ROLE WELCOME BAR ═══ */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2 flex items-center justify-between gap-4">
           {/* Pollution type pills */}
@@ -403,9 +375,15 @@ export function UnifiedDashboard() {
               ))}
             </div>
           </div>
-          {/* Active domain label */}
-          <div className="text-[11px] text-gray-400 hidden md:block">
-            Viewing: <span className="font-semibold text-[#14532d]">{typeConfig[pollutionType].label} Quality Monitoring</span>
+          {/* Welcome + designation */}
+          <div className="text-[11px] text-gray-500 hidden md:flex items-center gap-2">
+            <span>Welcome, <span className="font-semibold text-[#14532d]">{(user as any)?.name || 'Officer'}</span></span>
+            {(user as any)?.designation && (
+              <>
+                <span className="text-gray-300">|</span>
+                <span className="text-gray-400">{(user as any)?.designation}</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -437,8 +415,8 @@ export function UnifiedDashboard() {
               <ChevronRight className="h-3 w-3 text-gray-400" />
               <span className="text-gray-700 font-medium">
                 {lang === 'en'
-                  ? NAV_ITEMS_EN.find(n => n.id === activeTab)?.label
-                  : NAV_ITEMS_EN.find(n => n.id === activeTab)?.labelHi}
+                  ? ALL_NAV_ITEMS.find(n => n.id === safeTab)?.label
+                  : ALL_NAV_ITEMS.find(n => n.id === safeTab)?.labelHi}
               </span>
             </li>
           </ol>
@@ -450,15 +428,47 @@ export function UnifiedDashboard() {
 
       {/* ═══ Main Content ═══ */}
       <main id="main-content" className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-6" role="main">
-        {activeTab === 'overview' && <PublicPortal pollutionType={pollutionType} />}
-        {activeTab === 'telemetry' && <DashboardPage pollutionType={pollutionType} />}
-        {activeTab === 'forecast' && <ForecastPage pollutionType={pollutionType} />}
-        {activeTab === 'compliance' && <ComplianceDashboard pollutionType={pollutionType} />}
-        {activeTab === 'alerts' && <AlertsDashboard />}
-        {activeTab === 'regional' && <RegionalAnalytics />}
-        {activeTab === 'industries' && <IndustryTracker />}
-        {activeTab === 'aqi-logs' && <AqiLogsPage />}
+        {safeTab === 'overview' && <PublicPortal pollutionType={pollutionType} />}
+        {safeTab === 'telemetry' && <DashboardPage pollutionType={pollutionType} />}
+        {safeTab === 'forecast' && <ForecastPage pollutionType={pollutionType} />}
+        {safeTab === 'compliance' && <ComplianceDashboard pollutionType={pollutionType} />}
+        {safeTab === 'alerts' && <AlertsDashboard />}
+        {safeTab === 'regional' && <RegionalAnalytics />}
+        {safeTab === 'industries' && <IndustryTracker />}
+        {safeTab === 'aqi-logs' && <AqiLogsPage />}
       </main>
+
+      {/* Floating Copilot Action Button */}
+      <button
+        onClick={() => setIsCopilotOpen(true)}
+        className="fixed bottom-6 right-6 z-40 bg-[#166534] text-white p-4 rounded-full shadow-2xl hover:bg-[#14532d] hover:-translate-y-1 transition-all flex items-center justify-center border-2 border-[#4ade80]/30"
+        aria-label="Open AI Copilot"
+      >
+        <MessageSquare className="w-6 h-6" />
+      </button>
+
+      {/* Copilot Slide-over Panel */}
+      <div className={`fixed inset-y-0 right-0 w-full sm:w-[450px] bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.15)] z-50 transform transition-transform duration-300 ease-in-out ${isCopilotOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="h-full flex flex-col relative">
+          <button
+            onClick={() => setIsCopilotOpen(false)}
+            className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="flex-1 overflow-hidden">
+            <CopilotChat />
+          </div>
+        </div>
+      </div>
+
+      {/* Backdrop for mobile */}
+      {isCopilotOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40 sm:hidden backdrop-blur-sm"
+          onClick={() => setIsCopilotOpen(false)}
+        />
+      )}
 
       {/* ═══ Government Footer ═══ */}
       <footer className="gov-footer mt-auto" role="contentinfo">

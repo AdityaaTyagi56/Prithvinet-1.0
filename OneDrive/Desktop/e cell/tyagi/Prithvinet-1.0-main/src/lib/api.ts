@@ -14,7 +14,7 @@ import {
   getAqiLogsList,
   getAqiLogRows,
   getAqiLogAnalysis,
-  DEMO_USER,
+  getDemoUser,
   DEMO_TOKEN,
 } from "./mockData";
 import type { PollutionType } from "./mockData";
@@ -64,6 +64,9 @@ function mockResponse<T>(data: T): AxiosResponse<T> {
 // Copilot history store (in-memory)
 const copilotSessions: Record<string, { role: string; content: string }[]> = {};
 
+// Track which demo account is logged in
+let _loggedInEmail = 'admin@cecb.gov.in';
+
 // Live data cache — loaded on first API call
 let _liveSnapshotCache: LiveSnapshot | null = null;
 let _liveLoaded = false;
@@ -82,7 +85,7 @@ function mockGet(
   url: string,
   _config?: AxiosRequestConfig,
 ): AxiosResponse<any> {
-  if (url.includes("/auth/me")) return mockResponse(DEMO_USER);
+  if (url.includes("/auth/me")) return mockResponse(getDemoUser(_loggedInEmail));
 
   // Locations – supports ?type=air|water|noise
   if (url.match(/\/locations(\?|$)/)) {
@@ -245,8 +248,10 @@ function mockGet(
 }
 
 function mockPost(url: string, data?: any): AxiosResponse<any> {
-  if (url.includes("/auth/login"))
+  if (url.includes("/auth/login")) {
+    _loggedInEmail = data?.email || 'admin@cecb.gov.in';
     return mockResponse({ access_token: DEMO_TOKEN });
+  }
   if (url.includes("/copilot/query")) {
     const { session_id, query } = data || {};
     if (!copilotSessions[session_id]) copilotSessions[session_id] = [];

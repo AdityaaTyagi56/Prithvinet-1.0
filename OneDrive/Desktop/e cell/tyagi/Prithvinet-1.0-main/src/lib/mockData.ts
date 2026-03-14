@@ -282,13 +282,37 @@ export function getCopilotResponse(query: string): string {
   return COPILOT_RESPONSES['default'];
 }
 
-// ─── Demo user ──────────────────────────────────────────────
-export const DEMO_USER = {
-  id: 'usr-demo-001',
-  email: 'admin@cecb.gov.in',
-  role: 'super_admin',
-  region_office_id: 'ro-1',
+// ─── Demo users (role-based) ────────────────────────────────
+export const DEMO_USERS: Record<string, { id: string; email: string; name: string; role: string; designation: string; region_office_id?: string }> = {
+  'admin@cecb.gov.in': {
+    id: 'usr-001', email: 'admin@cecb.gov.in', name: 'Admin',
+    role: 'admin', designation: 'System Administrator',
+    region_office_id: 'ro-hq',
+  },
+  'member-secretary@cecb.gov.in': {
+    id: 'usr-002', email: 'member-secretary@cecb.gov.in', name: 'Dr. R. K. Sharma',
+    role: 'member_secretary', designation: 'Member Secretary, CECB',
+    region_office_id: 'ro-hq',
+  },
+  'ro.raipur@cecb.gov.in': {
+    id: 'usr-003', email: 'ro.raipur@cecb.gov.in', name: 'Sh. Anil Verma',
+    role: 'regional_officer', designation: 'Regional Officer, Raipur',
+    region_office_id: 'ro-raipur',
+  },
+  'ro.bhilai@cecb.gov.in': {
+    id: 'usr-004', email: 'ro.bhilai@cecb.gov.in', name: 'Sh. Pradeep Mishra',
+    role: 'regional_officer', designation: 'Regional Officer, Bhilai',
+    region_office_id: 'ro-bhilai',
+  },
 };
+
+export function getDemoUser(email?: string) {
+  if (email && DEMO_USERS[email]) return DEMO_USERS[email];
+  return DEMO_USERS['admin@cecb.gov.in'];
+}
+
+// Keep backward-compat
+export const DEMO_USER = DEMO_USERS['admin@cecb.gov.in'];
 
 export const DEMO_TOKEN = 'demo-jwt-token-prithvinet-2026';
 
