@@ -111,22 +111,59 @@ async def seed_db():
         session.add_all(industries)
         await session.flush()
 
-        # 4. Create real monitoring locations only (no synthetic Stack placeholders)
+        # 4. Create real monitoring locations covering Chhattisgarh hubs
         locations = [
             MonitoringLocation(
-                name="Central Station",
+                name="Central Station Raipur",
                 location="21.2514,81.6296",
+                coordinates="21.2514, 81.6296",
                 type=LocationType.air,
                 region_id=ro.id,
                 iot_device_id="iot_001",
             ),
             MonitoringLocation(
-                name="Bharat Steel",
-                location="21.2315,81.6521",
+                name="Bharat Steel Bhilai",
+                location="21.1923,81.3508",
+                coordinates="21.1923, 81.3508",
                 type=LocationType.air,
                 industry_id=industries[0].id,
                 region_id=ro.id,
                 iot_device_id="iot_002",
+            ),
+            MonitoringLocation(
+                name="Korba Power Hub",
+                location="22.3595,82.7501",
+                coordinates="22.3595, 82.7501",
+                type=LocationType.air,
+                region_id=ro.id,
+            ),
+            MonitoringLocation(
+                name="Bilaspur SECL Zone",
+                location="22.0796,82.1390",
+                coordinates="22.0796, 82.1390",
+                type=LocationType.air,
+                region_id=ro.id,
+            ),
+            MonitoringLocation(
+                name="Raigarh Jindal Zone",
+                location="21.8974,83.3966",
+                coordinates="21.8974, 83.3966",
+                type=LocationType.air,
+                region_id=ro.id,
+            ),
+            MonitoringLocation(
+                name="Ambikapur Surguja",
+                location="23.1197,83.1950",
+                coordinates="23.1197, 83.1950",
+                type=LocationType.air,
+                region_id=ro.id,
+            ),
+            MonitoringLocation(
+                name="Jagdalpur South Bastar",
+                location="19.0775,82.0240",
+                coordinates="19.0775, 82.0240",
+                type=LocationType.air,
+                region_id=ro.id,
             ),
         ]
         session.add_all(locations)
