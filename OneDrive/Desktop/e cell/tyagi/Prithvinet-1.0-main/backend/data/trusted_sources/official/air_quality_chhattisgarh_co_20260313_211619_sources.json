@@ -1,0 +1,12 @@
+{
+  "name": "air_quality_chhattisgarh_co",
+  "resource_id": "3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69",
+  "provider": "data.gov.in",
+  "filters": {
+    "state": "Chhattisgarh",
+    "pollutant_id": "CO"
+  },
+  "generated_at_utc": "2026-03-13T21:18:02.520395+00:00",
+  "row_count": 10,
+  "output_csv": "/Users/adityatyagi/Downloads/Prithvinet-1.0-main/backend/data/trusted_sources/official/air_quality_chhattisgarh_co_20260313_211619.csv"
+}

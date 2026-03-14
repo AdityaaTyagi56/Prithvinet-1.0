@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+29,Bilaspur,India,13-03-2026 15:00:00,22.08815,82.13737,69,20,NO2,Chhattisgarh,"Mangala, Bilaspur - NTPC"
+NA,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,NA,NA,NO2,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+42,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,59,24,NO2,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+32,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,43,28,NO2,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+21,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,33,15,NO2,Chhattisgarh,"Krishak Nagar, Raipur - CECB"
+62,Milupara,India,13-03-2026 15:00:00,22.1910172,83.5197009,94,24,NO2,Chhattisgarh,"Govt. Higher Secondary School, Milupara - CECB"
+38,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,73,16,NO2,Chhattisgarh,"Rampur, Korba - CECB"
+57,Kunjemura,India,13-03-2026 15:00:00,22.126650,83.483212,95,20,NO2,Chhattisgarh,"OP Jindal School, Kunjemura - CECB"
+33,Raipur,India,13-03-2026 15:00:00,21.371751,81.664929,65,16,NO2,Chhattisgarh,"Siltara Phase-II, Raipur - CECB"
+30,Chhal,India,13-03-2026 15:00:00,22.118125,83.140608,55,15,NO2,Chhattisgarh,"Nawapara SECL Colony, Chhal - CECB"

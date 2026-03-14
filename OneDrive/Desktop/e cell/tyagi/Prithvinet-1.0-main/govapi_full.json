@@ -1,0 +1,226 @@
+{
+    "index_name": "3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69",
+    "title": "Real time Air Quality Index from various locations",
+    "desc": "Real time Air Quality Index from various locations",
+    "org_type": "Central",
+    "org": [
+        "Ministry of Environment, Forest and Climate Change",
+        "Central Pollution Control Board"
+    ],
+    "sector": [
+        "Environment and Forest",
+        "Industrial Air Pollution",
+        "Residential Air Pollution",
+        "Vehicular Air Pollution"
+    ],
+    "source": "data.gov.in",
+    "catalog_uuid": "a3e7afc6-b799-4ede-b143-8e074b27e062",
+    "visualizable": "1",
+    "active": "1",
+    "created": 1470249000,
+    "updated": 1773398317,
+    "created_date": "2016-04-08T00:00:00Z",
+    "updated_date": "2026-03-13T10:38:37Z",
+    "external_ws": 0,
+    "external_ws_url": "",
+    "target_bucket": {
+        "index": "air_quality",
+        "type": "3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69"
+    },
+    "field": [
+        {
+            "name": "country",
+            "id": "country",
+            "type": "keyword"
+        },
+        {
+            "name": "state",
+            "id": "state",
+            "type": "keyword"
+        },
+        {
+            "name": "city",
+            "id": "city",
+            "type": "keyword"
+        },
+        {
+            "name": "station",
+            "id": "station",
+            "type": "keyword"
+        },
+        {
+            "name": "last_update",
+            "id": "last_update",
+            "type": "keyword"
+        },
+        {
+            "name": "latitude",
+            "id": "latitude",
+            "type": "keyword"
+        },
+        {
+            "name": "longitude",
+            "id": "longitude",
+            "type": "keyword"
+        },
+        {
+            "name": "pollutant_id",
+            "id": "pollutant_id",
+            "type": "keyword"
+        },
+        {
+            "name": "pollutant_min",
+            "id": "min_value",
+            "type": "keyword"
+        },
+        {
+            "name": "pollutant_max",
+            "id": "max_value",
+            "type": "keyword"
+        },
+        {
+            "name": "pollutant_avg",
+            "id": "avg_value",
+            "type": "keyword"
+        }
+    ],
+    "message": "Resource lists",
+    "version": "2.2.0",
+    "status": "ok",
+    "total": 96,
+    "count": 10,
+    "limit": 10,
+    "offset": "0",
+    "records": [
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Bhilai",
+            "station": "32Bungalows, Bhilai - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.194815",
+            "longitude": "81.314770",
+            "pollutant_id": "NO2",
+            "min_value": "28",
+            "max_value": "43",
+            "avg_value": "32"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Bhilai",
+            "station": "32Bungalows, Bhilai - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.194815",
+            "longitude": "81.314770",
+            "pollutant_id": "NH3",
+            "min_value": "1",
+            "max_value": "2",
+            "avg_value": "1"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Bhilai",
+            "station": "32Bungalows, Bhilai - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.194815",
+            "longitude": "81.314770",
+            "pollutant_id": "SO2",
+            "min_value": "3",
+            "max_value": "5",
+            "avg_value": "4"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Bhilai",
+            "station": "Civic Center, Bhilai - Bhilai Steel Plant",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.185571",
+            "longitude": "81.343175",
+            "pollutant_id": "SO2",
+            "min_value": "7",
+            "max_value": "9",
+            "avg_value": "8"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Chhal",
+            "station": "Nawapara SECL Colony, Chhal - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "22.118125",
+            "longitude": "83.140608",
+            "pollutant_id": "PM10",
+            "min_value": "56",
+            "max_value": "279",
+            "avg_value": "125"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Raipur",
+            "station": "AIIMS, Raipur - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.258815",
+            "longitude": "81.578979",
+            "pollutant_id": "OZONE",
+            "min_value": "5",
+            "max_value": "21",
+            "avg_value": "8"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Raipur",
+            "station": "Bhatagaon New ISBT, Raipur - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.219665",
+            "longitude": "81.630094",
+            "pollutant_id": "PM10",
+            "min_value": "24",
+            "max_value": "108",
+            "avg_value": "69"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Raipur",
+            "station": "Krishak Nagar, Raipur - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.237755",
+            "longitude": "81.705301",
+            "pollutant_id": "NH3",
+            "min_value": "2",
+            "max_value": "2",
+            "avg_value": "2"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Raipur",
+            "station": "Siltara Phase-II, Raipur - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "21.371751",
+            "longitude": "81.664929",
+            "pollutant_id": "PM10",
+            "min_value": "57",
+            "max_value": "158",
+            "avg_value": "109"
+        },
+        {
+            "country": "India",
+            "state": "Chhattisgarh",
+            "city": "Tumidih",
+            "station": "OP Jindal Industrial Park, Tumidih - CECB",
+            "last_update": "13-03-2026 15:00:00",
+            "latitude": "22.06631475",
+            "longitude": "83.33820077",
+            "pollutant_id": "CO",
+            "min_value": "24",
+            "max_value": "118",
+            "avg_value": "59"
+        }
+    ]
+}
