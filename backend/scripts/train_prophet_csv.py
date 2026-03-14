@@ -27,11 +27,13 @@ import pandas as pd
 from prophet import Prophet
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "trusted_sources"
+AQI_LOGS_DIR = Path(__file__).resolve().parents[1] / "data" / "aqi_logs"
 MODEL_DIR = Path(__file__).resolve().parents[1] / "ml_models"
 
-# Read all project trusted-source CSVs
+# Read all project trusted-source CSVs and newly fetched AQI logs
 CSV_GLOBS = [
     str(DATA_DIR / "*.csv"),
+    str(AQI_LOGS_DIR / "*.csv"),
 ]
 
 MIN_POINTS = 200  # minimum hourly points to attempt training

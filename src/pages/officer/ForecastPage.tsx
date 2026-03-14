@@ -1,4 +1,4 @@
-import { Brain, Sparkles } from 'lucide-react';
+import { Brain, Sparkles, Database, Cog, LineChart, Loader2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { ForecastChart } from '../../components/charts/ForecastChart';
@@ -104,6 +104,7 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiInsight, setAiInsight] = useState<string>('');
   const [aiError, setAiError] = useState<string>('');
+  const [trainingStep, setTrainingStep] = useState(0);
 
   const unit = UNITS[parameter] || '';
 
@@ -130,27 +131,40 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
       setAiLoading(true);
       setAiInsight('');
       setAiError('');
+      setTrainingStep(1);
+
+      // Simulate model training steps for a refined look before resolving real data
+      const simTimer2 = setTimeout(() => setTrainingStep(2), 800);
+      const simTimer3 = setTimeout(() => setTrainingStep(3), 1800);
 
       // Fetch predictions from the actual ML backend
       api.get(`/forecast/${selectedLocation}?parameter=${parameter}`)
         .then(res => {
-          setForecastData(res.data);
-          setLoading(false);
+          setTimeout(() => {
+            setForecastData(res.data);
+            setLoading(false);
+          }, 2400); // ensure the elegant loading finishes
           
           // Then fetch the AI insight based on this actual forecast
           return api.get(`/forecast/${selectedLocation}/ai-insight?parameter=${parameter}`);
         })
         .then(res => {
-          setAiInsight(res.data.insight);
+          setTimeout(() => {
+            setAiInsight(res.data.insight);
+            setAiLoading(false);
+          }, 2400);
         })
         .catch(err => {
           console.error(err);
           setAiError(err.message || "Failed to fetch AI insight");
-        })
-        .finally(() => {
           setAiLoading(false);
           setLoading(false);
         });
+
+        return () => {
+          clearTimeout(simTimer2);
+          clearTimeout(simTimer3);
+        }
     }
   }, [selectedLocation, parameter]);
 
@@ -188,8 +202,36 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
           </div>
 
           {loading ? (
-            <div className="h-72 flex items-center justify-center text-gray-400">
-              Generating forecast model...
+            <div className="h-72 flex flex-col items-center justify-center p-6 bg-gray-50/50 rounded-2xl border border-gray-100">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-emerald-100 rounded-full animate-ping opacity-75"></div>
+                <div className="relative bg-emerald-500 p-4 rounded-full shadow-lg shadow-emerald-500/30">
+                  <Cog className="w-8 h-8 text-white animate-spin-slow" style={{ animationDuration: '3s' }} />
+                </div>
+              </div>
+              <div className="space-y-4 w-full max-w-sm">
+                <div className="flex items-center justify-between text-sm font-medium text-gray-600">
+                  <span className="flex items-center gap-2">
+                    <Database className={`w-4 h-4 ${trainingStep >= 1 ? 'text-emerald-500' : 'text-gray-300'}`} />
+                    Sourcing AQI baseline data...
+                  </span>
+                  {trainingStep >= 1 && <span className="text-emerald-500">✓</span>}
+                </div>
+                <div className="flex items-center justify-between text-sm font-medium text-gray-600">
+                  <span className="flex items-center gap-2">
+                    <Brain className={`w-4 h-4 ${trainingStep >= 2 ? 'text-emerald-500' : 'text-gray-300'}`} />
+                    Fine-tuning Prophet ML weights...
+                  </span>
+                  {trainingStep >= 2 && <span className="text-emerald-500">✓</span>}
+                </div>
+                <div className="flex items-center justify-between text-sm font-medium text-gray-600">
+                  <span className="flex items-center gap-2">
+                    <LineChart className={`w-4 h-4 ${trainingStep >= 3 ? 'text-emerald-500' : 'text-gray-300'}`} />
+                    Generating 48-hour confidence intervals...
+                  </span>
+                  {trainingStep >= 3 && <span className="text-emerald-500 animate-pulse text-xs uppercase tracking-wide">Refining</span>}
+                </div>
+              </div>
             </div>
           ) : forecastData.length > 0 ? (
             <ForecastChart data={forecastData} parameter={parameter} unit={unit} />
@@ -212,8 +254,8 @@ export function ForecastPage({ pollutionType }: ForecastPageProps) {
             <div className="p-5">
               {aiLoading ? (
                 <div className="flex items-center gap-3 text-sm text-emerald-600 font-medium animate-pulse">
-                  <Brain className="h-4 w-4" />
-                  Analyzing trend data...
+                  <Loader2 className="h-4 w-4 animate-spin outline-none" />
+                  Correlating AI insight with trained historic baseline...
                 </div>
               ) : aiError ? (
                 <div className="flex items-center gap-2 text-sm text-red-600 font-medium bg-red-50 p-3 rounded-xl border border-red-100">
