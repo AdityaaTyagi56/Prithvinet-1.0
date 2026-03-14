@@ -279,6 +279,18 @@ function mockGet(
     return mockResponse(getComplianceMetrics(type));
   }
 
+  // Forecast Insight
+  const insightMatch = url.match(/\/forecast\/([^/]+)\/ai-insight/);
+  if (insightMatch) {
+    const qIdx = url.indexOf("?");
+    const params = qIdx >= 0 ? new URLSearchParams(url.slice(qIdx)) : new URLSearchParams();
+    const parameter = params.get("parameter") || "PM2.5";
+    
+    return mockResponse({
+      insight: `**Predicted ${parameter} Trends**\n- Based on Prophet ML analysis, ${parameter} is expected to fluctuate within 10-15% of the district median over the next 48 hours.\n- High-confidence clustering shows diurnal spiking during peak traffic hours (7-9 AM, 6-8 PM).\n- Secondary peak predicted tomorrow evening at 20:00 hrs due to expected surface temperature inversion.\n\n**Risk & Action Alert**\n- Peak predicted values are approaching moderate risk thresholds. Continue standard compliance checks.\n- Ensure heavy industry emission filters remain active during predicted thermal inversion windows.`
+    });
+  }
+
   // Forecast
   const forecastMatch = url.match(/\/forecast\/([^?]+)/);
   if (forecastMatch) {
