@@ -14,7 +14,7 @@ import subprocess
 import sys
 import time
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 # Allow importing from the backend package
@@ -110,9 +110,11 @@ def records_to_csv_rows(records: list) -> list:
         # Parse timestamp
         ts = ""
         if ts_raw:
+            # The government API provides times in IST (UTC+5:30)
+            ist_tz = timezone(timedelta(hours=5, minutes=30))
             for fmt in ("%d-%m-%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y %H:%M:%S"):
                 try:
-                    dt = datetime.strptime(ts_raw, fmt).replace(tzinfo=timezone.utc)
+                    dt = datetime.strptime(ts_raw, fmt).replace(tzinfo=ist_tz)
                     ts = dt.isoformat()
                     break
                 except ValueError:
