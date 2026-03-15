@@ -1,0 +1,24 @@
+{
+  "location_id": "0895affe-1800-45f6-95f4-03a7bf1f1746",
+  "location_name": "32Bungalows, Bhilai",
+  "parameter": "PM2.5",
+  "n_training_points": 4344,
+  "trained_at": "2026-03-14T21:05:52.654135+00:00",
+  "model_version": "prophet-quality-v2",
+  "prophet_kwargs": {
+    "changepoint_prior_scale": "0.15",
+    "seasonality_prior_scale": "15.0",
+    "seasonality_mode": "multiplicative",
+    "yearly_seasonality": "False",
+    "weekly_seasonality": "True",
+    "daily_seasonality": "True",
+    "interval_width": "0.95"
+  },
+  "cv_metrics": {
+    "mae": 22.135,
+    "rmse": 27.283,
+    "mape": 0.37236,
+    "coverage": 0.812,
+    "n_cv_windows": 44
+  }
+}

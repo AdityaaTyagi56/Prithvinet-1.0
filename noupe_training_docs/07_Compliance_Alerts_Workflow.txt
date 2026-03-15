@@ -1,0 +1,18 @@
+PrithviNet: Alerts and Compliance Workflow
+
+The old siloed approach leads to non-compliance by industries and delayed reporting. PrithviNet revolutionizes this via automated thresholding.
+
+Prescribed Limits:
+- Limits are configured at an administrative level (e.g., PM2.5 > 60 is flagged, PM10 > 100 is flagged).
+
+Alert Types:
+1. Limit Exceedance Alerts:
+- Triggered automatically via backend state checks when an IoT sensor or API hook pushes reading data higher than the designated upper bounds.
+- System shifts statuses from green (Safe) to red (Hazardous).
+
+2. Missing Report Reminders:
+- Tracks when industries or local stations fail to ping the database within their expected temporal window. Automated reminders are sent.
+
+Tracking & Response:
+- Non-compliance Tracking Dashboard: Allows Regional Officers to view a ranked list of the worst local offenders.
+- Escalation Workflow to Authorities: Repeated infractions lead to a logged "Incident" and trigger email/notification escalations to state authorities to apply consequences or dispatch a manual monitoring team.

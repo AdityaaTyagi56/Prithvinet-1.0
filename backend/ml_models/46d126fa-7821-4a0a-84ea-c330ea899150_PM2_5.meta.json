@@ -1,0 +1,24 @@
+{
+  "location_id": "46d126fa-7821-4a0a-84ea-c330ea899150",
+  "location_name": "Siltara Phase-II, Raipur",
+  "parameter": "PM2.5",
+  "n_training_points": 4344,
+  "trained_at": "2026-03-14T21:12:56.249570+00:00",
+  "model_version": "prophet-quality-v2",
+  "prophet_kwargs": {
+    "changepoint_prior_scale": "0.15",
+    "seasonality_prior_scale": "15.0",
+    "seasonality_mode": "multiplicative",
+    "yearly_seasonality": "False",
+    "weekly_seasonality": "True",
+    "daily_seasonality": "True",
+    "interval_width": "0.95"
+  },
+  "cv_metrics": {
+    "mae": 21.094,
+    "rmse": 25.661,
+    "mape": 0.35405,
+    "coverage": 0.823,
+    "n_cv_windows": 44
+  }
+}

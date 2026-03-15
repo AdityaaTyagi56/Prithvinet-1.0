@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+42,Bhilai,India,13-03-2026 15:00:00,21.185571,81.343175,68,24,PM10,Chhattisgarh,"Civic Center, Bhilai - Bhilai Steel Plant"
+147,Milupara,India,13-03-2026 15:00:00,22.1910172,83.5197009,211,73,PM10,Chhattisgarh,"Govt. Higher Secondary School, Milupara - CECB"
+160,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,500,58,PM10,Chhattisgarh,"Urja Nagar, Korba - CECB"
+69,Raipur,India,13-03-2026 15:00:00,21.219665,81.630094,108,24,PM10,Chhattisgarh,"Bhatagaon New ISBT, Raipur - CECB"
+109,Raipur,India,13-03-2026 15:00:00,21.371751,81.664929,158,57,PM10,Chhattisgarh,"Siltara Phase-II, Raipur - CECB"
+125,Chhal,India,13-03-2026 15:00:00,22.118125,83.140608,279,56,PM10,Chhattisgarh,"Nawapara SECL Colony, Chhal - CECB"
+71,Raipur,India,13-03-2026 15:00:00,21.237755,81.705301,117,43,PM10,Chhattisgarh,"Krishak Nagar, Raipur - CECB"
+167,Tumidih,India,13-03-2026 15:00:00,22.06631475,83.33820077,229,55,PM10,Chhattisgarh,"OP Jindal Industrial Park, Tumidih - CECB"
+29,Bhilai,India,13-03-2026 15:00:00,21.194815,81.314770,38,17,PM10,Chhattisgarh,"32Bungalows, Bhilai - CECB"
+215,Kunjemura,India,13-03-2026 15:00:00,22.126650,83.483212,405,82,PM10,Chhattisgarh,"OP Jindal School, Kunjemura - CECB"

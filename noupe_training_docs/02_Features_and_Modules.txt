@@ -1,0 +1,27 @@
+Title: PrithviNet Features & Platform Modules
+Context: Detailed breakdown of the technical features, pages, and capabilities of the PrithviNet application.
+
+# 1. Real-Time Pollution Mapping (GIS)
+PrithviNet features an interactive Leaflet-powered geographic map that displays real-time live readings of various pollutants. 
+- The map utilizes heatmap overlays to visually represent pollution hotspots.
+- Users can toggle between different pollutant views (AQI, PM2.5, NO2, SO2).
+- Clicking on a map marker shows detailed readings for a specific monitoring station or industrial plant.
+
+# 2. AI Forecasting & Predictive Modeling
+The platform leverages machine learning models (Prophet algorithms trained on official state datasets) to predict future pollution trends.
+- Planners can view time-series forecasts for NO2, SO2, and PM2.5 to anticipate smog events or unsafe environmental conditions.
+
+# 3. Anomaly & Alert System
+PrithviNet actively monitors incoming sensor data against strict threshold limits defined by the CECB.
+- Continuous backend workers scan for spikes.
+- If a factory or region exceeds safe pollutant limits, an Alert is generated.
+- Alerts are categorized by severity (Warning, Critical).
+- Compliance Officers receive these alerts on their dashboard for immediate action.
+
+# 4. Dashboard Interfaces
+- **Public Dashboard:** Unrestricted view of air quality parameters.
+- **Officer Dashboard:** Prioritizes active alerts, pending inspections, and specific industry compliance records.
+- **Admin Dashboard:** Manages users, geographic regions, platform settings, and overarching compliance rules.
+
+# 5. Live Readings (WebSocket/SSE)
+The application streams data in real-time using modern persistent connections, meaning the graphs and charts update automatically without the user having to refresh the page when new sensor data arrives.

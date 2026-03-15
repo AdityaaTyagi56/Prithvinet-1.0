@@ -1,0 +1,18 @@
+PrithviNet: Forecasting and Predictive Models
+
+An integral part of the Innovation Challenge module is projecting the immediate environmental future.
+
+Multi-step Forecasting Scope: 
+- Designed to predict environmental parameters strictly for the next 24 to 72 hours.
+- Used to foresee bad air/water events before the citizen population is directly harmed.
+
+Output Requirements:
+1. Point Forecasts:
+- Exact predicted values (e.g., "At 14:00 tomorrow, PM2.5 will hit 115 ug/m3").
+2. Uncertainty Estimates:
+- Statistical confidence intervals (e.g., "± 10 ug/m3" or "85% confidence").
+
+Methodologies embedded in the architecture:
+- Time-series modeling based on the historical logs stored in `backend/data/aqi_logs/`.
+- Factors in diurnal patterns (the natural up-and-down of temperature/sunlight/traffic throughout a 24-hour cycle).
+- Displayed natively in the Web Interface within Comparison Charts and Trend Analysis panels.

@@ -1,0 +1,18 @@
+PrithviNet: AI Assisted Compliance Copilot
+
+PrithviNet embeds a conversational AI agent designed specifically for advanced queries regarding environment interventions. As a requirement of PS01, Noupe (the chatbot) must understand Structural Models / Causal Graphs combining emissions, meteorology, and pollution data, as well as Learned Surrogate models.
+
+Core Capabilities the AI must handle:
+- Natural Language querying over CSV/Database statistics.
+- Hypothetical Interventions (Counterfactuals).
+
+Primary Scenarios outlined in CECB PS01:
+Scenario 1: Emission Adjustments
+Query: "If industry X reduces emissions of pollutant Y by 30 percent, what is the expected change in regional risk over the next week?"
+Expected Logic: The AI correlates Industry X's current output levels, extrapolates a 30% cut, references the current predictive 7-day model for the local geo-tagged region, and provides an estimate (e.g., "The AQI will likely drop from 180 to 145 over 7 days").
+
+Scenario 2: Festival / Periodic Shutdowns
+Query: "What happens if the top high risk units are temporarily shut down during a festival period?"
+Expected Logic: The AI identifies the "Top High Risk Units" in the database by highest average exceedance, simulates a 100% emission reduction from those coordinates for the specific festival days, and presents the delta. 
+
+The AI should act strictly as an "AI driven compliance assistant" and anomaly detector, relying heavily on existing trends and the 24-72 hour forecasts.

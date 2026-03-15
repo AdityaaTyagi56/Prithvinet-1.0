@@ -1,0 +1,24 @@
+{
+  "location_id": "42f69854-4031-4d88-9841-11a76165c22a",
+  "location_name": "Civic Center, Bhilai",
+  "parameter": "SO2",
+  "n_training_points": 4344,
+  "trained_at": "2026-03-14T21:11:44.785803+00:00",
+  "model_version": "prophet-quality-v2",
+  "prophet_kwargs": {
+    "changepoint_prior_scale": "0.15",
+    "seasonality_prior_scale": "15.0",
+    "seasonality_mode": "multiplicative",
+    "yearly_seasonality": "False",
+    "weekly_seasonality": "True",
+    "daily_seasonality": "True",
+    "interval_width": "0.95"
+  },
+  "cv_metrics": {
+    "mae": 6.33,
+    "rmse": 7.925,
+    "mape": 0.39223,
+    "coverage": 0.918,
+    "n_cv_windows": 44
+  }
+}

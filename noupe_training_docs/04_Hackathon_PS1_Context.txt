@@ -1,0 +1,12 @@
+PrithviNet: Background & Problem Statement Context
+Hackathon Problem Statement-1 (PS 01)
+Client: CECB (Chhattisgarh Environment Conservation Board)
+
+Background:
+State Pollution Control Boards and Environment Departments monitor environmental parameters such as air quality, water quality, and noise levels across industries, cities, and monitoring stations. Currently, data collection, reporting, compliance checks, and alerts are fragmented across spreadsheets, manual reports, and siloed systems. This leads to delayed reporting, non-compliance by industries, poor public transparency, and limited real-time decision making. The Environment Department has outlined core administrative modules such as on-boarding industries, regional offices, monitoring units, prescribed limits, reporting, and alerts in its existing system wireframes.
+
+Problem Statement:
+Design and build "PrithviNet", a digital platform that enables real-time environmental monitoring, automated compliance tracking, predictive analytics, and intelligent alerts for Air, Water, and Noise pollution across regions and industries. 
+
+Goal:
+There is a need for a smart, scalable, real-time, and citizen-aware environmental monitoring ecosystem.

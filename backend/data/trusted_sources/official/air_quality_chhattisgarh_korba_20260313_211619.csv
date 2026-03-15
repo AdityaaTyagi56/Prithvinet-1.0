@@ -1,0 +1,11 @@
+avg_value,city,country,last_update,latitude,longitude,max_value,min_value,pollutant_id,state,station
+38,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,73,16,NO2,Chhattisgarh,"Rampur, Korba - CECB"
+35,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,98,11,CO,Chhattisgarh,"Rampur, Korba - CECB"
+191,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,500,44,PM2.5,Chhattisgarh,"Urja Nagar, Korba - CECB"
+1,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,1,1,NH3,Chhattisgarh,"Urja Nagar, Korba - CECB"
+1,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,1,1,NH3,Chhattisgarh,"Rampur, Korba - CECB"
+48,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,91,6,SO2,Chhattisgarh,"Rampur, Korba - CECB"
+160,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,500,58,PM10,Chhattisgarh,"Urja Nagar, Korba - CECB"
+161,Korba,India,13-03-2026 15:00:00,22.368195,82.746431,288,27,PM2.5,Chhattisgarh,"Rampur, Korba - CECB"
+19,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,32,9,SO2,Chhattisgarh,"Urja Nagar, Korba - CECB"
+32,Korba,India,13-03-2026 15:00:00,22.348441,82.549611,62,14,CO,Chhattisgarh,"Urja Nagar, Korba - CECB"
